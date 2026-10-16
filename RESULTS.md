@@ -90,3 +90,41 @@ fortfarande spela roll i spelbanor med mer rörelse och dynamiska ljus (inte tes
 - Prova fas 1-variablerna i spelbanor (inte bara öppningsfilmen).
 - Himmel (skyboxarna är 256x256: uppskalning/utbyte), vatten (27 vätsketexturer -> Remix-material), partiklar.
 - Finjustera kartljusens styrka/radie per ljustyp (`falloff`, `cap`, `_cone` används inte än).
+
+## Uppföljning: ljusnycklar, himmel och vatten
+
+### Kartljus: `cap`, `falloff`, `_cone`
+Anachronox ljusnycklar är inte dokumenterade någonstans (ArghRad har `_cap` = tak för ljusstyrkan;
+hogsy/chronon: "_cone ... size of light for spotlights", standard 10). `tools/bsp2lights.py` använder nu en
+tumregel: styrka = min(`light`, `cap`) / clamp(`falloff`, 0.25, 4); `_cone` med känd riktning (mot `target`
+eller från `angle`/`angles`) blir spotljus (145 st i spelet). QindieGL:s `maplights` läser riktning + konvinkel
+(valfria fält 9–12) och sätter Remix-shaping. Resultat i Rowdy's: något mörkare, samma ljusfördelning
+(vänster utan kartljus, mitten råa värden, höger tumregeln):
+
+![kartljus: av / råa / tumregel](docs/img/cmp-heur.jpg)
+
+### Texturhashar utan Remix-fångst
+- QindieGL `DumpTextures = 1` (gren `texdump`) räknar Remix texturhash (XXH3_64 av mip 0 i D3D-format,
+  som i dxvk-remix `d3d9_common_texture.cpp`) och sparar bilden som `<hash>.tga`. Kontroll: vinevi1:s hashar
+  i `rtx.conf` finns i dumpen (51 UI, 26 dekaler, 15 himmel, …).
+- Dumpade bilder är exakt originalfilerna, så `tools/remixhash.py` räknar hashen direkt från spelets
+  bildfiler (BGRA, alfa 255 utan alfakanal). Kontroll: 49 av vinevi1:s 53 himmelshashar.
+- `rtx.skyBoxTextures` utökad från 53 till 103 (alla himmelssidor), så Remix känner igen fler himlar.
+
+### Himmel
+21 skyboxar i `GRAPHICS.dat` `sky\` (111 sidor 256×256, 15 platshållare 16×16). Uppskalade ×4 med
+Real-ESRGAN (realesrgan-ncnn-vulkan). Stjärnhimlar blev **sämre** (stjärnorna försvinner), så bara ljusa
+himlar ersätts: 62 sidor från 14 himlar (sunder, blue, forest, home, outside, …) i `hd_sky.usda`
+(DXT1 med mipmaps). Introt visar bara stjärnhimlar, så de ersatta himlarna är inte sedda i spelet än.
+
+### Vatten och andra vätskor
+25 vätsketexturer (`SURF_WARP`) i banorna; 23 går att hasha (2 `proc_lava*` genereras medan spelet kör).
+`liquids.usda` ger material efter typ: vatten genomskinligt (`AperturePBR_Translucent`, IOR 1.33),
+slem/avlopp blankt, lava och kristaller självlysande. Uppskalade ×4. Laddas av Remix (loggen), men
+**inte sett i spelet**: vätskorna finns först i senare banor (Limbus, Levant, Hive, …).
+
+![vätsketexturerna](docs/img/liquids.jpg)
+
+Bygga lokalt (speldata committas inte): `tools/adat.py extract … 'sky*'` och vätsketexturerna ur
+TEXTURES.dat, uppskala till PNG, sedan `tools/make_layers.py <mod> --sky-src … --sky-hd … --liq-src … --liq-hd …`
+och lägg `subLayers = [@./hd_sky.usda@, @./liquids.usda@]` i `mod.usda`.

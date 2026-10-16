@@ -1,0 +1,631 @@
+#usda 1.0
+(
+    upAxis = "Y"
+)
+
+over "RootNode"
+{
+    over "Looks"
+    {
+        over "mat_38C9D9AB9E5FE246"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/balsunbk.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_D397492282656452"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/balsundn.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_759ACEB2E1988135"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/balsunft.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_B8B653E0B78365F6"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/balsunlf.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_AE8301B9B2573EDB"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/balsunrt.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_BE210AECD0748AAE"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/balsunup.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_FAAC8404E2A046A7"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/blue3bk.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_CCA93DAE6A3A5F0C"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/blue3ft.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_8B1DE79382ACECF5"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/blue3lf.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_EEEA2F5704BBC4B8"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/blue3rt.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_A8C56C7271E66264"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/blue3up.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_40493F5DC7741B34"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/blue4bk.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_005D579C521FEE70"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/blue4dn.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_BC4E63A265397194"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/blue4ft.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_755EAF05CA37B74E"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/blue4lf.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_200632FABC952220"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/blue4rt.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_E45DB0E3965AB1A3"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/blue4up.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_8C6D634E659DE6EF"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/bluebk.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_46E9673058247F00"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/bluedbk.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_B03CC4C13DBD6EB8"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/bluedlf.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_FDB67898AC1A9488"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/bluedrt.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_FD64BCFB21C1C90A"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/blueft.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_83D5DD361AE47964"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/bluelf.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_76CAE5829C178396"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/blueup.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_E64D5AB1113EDF02"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/boombk.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_1872CCB909DEFF09"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/boomdn.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_0AA7905F3CC4C3F1"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/boomft.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_4784EE3C210E7FA3"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/boomlf.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_8EE81FA6F03777E9"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/boomrt.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_D088C60010737604"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/conedn.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_6446B498D279A71B"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/e1m1ft.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_A4A04FB5AD0B05B1"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/e1m1lf.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_2818D5554155ED17"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/forestbk.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_E19C4C45138924F5"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/forestdn.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_180621EFD268D142"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/forestft.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_AD60C7FAA0B690DE"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/forestlf.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_CC97EAC82E70E3AD"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/forestrt.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_66A183B93926B135"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/forestup.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_D42BAF352D603033"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/homebk.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_CF6422FAA08B7533"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/homeft.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_ED43C346F6998CCE"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/homelf.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_54602E4C7D0F4F97"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/homert.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_C30F7452CBA49930"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/homeup.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_EB23119DEEEABDFC"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/outsidebk.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_0E47E87FE97850C7"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/outsidedn.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_931D7F327BD14F38"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/outsideft.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_A3842DD549B2CC5F"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/outsidelf.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_67D9811DE6C1161C"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/outsidert.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_407830FB834D23D7"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/outsideup.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_CF326193EA1EE939"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/sunder2bk.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_C1A797E4921BD528"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/sunder2dn.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_BD8E02FD2DF78EBE"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/sunder2ft.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_B8D360F5A4955554"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/sunder2lf.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_5E16DBF075230502"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/sunder2rt.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_207DBE12CA5303A3"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/sunder2up.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_1042DCA04F9B2646"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/sunderbk.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_EDA1137EE926041E"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/sunderdn.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_DE66B17D15B152CE"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/sunderft.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_EDBC48F47FEFF5AC"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/sunderlf.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_CC8D1C7D1916C976"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/sunderrt.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_590A4DCECCEE36DD"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/whitlf.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+        over "mat_8655691D03E4F5AB"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/sky/whitup.dds@ (
+                    colorSpace = "auto"
+                )
+            }
+        }
+
+    }
+}
