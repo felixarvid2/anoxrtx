@@ -53,9 +53,15 @@ def grab(d):
     w = game_window(d)
     if not w:
         return None
-    g = w.get_geometry()
-    raw = w.get_image(0, 0, g.width, g.height, X.ZPixmap, 0xffffffff)
-    return Image.frombytes('RGB', (g.width, g.height), raw.data, 'raw', 'BGRX')
+    # read what is on screen (root window, cropped to the game window): reading the game window itself can
+    # return black when the Remix bridge presents through another X window
+    g = w.get_geometry(); root = d.screen().root
+    t = w.translate_coords(root, 0, 0)
+    x, y = max(0, -t.x), max(0, -t.y)
+    sw, sh = d.screen().width_in_pixels, d.screen().height_in_pixels
+    ww, hh = min(g.width, sw - x), min(g.height, sh - y)
+    raw = root.get_image(x, y, ww, hh, X.ZPixmap, 0xffffffff)
+    return Image.frombytes('RGB', (ww, hh), raw.data, 'raw', 'BGRX')
 
 
 def brightness(im):
@@ -173,7 +179,23 @@ def wait_menu(limit=180):
 def cmd_timeline(prefix, *times):
     """fresh start -> New Universe/Normal, no skipping; shots at fixed seconds after the difficulty click"""
     wait_menu()
-    cmd_move(-3000, -3000, 60); cmd_move(268, 139, 30); cmd_press(); time.sleep(3)
+    d = display.Display()
+    for attempt in range(4):                # the menu may not take input yet (slow texture loading)
+        time.sleep(4 + 4 * attempt)
+        from PIL import ImageChops, ImageStat
+        before = grab(d)
+        cmd_move(-3000, -3000, 60); cmd_move(268, 139, 30); cmd_press()
+        changed = False
+        for _ in range(20):                 # the difficulty panel fades in; wait up to 10 s for a change
+            time.sleep(0.5)
+            after = grab(d)
+            diff = sum(ImageStat.Stat(ImageChops.difference(before.resize((160, 100)), after.resize((160, 100)))).mean) / 3
+            if diff > 2.0:
+                changed = True; break
+        if changed:
+            time.sleep(2)
+            break
+        print('New Universe click not taken, retrying')
     cmd_move(0, 13, 5); cmd_press()
     t0 = time.time()
     for t in times:
@@ -187,10 +209,26 @@ def cmd_chord(*names):
     codes = [d.keysym_to_keycode(XK.string_to_keysym(n)) for n in names]
     for c in codes:
         xtest.fake_input(d, X.KeyPress, c); d.sync(); time.sleep(0.15)
-    time.sleep(0.3)
+    time.sleep(float(os.environ.get('ANOX_HOLD', '0.3')))
     for c in reversed(codes):
         xtest.fake_input(d, X.KeyRelease, c); d.sync(); time.sleep(0.1)
     print('chord', '+'.join(names))
+
+
+def cmd_sendkey(*names):
+    """like chord, but XSendEvent straight to the game window (focus-independent)"""
+    from Xlib.protocol import event
+    d = display.Display(); w = game_window(d); root = d.screen().root
+    codes = [d.keysym_to_keycode(XK.string_to_keysym(n)) for n in names]
+    state = 0
+    for etype in (X.KeyPress, X.KeyRelease):
+        seq = codes if etype == X.KeyPress else list(reversed(codes))
+        for c in seq:
+            ev = (event.KeyPress if etype == X.KeyPress else event.KeyRelease)(
+                time=X.CurrentTime, root=root, window=w, same_screen=1, child=X.NONE,
+                root_x=0, root_y=0, event_x=0, event_y=0, state=state, detail=c)
+            w.send_event(ev, propagate=True); d.sync(); time.sleep(0.2)
+    print('sendkey', '+'.join(names))
 
 
 def cmd_key(*names):
