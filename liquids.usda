@@ -1,0 +1,378 @@
+#usda 1.0
+(
+    upAxis = "Y"
+)
+
+over "RootNode"
+{
+    over "Looks"
+    {
+        # ballotine/slime01a
+        over "mat_4E1FE7654DF82200"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/liquids/ballotine__slime01a.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:reflection_roughness_constant = 0.15
+                float inputs:metallic_constant = 0
+            }
+        }
+
+        # baseanox/sewagesolid
+        over "mat_90B2F79A89725452"
+        {
+            over "Shader"
+            {
+                uniform asset info:mdl:sourceAsset = @AperturePBR_Translucent.mdl@
+                uniform token info:mdl:sourceAsset:subIdentifier = "AperturePBR_Translucent"
+                uniform token info:implementationSource = "sourceAsset"
+                float inputs:ior_constant = 1.33
+                asset inputs:transmittance_texture = @./hd/liquids/baseanox__sewagesolid.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:transmittance_measurement_distance = 64
+                bool inputs:thin_walled = 0
+            }
+        }
+
+        # bricks/shitplain2
+        over "mat_7528B8FD76806DAB"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/liquids/bricks__shitplain2.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:reflection_roughness_constant = 0.15
+                float inputs:metallic_constant = 0
+            }
+        }
+
+        # bricks2/brownwater
+        over "mat_60387B1FB25DE4DD"
+        {
+            over "Shader"
+            {
+                uniform asset info:mdl:sourceAsset = @AperturePBR_Translucent.mdl@
+                uniform token info:mdl:sourceAsset:subIdentifier = "AperturePBR_Translucent"
+                uniform token info:implementationSource = "sourceAsset"
+                float inputs:ior_constant = 1.33
+                asset inputs:transmittance_texture = @./hd/liquids/bricks2__brownwater.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:transmittance_measurement_distance = 64
+                bool inputs:thin_walled = 0
+            }
+        }
+
+        # bricks2/dpoo3
+        over "mat_4BC8630C4EED11D4"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/liquids/bricks2__dpoo3.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:reflection_roughness_constant = 0.15
+                float inputs:metallic_constant = 0
+            }
+        }
+
+        # detta/fluid
+        over "mat_7151153A3B0D1811"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/liquids/detta__fluid.dds@ (
+                    colorSpace = "auto"
+                )
+                bool inputs:enable_emission = 1
+                asset inputs:emissive_mask_texture = @./hd/liquids/detta__fluid.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:emissive_intensity = 3
+                float inputs:reflection_roughness_constant = 0.6
+            }
+        }
+
+        # hive/cryspurp1
+        over "mat_03814F474B135148"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/liquids/hive__cryspurp1.dds@ (
+                    colorSpace = "auto"
+                )
+                bool inputs:enable_emission = 1
+                asset inputs:emissive_mask_texture = @./hd/liquids/hive__cryspurp1.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:emissive_intensity = 2
+                float inputs:reflection_roughness_constant = 0.6
+            }
+        }
+
+        # hive/ycrystl
+        over "mat_B1BBE061B7A766B0"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/liquids/hive__ycrystl.dds@ (
+                    colorSpace = "auto"
+                )
+                bool inputs:enable_emission = 1
+                asset inputs:emissive_mask_texture = @./hd/liquids/hive__ycrystl.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:emissive_intensity = 2
+                float inputs:reflection_roughness_constant = 0.6
+            }
+        }
+
+        # krapton/p6
+        over "mat_CEC0329AC6DB0675"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/liquids/krapton__p6.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:reflection_roughness_constant = 0.15
+                float inputs:metallic_constant = 0
+            }
+        }
+
+        # krapton/purglow
+        over "mat_14EB9D52F5C10E7B"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/liquids/krapton__purglow.dds@ (
+                    colorSpace = "auto"
+                )
+                bool inputs:enable_emission = 1
+                asset inputs:emissive_mask_texture = @./hd/liquids/krapton__purglow.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:emissive_intensity = 3
+                float inputs:reflection_roughness_constant = 0.6
+            }
+        }
+
+        # levant/lava
+        over "mat_983FE87FC8C7C386"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/liquids/levant__lava.dds@ (
+                    colorSpace = "auto"
+                )
+                bool inputs:enable_emission = 1
+                asset inputs:emissive_mask_texture = @./hd/liquids/levant__lava.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:emissive_intensity = 12
+                float inputs:reflection_roughness_constant = 0.6
+            }
+        }
+
+        # levant/levant3a
+        over "mat_4E423F65FE663811"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/liquids/levant__levant3a.dds@ (
+                    colorSpace = "auto"
+                )
+                bool inputs:enable_emission = 1
+                asset inputs:emissive_mask_texture = @./hd/liquids/levant__levant3a.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:emissive_intensity = 6
+                float inputs:reflection_roughness_constant = 0.6
+            }
+        }
+
+        # limbus/crysblu
+        over "mat_F3951704DB8FDA92"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/liquids/limbus__crysblu.dds@ (
+                    colorSpace = "auto"
+                )
+                bool inputs:enable_emission = 1
+                asset inputs:emissive_mask_texture = @./hd/liquids/limbus__crysblu.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:emissive_intensity = 2
+                float inputs:reflection_roughness_constant = 0.6
+            }
+        }
+
+        # limbus/water3b
+        over "mat_EB60C44C4DEC1A45"
+        {
+            over "Shader"
+            {
+                uniform asset info:mdl:sourceAsset = @AperturePBR_Translucent.mdl@
+                uniform token info:mdl:sourceAsset:subIdentifier = "AperturePBR_Translucent"
+                uniform token info:implementationSource = "sourceAsset"
+                float inputs:ior_constant = 1.33
+                asset inputs:transmittance_texture = @./hd/liquids/limbus__water3b.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:transmittance_measurement_distance = 64
+                bool inputs:thin_walled = 0
+            }
+        }
+
+        # limbus/water3b1
+        over "mat_779AD8D3ADE565D9"
+        {
+            over "Shader"
+            {
+                uniform asset info:mdl:sourceAsset = @AperturePBR_Translucent.mdl@
+                uniform token info:mdl:sourceAsset:subIdentifier = "AperturePBR_Translucent"
+                uniform token info:implementationSource = "sourceAsset"
+                float inputs:ior_constant = 1.33
+                asset inputs:transmittance_texture = @./hd/liquids/limbus__water3b1.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:transmittance_measurement_distance = 64
+                bool inputs:thin_walled = 0
+            }
+        }
+
+        # limbus/water3c
+        over "mat_5967C99062BFC181"
+        {
+            over "Shader"
+            {
+                uniform asset info:mdl:sourceAsset = @AperturePBR_Translucent.mdl@
+                uniform token info:mdl:sourceAsset:subIdentifier = "AperturePBR_Translucent"
+                uniform token info:implementationSource = "sourceAsset"
+                float inputs:ior_constant = 1.33
+                asset inputs:transmittance_texture = @./hd/liquids/limbus__water3c.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:transmittance_measurement_distance = 64
+                bool inputs:thin_walled = 0
+            }
+        }
+
+        # senderloung/water1
+        over "mat_773956399CDF6077"
+        {
+            over "Shader"
+            {
+                uniform asset info:mdl:sourceAsset = @AperturePBR_Translucent.mdl@
+                uniform token info:mdl:sourceAsset:subIdentifier = "AperturePBR_Translucent"
+                uniform token info:implementationSource = "sourceAsset"
+                float inputs:ior_constant = 1.33
+                asset inputs:transmittance_texture = @./hd/liquids/senderloung__water1.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:transmittance_measurement_distance = 64
+                bool inputs:thin_walled = 0
+            }
+        }
+
+        # sexmachine/trash1
+        over "mat_D94E2A7572AC17F7"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/liquids/sexmachine__trash1.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:reflection_roughness_constant = 0.15
+                float inputs:metallic_constant = 0
+            }
+        }
+
+        # tensil/h2002_sm
+        over "mat_B37DFB00B52FD633"
+        {
+            over "Shader"
+            {
+                uniform asset info:mdl:sourceAsset = @AperturePBR_Translucent.mdl@
+                uniform token info:mdl:sourceAsset:subIdentifier = "AperturePBR_Translucent"
+                uniform token info:implementationSource = "sourceAsset"
+                float inputs:ior_constant = 1.33
+                asset inputs:transmittance_texture = @./hd/liquids/tensil__h2002_sm.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:transmittance_measurement_distance = 64
+                bool inputs:thin_walled = 0
+            }
+        }
+
+        # tensil/poo
+        over "mat_7BB23DF92EFB4130"
+        {
+            over "Shader"
+            {
+                uniform asset info:mdl:sourceAsset = @AperturePBR_Translucent.mdl@
+                uniform token info:mdl:sourceAsset:subIdentifier = "AperturePBR_Translucent"
+                uniform token info:implementationSource = "sourceAsset"
+                float inputs:ior_constant = 1.33
+                asset inputs:transmittance_texture = @./hd/liquids/tensil__poo.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:transmittance_measurement_distance = 64
+                bool inputs:thin_walled = 0
+            }
+        }
+
+        # warshipbay/flshnlit
+        over "mat_236585D983746D9F"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/liquids/warshipbay__flshnlit.dds@ (
+                    colorSpace = "auto"
+                )
+                bool inputs:enable_emission = 1
+                asset inputs:emissive_mask_texture = @./hd/liquids/warshipbay__flshnlit.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:emissive_intensity = 3
+                float inputs:reflection_roughness_constant = 0.6
+            }
+        }
+
+        # warshipbay/plain3
+        over "mat_65E7A26127AD04E1"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./hd/liquids/warshipbay__plain3.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:reflection_roughness_constant = 0.15
+                float inputs:metallic_constant = 0
+            }
+        }
+
+        # waukees/h2002
+        over "mat_11F877D9CAC1DCD7"
+        {
+            over "Shader"
+            {
+                uniform asset info:mdl:sourceAsset = @AperturePBR_Translucent.mdl@
+                uniform token info:mdl:sourceAsset:subIdentifier = "AperturePBR_Translucent"
+                uniform token info:implementationSource = "sourceAsset"
+                float inputs:ior_constant = 1.33
+                asset inputs:transmittance_texture = @./hd/liquids/waukees__h2002.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:transmittance_measurement_distance = 64
+                bool inputs:thin_walled = 0
+            }
+        }
+
+    }
+}
