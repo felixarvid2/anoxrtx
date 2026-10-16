@@ -32,3 +32,13 @@ I raise roughness and metalicity of character materials to the max to mask the p
    - Add `presentSemaphoreEnabled = False` to `.trex/bridge.conf`.
    - Use a QindieGL `opengl32.dll` built for Linux/MinGW (https://github.com/felixarvid2/QindieGL, see `linux/`)
      or the official one, and launch with `WINEDLLOVERRIDES="opengl32=n,b;d3d9=n,b" %command%`.
+
+5. Chuncki's 4x AI upscaled level textures (ModDB, v0.9.2) together with this mod:
+   - Install as its readme says (Steam version: rename `anoxdata/TEXTURES.dat` instead of `textures.pac`; the
+     pack's patched `ref_gl.dll` keeps all exports, QindieGL's hooks keep working).
+   - All level textures get new Remix hashes, so material overrides and texture lists in `mod.usda`,
+     `liquids.usda` and `rtx.conf` must be rewritten to the new hashes:
+     `python3 tools/rehash_textures.py apply maps/chuncki_texmap.tsv rtx.conf rtx-remix/mods/anoxrt/mod.usda rtx-remix/mods/anoxrt/liquids.usda`
+     (the map was made with `tools/rehash_textures.py map anoxdata/TEXTURES.dat.orig anoxdata/textures ...`).
+     Without this, e.g. the glowing light strips in Rowdy's bar go dark.
+   - Note: Steam "verify files" restores TEXTURES.dat; rename it again afterwards.
