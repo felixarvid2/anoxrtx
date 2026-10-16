@@ -85,11 +85,18 @@ def cmd_start():
 
 
 def cmd_stop():
-    for p in pids(r'[S]:.steamapps.common.Anachronox'):
-        try:
-            os.kill(p, 15)
-        except ProcessLookupError:
-            pass
+    """kill the game and the Remix bridge server and wait until they are really gone"""
+    for sig, wait in ((15, 30), (9, 10)):
+        for p in pids(r'[S]:.steamapps.common.Anachronox'):
+            try:
+                os.kill(p, sig)
+            except ProcessLookupError:
+                pass
+        end = time.time() + wait
+        while time.time() < end and pids(r'[S]:.steamapps.common.Anachronox'):
+            time.sleep(1)
+        if not pids(r'[S]:.steamapps.common.Anachronox'):
+            break
     time.sleep(3)
 
 
@@ -119,6 +126,7 @@ def cmd_click(fx, fy):
 def cmd_move(dx, dy, steps='20'):
     """relative pointer motion in small steps (the game reads deltas, Quake 2 style)"""
     d = display.Display()
+    d.change_pointer_control(accel=(1, 1), threshold=0)   # no acceleration: deltas must be exact
     n = int(steps); dx, dy = float(dx) / n, float(dy) / n
     ax = ay = 0.0
     for _ in range(n):
@@ -137,7 +145,7 @@ def cmd_press():
 
 def cmd_to_rowdys():
     """from a fresh start: skip the intro, New Universe, skip the opening cutscenes -> Boots in Rowdy's bar"""
-    time.sleep(20); cmd_key('Escape'); time.sleep(6)                  # intro -> main menu
+    wait_menu()                                                       # intro -> main menu
     cmd_move(-3000, -3000, 60); cmd_move(268, 139, 30); cmd_press()   # New Universe (game coords 268,139)
     time.sleep(3)
     cmd_move(0, 13, 5); cmd_press()                                  # difficulty: Normal (game coords 268,152)
@@ -148,9 +156,22 @@ def cmd_to_rowdys():
     print('should be in Rowdy\'s now')
 
 
+def wait_menu(limit=180):
+    """press Esc every few seconds until the main (Fatima) menu is on screen; intro length varies"""
+    d = display.Display()
+    end = time.time() + limit
+    while time.time() < end:
+        cmd_key('Escape')                   # Esc toggles the menu, and it fades in over a few seconds
+        for _ in range(15):
+            time.sleep(1)
+            if is_menu(grab(d)):
+                time.sleep(2); return True
+    print('main menu not found'); return False
+
+
 def cmd_timeline(prefix, *times):
     """fresh start -> New Universe/Normal, no skipping; shots at fixed seconds after the difficulty click"""
-    time.sleep(20); cmd_key('Escape'); time.sleep(6)
+    wait_menu()
     cmd_move(-3000, -3000, 60); cmd_move(268, 139, 30); cmd_press(); time.sleep(3)
     cmd_move(0, 13, 5); cmd_press()
     t0 = time.time()
