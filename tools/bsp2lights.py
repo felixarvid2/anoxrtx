@@ -4,17 +4,23 @@
 usage: bsp2lights.py OUTDIR MAP.bsp...      -> OUTDIR/<map>.lights  (one per map)
 
 Line format (read by QindieGL's `maplights` option, see QindieGL rmx_maplights.cpp):
-    x y z r g b intensity radius [dx dy dz cone_degrees]
+    x y z r g b intensity radius [dx dy dz cone_degrees] [style N]
+    sun dx dy dz r g b intensity angle_degrees
 x y z: light origin in game units; r g b: _color (0..1, default white); radius: sphere radius in game
 units; the optional last four fields make a spotlight (direction + cone angle).
 
-Anachronox' own light keys are not documented; this uses a heuristic (tune with the options):
-  intensity = min(light, cap) / clamp(falloff, 0.25, 4) ** FALLOFF_EXP
-    `cap`     like ArghRad's _cap: a ceiling on the light's brightness (default: none)
-    `falloff` larger = shorter reach (values 0.1 .. 5 in the game data; default 1)
+Intensity (calibrated against the maps' baked lightmaps with tools/lightcal.py, low confidence):
+  intensity = light^2 / L_REF (L_REF = 300, so a default 300 light keeps intensity 300)
+  The measured reach is ~0.4-0.9 x `light`; an inverse-square Remix light reaches a fixed brightness at a
+  distance proportional to sqrt(intensity), so intensity ~ light^2 keeps the relative reach.
+  `cap` showed no effect in the lightmaps and `falloff` no consistent one, so both are ignored.
   spotlight when `_cone` is set and a direction is known: towards the `target` entity, or from
   `angle` (yaw; -1 up, -2 down) / `angles` (pitch yaw roll); cone angle = _cone, clamped to 5..90.
-Only `light` entities are written. Global brightness: maplights_scale in QindieGL.ini.
+Only `light` entities are written; lights with spawnflags & 1 (START_OFF) are skipped, `style` 1..11
+(Quake 2 flicker/pulse styles) is written so QindieGL animates it. A `sun` line comes from worldspawn
+_sun_angle ("yaw pitch", pitch < 0 = sun above the horizon), _sun_color, _sun_light (ArghRad keys; the
+stronger of _sun and _sun2): direction = from the sun into the scene, intensity = _sun_light / SUN_DIV.
+Global brightness: maplights_scale in QindieGL.ini.
 
 Put the files in <Anachronox>/rtx-remix/maplights/.
 """
@@ -25,7 +31,9 @@ spec = importlib.util.spec_from_file_location('bspinfo', os.path.join(here, 'bsp
 bspinfo = importlib.util.module_from_spec(spec); spec.loader.exec_module(bspinfo)
 
 RADIUS = 4.0
-FALLOFF_EXP = 1.0
+L_REF = 300.0
+SUN_DIV = 200.0
+SUN_ANGLE = 2.0
 
 
 def angles_dir(keys):
@@ -61,7 +69,7 @@ def main():
         print(__doc__); sys.exit(1)
     out = sys.argv[1]
     os.makedirs(out, exist_ok=True)
-    total = 0; spots = 0
+    total = 0; spots = 0; animated = 0; startoff = 0; suns = 0
     for path in sys.argv[2:]:
         info = bspinfo.info(path)
         name = os.path.splitext(info['map'])[0].lower()
@@ -73,11 +81,7 @@ def main():
             if l['classname'] != 'light':
                 continue
             k = l['keys']; x, y, z = l['origin']; r, g, b = l['color']
-            inten = l['light']
-            if 'cap' in k:
-                inten = min(inten, fnum(k['cap'], inten))
-            fo = min(4.0, max(0.25, fnum(k.get('falloff'), 1.0)))
-            inten = inten / fo ** FALLOFF_EXP
+            inten = l['light'] * l['light'] / L_REF
             row = '%.1f %.1f %.1f %.4f %.4f %.4f %g %g' % (x, y, z, r, g, b, round(inten, 2), RADIUS)
             cone = fnum(k.get('_cone') or k.get('-cone'), 0.0)
             if cone > 0:
@@ -91,11 +95,37 @@ def main():
                 if d and any(abs(c) > 1e-6 for c in d):
                     row += ' %.4f %.4f %.4f %g' % (d[0], d[1], d[2], min(90.0, max(5.0, cone)))
                     spots += 1
+            try:
+                st = int(k.get('style', '0') or 0)
+            except ValueError:
+                st = 0
+            if 1 <= st <= 11:
+                row += ' style %d' % st; animated += 1
+            if int(fnum(k.get('spawnflags'), 0)) & 1:
+                startoff += 1; continue
             rows.append(row)
+        w = ents[0] if ents else {}
+        best = None
+        for pre in ('_sun', '_sun2'):
+            if pre + '_light' in w and pre + '_angle' in w:
+                L = fnum(w[pre + '_light'], 0.0)
+                try:
+                    yaw, pitch = [float(v) for v in w[pre + '_angle'].split()[:2]]
+                except ValueError:
+                    continue
+                if best is None or L > best[0]:
+                    best = (L, yaw, pitch, bspinfo.vec(w.get(pre + '_color'), (1, 1, 1)))
+        if best and best[0] > 0:
+            L, yaw, pitch, col = best
+            p_, y_ = math.radians(pitch), math.radians(yaw)
+            fwd = (math.cos(p_) * math.cos(y_), math.cos(p_) * math.sin(y_), -math.sin(p_))   # towards the sun
+            rows.append('sun %.4f %.4f %.4f %.4f %.4f %.4f %g %g' % (-fwd[0], -fwd[1], -fwd[2], col[0], col[1], col[2],
+                                                                  round(L / SUN_DIV, 3), SUN_ANGLE))
+            suns += 1
         with open(os.path.join(out, name + '.lights'), 'w') as f:
             f.write('\n'.join(rows) + '\n')
         total += len(rows) - 2
-    print('%d maps, %d lights (%d spotlights) -> %s' % (len(sys.argv) - 2, total, spots, out))
+    print('%d maps, %d lights (%d spotlights, %d animated, %d start-off skipped, %d suns) -> %s' % (len(sys.argv) - 2, total, spots, animated, startoff, suns, out))
 
 
 if __name__ == '__main__':
