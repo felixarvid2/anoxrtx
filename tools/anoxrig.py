@@ -12,6 +12,7 @@ Runs against an X display (default :7, a nested `Xwayland :7 -geometry 1920x1200
   anoxrig.py press                 left button press/release at the current position
   anoxrig.py to-rowdys             fresh start -> New Universe -> skip cutscenes (about 4 min)
   anoxrig.py timeline PFX T...     fresh start -> New Universe, shots at T seconds (deterministic scenes)
+  anoxrig.py chord K1 K2 ...        hold keys together (e.g. Control_L Shift_L q = Remix capture)
   anoxrig.py key NAME [NAME...]    press keys (X keysym names: Return, Escape, F1, a, ...)
   anoxrig.py wait-bright [SECS]    wait until the window is not black (menu/level visible)
   anoxrig.py log                   show the interesting Remix / QindieGL log lines
@@ -178,6 +179,18 @@ def cmd_timeline(prefix, *times):
     for t in times:
         time.sleep(max(0, t0 + float(t) - time.time()))
         cmd_shot('%s-%03d' % (prefix, int(float(t))))
+
+
+def cmd_chord(*names):
+    """hold several keys together, e.g. chord Control_L Shift_L q (Remix capture hotkey)"""
+    d = display.Display()
+    codes = [d.keysym_to_keycode(XK.string_to_keysym(n)) for n in names]
+    for c in codes:
+        xtest.fake_input(d, X.KeyPress, c); d.sync(); time.sleep(0.15)
+    time.sleep(0.3)
+    for c in reversed(codes):
+        xtest.fake_input(d, X.KeyRelease, c); d.sync(); time.sleep(0.1)
+    print('chord', '+'.join(names))
 
 
 def cmd_key(*names):

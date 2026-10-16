@@ -48,7 +48,19 @@ fortfarande spela roll i spelbanor med mer rörelse och dynamiska ljus (inte tes
   men öppningsfilmen har inga dynamiska ljus, så **funktionen är inte prövad**. Avstängd som standard.
   Testa i en bana med strid/explosioner med `gl_flashblend 1`, `remixapi = 1`, `flashblendlights = 1` och
   `exposeRemixApi = True` i `.trex/bridge.conf`; loggen visar `flashblend light #N` när den slår till.
-- **Ljus ur banfilerna**: inte gjort (MAPS.dat är komprimerad).
+- **Ljus ur banfilerna** (`maplights`, QindieGL-gren `maplights`): fungerar.
+  - `tools/adat.py` packar upp spelets ADAT-arkiv (format från hogsy/chronon); `tools/bspinfo.py` läser
+    ljus, himmel och vätskeytor ur BSP-filerna (16 068 `light` i 97 av 98 banor, 21 skyboxar i
+    `GRAPHICS.dat` `sky\`, 27 vätsketexturer); `tools/bsp2lights.py` skriver en `.lights`-fil per bana.
+  - Ljus i `mod.usda` under `/RootNode/lights` fungerar **inte**: Remix (1.5.2, `rtx_mod_usd.cpp`) läser
+    dem bara som ersättning av spelets egna ljus. En Remix-fångst för att hitta en ankarmesh gick inte att
+    starta från riggen (Remix får inga syntetiska tangenttryck), så ljusen läggs in via Remix API i stället:
+    QindieGL fångar `ref_gl.dll!ref_SetMapName`, läser `rtx-remix/maplights/<bana>.lights` och ritar
+    ljusen varje bildruta. Kräver `remixapi = 1`, `maplights = 1` i `[game.anox]` och
+    `exposeRemixApi = True` i `.trex/bridge.conf`.
+  - Rowdy's (71 ljus), vänster utan, mitten `maplights_scale = 100`, höger 1000:
+
+    ![kartljus av / 100 / 1000](docs/img/cmp-maplights.jpg)
 
 ## Fas 3: geometri
 
@@ -76,4 +88,5 @@ fortfarande spela roll i spelbanor med mer rörelse och dynamiska ljus (inte tes
 
 - Testa `flashblendlights` i en bana med dynamiska ljus.
 - Prova fas 1-variablerna i spelbanor (inte bara öppningsfilmen).
-- Ljus ur banfilerna, himmel, vatten, partiklar (fas 2.3, 3.3, fas 4).
+- Himmel (skyboxarna är 256x256: uppskalning/utbyte), vatten (27 vätsketexturer -> Remix-material), partiklar.
+- Finjustera kartljusens styrka/radie per ljustyp (`falloff`, `cap`, `_cone` används inte än).
