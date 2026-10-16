@@ -23,3 +23,12 @@ The last line prevents green background leaking through geometry.
 
 3. The game relies a lot on id tech phong shading. So most character models have bad normals.
 I raise roughness and metalicity of character materials to the max to mask the problem. 
+
+4. Linux (Steam + Proton, tested with GE-Proton 11-9 and an RTX 5060):
+   - `rtx.conf` disables DLSS frame generation (`rtx.dlfg.enable`, `rtx.dlfg.enablePresentMetering`); with it on,
+     the Remix server hangs inside Present under Wine.
+   - `rtx.useNewGuiInputMethod = False`: Remix' new GUI input method puts an invisible (alpha 0) layered window
+     over the game. Wine/X11 shows it as an opaque white window, so the game looks white after the first frame.
+   - Add `presentSemaphoreEnabled = False` to `.trex/bridge.conf`.
+   - Use a QindieGL `opengl32.dll` built for Linux/MinGW (https://github.com/felixarvid2/QindieGL, see `linux/`)
+     or the official one, and launch with `WINEDLLOVERRIDES="opengl32=n,b;d3d9=n,b" %command%`.
