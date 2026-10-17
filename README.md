@@ -49,3 +49,6 @@ I raise roughness and metalicity of character materials to the max to mask the p
    keep alpha channels separately, then
    `tools/hd_layer.py rtx-remix/mods/anoxrt models_hd <upscaled dir> <alpha dir>` and add
    `@./models_hd.usda@` to mod.usda's subLayers. (2112 textures, ~430 MB of DDS; not committed.)
+   Tiny posters/signs (32x64) come out smeared from ESRGAN; redraw them with FLUX.1 img2img in a local
+   ComfyUI before building the layer: `tools/flux_refine.py maps/posters_flux.tsv <upscaled dir> <flux dir>`
+   (denoise 0.65, ~2 min per texture on an 8 GB GPU), then copy the results over the upscaled images.
