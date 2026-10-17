@@ -1,11 +1,12 @@
 # Remix hash (original objects/posterN.tga) <TAB> FLUX description; used by tools/flux_refine.py
+# Posters with game text: first paint the old (invented) text over with flat colour, then --denoise 0.75
 0xE5FA076FC83E7D49	ornate tribal propaganda poster, red and green carved idol emblem, title text at top, gritty sci-fi city wall
-0x3FCAA96A70046C88	retro sci-fi advertisement poster, green frame, beige panel with brown blobs and a round gauge dial
-0x2776DA98769DDFA6	faded travel poster, pastel sky, pink tropical bird of paradise flower, purple text banner
+0x3FCAA96A70046C88	retro sci-fi advertisement poster, green frame, orange metal plate with knobs and bold black text "MYSTECH", a round gauge dial
+0x2776DA98769DDFA6	faded retro travel poster, pastel sky, pink tropical bird of paradise, bold purple text "VISIT SUNDER"
 0x51A4B6092B612E9C	art deco alien insect mask poster, green and teal symmetrical creature on dark background, gold crown
-0xC954BA0182D29B05	retro sci-fi movie poster with bold title text "FLYLORD", orange bug-eyed alien head, teal wings, black background
+0xC954BA0182D29B05	retro sci-fi movie poster with bold title text "FLYLORD", orange bug-eyed alien head, teal wings, black background, small white text "NOW SHOWING" at the bottom
 0x214A96995D6B57DA	movie poster with vertical title text "FIREWALKER", fiery orange flames, dark red circle
-0x5D97BAA38FEE3130	retro comic style advertisement poster, muscular orange arm reaching, blue background, robot head, text banner
-0x3CCA9A700FD02943	propaganda poster, giant red eye inside a white gear cog on black background, red stripe with text at bottom
-0x39C6E83029CC2501	weathered torn poster, faded salmon red and teal paint, peeling paper, small text
+0x5D97BAA38FEE3130	retro comic style propaganda poster, a muscular orange arm and fist reaching across a blue sky, no face, no person, cream banner with bold black text "JOIN THE BRICKS"
+0x3CCA9A700FD02943	propaganda poster, giant red eye inside a white gear cog on black background, red text "THE CITY IS WATCHING", red banner at the bottom with bold white text "OBEY"
+0x39C6E83029CC2501	weathered torn political poster, faded salmon red and teal paint, peeling paper, bold black text "VOTE DEMOCRATUS"
 0xD06758BE9E9090A5	neon nightclub poster, red and purple lights, glowing hearts, vertical neon sign text
