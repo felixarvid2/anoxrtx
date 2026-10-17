@@ -16,6 +16,24 @@
 >
 > Game data (textures, generated DDS files) is not included; the tools build it from your own game files.
 
+## Quick install (Linux, Steam + Proton)
+
+```
+git clone https://github.com/felixarvid2/anoxrtx && cd anoxrtx
+tools/install.sh --chuncki ~/Downloads/Chunckis_4x_AI_upscaled_Anachronox_textures_v.0.9.2.zip --steam
+```
+This builds everything from your own game files: QindieGL (cloned and built with
+[llvm-mingw](https://github.com/mstorsjo/llvm-mingw), or `--qindiegl opengl32.dll`), the RTX Remix runtime
+(`--remix stock`, default, or `--remix plus`), configs, map lights, HD skies/liquids/model textures (Real-ESRGAN,
+downloaded), emissive and PBR materials, the lava material and mod.usda, and sets the Steam launch options
+(`--steam`; select GE-Proton for the game yourself). Chuncki's pack has to be downloaded from ModDB first; without
+it the level textures stay original and the PBR/lava layers are skipped. Steps can be run on their own, e.g.
+`tools/install.sh lights mod`; `--help` lists them. Replaced files go to `<game>/anoxrtx-backup/`.
+`tools/toggle.sh off|on` switches between RTX Remix and the plain game. Needs: python3 (venv), git, cmake, a
+Vulkan-capable NVIDIA GPU; the first full run takes a while (texture upscaling).
+
+The sections below describe what the installer does, step by step.
+
 Notes:
 
 1. For game to display correctly install:
