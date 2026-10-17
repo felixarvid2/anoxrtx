@@ -4,7 +4,7 @@
 Runs against an X display (default :7, a nested `Xwayland :7 -geometry 1920x1200 -decorate`; put
 `DISPLAY=:7` in the game's Steam launch options). Needs python-xlib and Pillow.
 
-  anoxrig.py start                 launch via Steam, wait until Remix has a camera
+  anoxrig.py start [SECS]          launch via Steam, wait for visible content (default 180 s)
   anoxrig.py stop                  kill the game (and the Remix bridge server)
   anoxrig.py shot NAME             save the game window to shots/NAME.png, print brightness
   anoxrig.py click FX FY           left click at a fraction of the game window (0..1)
@@ -14,10 +14,11 @@ Runs against an X display (default :7, a nested `Xwayland :7 -geometry 1920x1200
   anoxrig.py timeline PFX T...     fresh start -> New Universe, shots at T seconds (deterministic scenes)
   anoxrig.py chord K1 K2 ...        hold keys together (e.g. Control_L Shift_L q = Remix capture)
   anoxrig.py key NAME [NAME...]    press keys (X keysym names: Return, Escape, F1, a, ...)
+  anoxrig.py hold SECS KEY...      focus game and hold keys for movement (e.g. hold 2 w)
   anoxrig.py wait-bright [SECS]    wait until the window is not black (menu/level visible)
   anoxrig.py log                   show the interesting Remix / QindieGL log lines
 """
-import os, re, subprocess, sys, time, glob
+import math, os, re, signal, subprocess, sys, time
 
 GAME = os.path.expanduser('~/.steam/debian-installation/steamapps/common/Anachronox')
 LOGS = os.path.join(GAME, 'rtx-remix', 'logs')
@@ -77,18 +78,68 @@ def is_menu(im):
     return r < 18 and 22 <= g <= 34 and 22 <= b <= 34
 
 
-def cmd_start():
-    for f in glob.glob(os.path.join(LOGS, '*.log')):
-        os.remove(f)
-    subprocess.Popen(['steam', 'steam://rungameid/242940'], stdout=subprocess.DEVNULL,
-                     stderr=subprocess.DEVNULL, cwd=os.path.expanduser('~'), start_new_session=True)
+def seconds(value, maximum=None):
+    result = float(value)
+    if not math.isfinite(result) or result <= 0 or (maximum is not None and result > maximum):
+        raise ValueError('duration must be positive and finite' + (f' (at most {maximum} seconds)' if maximum else ''))
+    return result
+
+
+def read_log(path):
+    try:
+        with open(path, errors='replace') as f:
+            return f.read()
+    except OSError:
+        return ''
+
+
+def visible_content(im):
+    """Reject missing/black/flat white windows; this is not a gameplay/camera check."""
+    if im is None:
+        return False
+    extrema = im.resize((64, 40)).getextrema()
+    return max(high for low, high in extrema) > 60 and max(high - low for low, high in extrema) > 8
+
+
+def cmd_start(timeout='180'):
+    limit = seconds(timeout)
     log = os.path.join(LOGS, 'remix-dxvk.log')
-    for _ in range(180):
-        if os.path.exists(log) and 'Camera cut' in open(log, errors='replace').read():
-            print('remix camera found')
-            return
-        time.sleep(1)
-    print('timeout waiting for Remix camera')
+    previous = read_log(log)  # preserve diagnostics; ignore messages from earlier runs
+    d = display.Display()
+    try:
+        if game_window(d) is None:
+            subprocess.Popen(['steam', 'steam://rungameid/242940'], stdout=subprocess.DEVNULL,
+                             stderr=subprocess.DEVNULL, cwd=os.path.expanduser('~'), start_new_session=True)
+        end = time.monotonic() + limit
+        visible_since = None
+        camera_seen = False
+        state = 'no game window on ' + os.environ['DISPLAY']
+        while time.monotonic() < end:
+            current = read_log(log)
+            fresh = current[len(previous):] if current.startswith(previous) else current
+            previous = current
+            camera_seen |= 'Camera cut' in fresh
+            w = game_window(d)
+            if w is not None:
+                w.set_input_focus(X.RevertToParent, X.CurrentTime)
+                d.sync()
+                if visible_content(grab(d)):
+                    if visible_since is None:
+                        visible_since = time.monotonic()
+                    if time.monotonic() - visible_since >= 1:
+                        status = 'remix camera found' if camera_seen else 'camera unconfirmed'
+                        print(f'game window ready: visible content; {status}')
+                        return
+                else:
+                    visible_since = None
+                state = 'game window found, but no stable visible content (try key Escape for a black intro)'
+            else:
+                visible_since = None
+                state = 'no game window on ' + os.environ['DISPLAY']
+            time.sleep(0.5)
+        raise RuntimeError(f'start timeout after {limit:g}s: {state}; inspect logs with anoxrig.py log')
+    finally:
+        d.close()
 
 
 def cmd_stop():
@@ -203,16 +254,58 @@ def cmd_timeline(prefix, *times):
         cmd_shot('%s-%03d' % (prefix, int(float(t))))
 
 
-def cmd_chord(*names):
-    """hold several keys together, e.g. chord Control_L Shift_L q (Remix capture hotkey)"""
+def focus_game(d):
+    w = game_window(d)
+    if w is None:
+        raise RuntimeError('no game window on ' + os.environ['DISPLAY'])
+    w.set_input_focus(X.RevertToParent, X.CurrentTime)
+    d.sync()
+    return w
+
+
+def keycodes(d, names):
+    if not names:
+        raise ValueError('at least one key is required')
+    codes = []
+    for name in names:
+        code = int(name[2:]) if name.startswith('kc') else d.keysym_to_keycode(XK.string_to_keysym(name))
+        if not 8 <= code <= 255:
+            raise ValueError('unknown or invalid key: ' + name)
+        if code not in codes:
+            codes.append(code)
+    return codes
+
+
+def press_keys(d, codes, duration):
+    pressed = []
+    try:
+        for code in codes:
+            xtest.fake_input(d, X.KeyPress, code)
+            pressed.append(code)
+            d.sync()
+        time.sleep(duration)
+    finally:
+        for code in reversed(pressed):
+            xtest.fake_input(d, X.KeyRelease, code)
+        d.sync()
+
+
+def cmd_hold(duration, *names):
+    """Hold keys with game focus; always release them, including on interruption."""
+    limit = seconds(duration, maximum=60)
     d = display.Display()
-    codes = [d.keysym_to_keycode(XK.string_to_keysym(n)) for n in names]
-    for c in codes:
-        xtest.fake_input(d, X.KeyPress, c); d.sync(); time.sleep(0.15)
-    time.sleep(float(os.environ.get('ANOX_HOLD', '0.3')))
-    for c in reversed(codes):
-        xtest.fake_input(d, X.KeyRelease, c); d.sync(); time.sleep(0.1)
-    print('chord', '+'.join(names))
+    try:
+        codes = keycodes(d, names)  # validate the whole chord before sending anything
+        focus_game(d)
+        press_keys(d, codes, limit)
+        print('held', '+'.join(names), 'for', f'{limit:g}s')
+    finally:
+        d.close()
+
+
+def cmd_chord(*names):
+    """Hold several keys together; ANOX_HOLD preserves the existing duration override."""
+    cmd_hold(os.environ.get('ANOX_HOLD', '0.3'), *names)
 
 
 def cmd_sendkey(*names):
@@ -233,13 +326,17 @@ def cmd_sendkey(*names):
 
 def cmd_key(*names):
     d = display.Display()
-    for n in names:
-        code = int(n[2:]) if n.startswith('kc') else d.keysym_to_keycode(XK.string_to_keysym(n))  # kc49 = raw X keycode
-        if not code:
-            print('unknown key', n); continue
-        xtest.fake_input(d, X.KeyPress, code); d.sync(); time.sleep(0.08)
-        xtest.fake_input(d, X.KeyRelease, code); d.sync(); time.sleep(0.3)
-    print('keys', ' '.join(names))
+    try:
+        codes = [keycodes(d, (name,))[0] for name in names]
+        if not codes:
+            raise ValueError('at least one key is required')
+        focus_game(d)
+        for code in codes:
+            press_keys(d, [code], 0.08)
+            time.sleep(0.3)
+        print('keys', ' '.join(names))
+    finally:
+        d.close()
 
 
 def cmd_wait_bright(secs='90'):
@@ -265,9 +362,19 @@ def cmd_log():
 
 
 if __name__ == '__main__':
+    # Let finally blocks release synthetic keys when a test controller stops us.
+    def terminate(signum, frame):
+        raise SystemExit(128 + signum)
+    signal.signal(signal.SIGTERM, terminate)
     if len(sys.argv) < 2:
         print(__doc__); sys.exit(1)
     fn = globals().get('cmd_' + sys.argv[1].replace('-', '_'))
     if not fn:
         print(__doc__); sys.exit(1)
-    fn(*sys.argv[2:])
+    try:
+        fn(*sys.argv[2:])
+    except KeyboardInterrupt:
+        sys.exit(130)
+    except (RuntimeError, ValueError) as error:
+        print(error, file=sys.stderr)
+        sys.exit(1)

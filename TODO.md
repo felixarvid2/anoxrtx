@@ -13,6 +13,9 @@ Ordnat ungefär efter nytta. ✅ = klart, 🔶 = gjort men inte sett i spelet.
       `maplights_scale` (eventuellt en skala per bana).
 - [ ] **Testriggen**: fler fasta testplatser. Spara spel vid TimeMinders och lägg till ett riggkommando som
       laddar en sparfil, så att senare banor går att testa automatiskt.
+- [x] **Testriggens start och rörelse**: `start` känner igen synligt spelinnehåll trots att Remix Plus
+      inte skriver kamerameddelandet; `key`/`chord` fokuserar spelet och `hold SEK TANGENT...` håller
+      rörelsetangenter. Fokus och rörelse verifierade i nästlad Rowdy's-session 2026-10-17.
 
 ## 2. Ljus
 - [ ] **Kalibrera tumregeln för `cap`/`falloff`/`_cone`** mot banornas egna ljuskartor: BSP-filerna har
