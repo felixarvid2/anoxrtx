@@ -133,9 +133,20 @@ I raise roughness and metalicity of character materials to the max to mask the p
 nested X display `:7` (`ANOX_DISPLAY` overrides it). Follow `HANDOFF.md` to set up
 the nested session and restore Steam's launch options afterwards.
 
+For a dedicated environment:
+
+```sh
+python3 -m venv ~/.cache/anoxrtx/rig-venv
+~/.cache/anoxrtx/rig-venv/bin/pip install python-xlib Pillow
+```
+
+Use that environment's `bin/python` for the commands below.
+
 ```sh
 python tools/anoxrig.py start 90
 python tools/anoxrig.py key Escape
+python tools/anoxrig.py list-saves
+python tools/anoxrig.py load-save steamuser/1
 python tools/anoxrig.py hold 2 w
 python tools/anoxrig.py hold 1 w a
 python tools/anoxrig.py shot movement-check
@@ -156,6 +167,28 @@ and `chord` keeps the `ANOX_HOLD` duration override. Invalid keys are rejected
 before any input is sent, and held keys are released on completion, Ctrl+C, or
 SIGTERM. This fixes game movement; Remix overlay/capture hotkeys remain a
 separate, unverified input path. `move` controls the mouse, not the player.
+
+`list-saves` inspects local saves and prints each `PROFILE/SLOT`, description,
+map, and SHA-256 fingerprint. `load-save PROFILE/SLOT [SECS]` restores a chosen
+save in an already-running game (default timeout 120 seconds). Loading replaces
+the current unsaved game state. It does not write or replace save files, alter
+configs, restart Steam, or change launch options.
+
+The rig opens the developer console using the game's Alt+Shift+F10 shortcut when
+needed, submits `loadgame`, verifies a fresh console transcript, closes the
+console so the saved camera can settle, and reports position/yaw. It restores
+the previous developer-mode setting and removes its temporary console dumps.
+The console key defaults to raw X keycode 49; set `ANOX_CONSOLE_KEY` if needed.
+Recognition targets this game's default gold-text console and build footer;
+custom fonts/layouts can require adjustment. If recognition fails, no load
+command is sent. Wait for initial material loading to finish before trying it.
+
+The installed game build prints `LoadGame2: Aborted` even after restoring a
+save, so that line alone is not a failure. The rig checks the requested filename,
+restored save lumps, fresh read errors, a visible scene, and settled `viewpos`.
+Map-light reload messages alone cannot prove a save loaded, especially when
+reloading the same map. See [repeatable test locations](docs/test-locations.md)
+for baseline selection and before/after captures.
 
 Regression checks, without Steam or a running X server:
 

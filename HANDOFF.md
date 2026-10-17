@@ -60,7 +60,17 @@ The rig drives the game in a nested X server so the owner's desktop is not distu
 - `key`, `chord`, and `hold SECS KEY...` focus the game. Use `hold 2 w` for movement; short taps are
   not a navigation command. In a nested Rowdy's test, wrong focus prevented movement, while focusing
   the game and holding keys moved the logged camera. Keys are released on completion/interruption.
-  Remix overlay/capture hotkeys and repeatable navigation/save loading still need separate work.
+  Remix overlay/capture hotkeys and repeatable routes still need separate work.
+- Save loading (2026-10-17): `list-saves` lists local `PROFILE/SLOT` selectors, maps, descriptions,
+  and SHA-256 fingerprints. `load-save steamuser/1 [seconds]` uses the game's console to load a
+  slot, verifies a nonce-bounded console dump, waits for the scene to render, and records settled
+  position/yaw. It preserves save/config files and restores developer mode. Console dumps are
+  temporary. Requires a running game with initial material loading finished; see
+  `docs/test-locations.md`. Steam `-applaunch` arguments were not forwarded by this launch wrapper,
+  and the normal autoexec file did not execute, so neither is used by the rig.
+- Same-map restores need console closure before the camera settles. This game's `LoadGame2: Aborted`
+  message is emitted even after restoration; fresh filename/lump/read-error evidence and final
+  camera position are used instead. A map-light hot reload alone is not save-load evidence.
 
 ## What exists (see README.md in each repo for details)
 QindieGL options (all in `[game.anox]` of QindieGL.ini unless noted):
@@ -118,4 +128,4 @@ when started with `+map`, so it is untested. Tuning knobs: `rtx.volumetrics.fogR
 2. Weather per map with Remix Plus presets (rain/snow where the game has them).
 3. Remix variables driven by game state (cutscenes, underwater) – 2.2.
 4. Anchor meshes (4.1), anti-culling control (4.2), complete `rtx.uiTextures`/particle/beam lists (TODO.md §3).
-5. Add repeatable rig navigation/save loading; basic focused movement now works (`hold`).
+5. Add more fixed test locations and repeatable routes; focused movement (`hold`) and save loading now work.

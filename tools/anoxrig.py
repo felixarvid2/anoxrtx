@@ -15,10 +15,13 @@ Runs against an X display (default :7, a nested `Xwayland :7 -geometry 1920x1200
   anoxrig.py chord K1 K2 ...        hold keys together (e.g. Control_L Shift_L q = Remix capture)
   anoxrig.py key NAME [NAME...]    press keys (X keysym names: Return, Escape, F1, a, ...)
   anoxrig.py hold SECS KEY...      focus game and hold keys for movement (e.g. hold 2 w)
+  anoxrig.py list-saves            list local PROFILE/SLOT selectors and saved maps
+  anoxrig.py load-save SAVE [SECS] restore PROFILE/SLOT through the game console
   anoxrig.py wait-bright [SECS]    wait until the window is not black (menu/level visible)
   anoxrig.py log                   show the interesting Remix / QindieGL log lines
 """
-import math, os, re, signal, subprocess, sys, time
+import gzip, hashlib, math, os, re, signal, struct, subprocess, sys, time, uuid, zlib
+from pathlib import Path
 
 GAME = os.path.expanduser('~/.steam/debian-installation/steamapps/common/Anachronox')
 LOGS = os.path.join(GAME, 'rtx-remix', 'logs')
@@ -337,6 +340,229 @@ def cmd_key(*names):
         print('keys', ' '.join(names))
     finally:
         d.close()
+
+
+def save_info(selector):
+    match = re.fullmatch(r'([A-Za-z0-9_-]+)/([0-9]{1,9})', selector)
+    if not match:
+        raise ValueError('save must be PROFILE/SLOT (for example steamuser/1)')
+    profile, slot = match.groups()
+    slot = int(slot)
+    root = Path(GAME) / 'anoxdata/SAVE'
+    path = root / profile / f'anoxsave{slot}.sav'
+    if not path.resolve().is_relative_to(root.resolve()):
+        raise ValueError('save must stay inside anoxdata/SAVE')
+    if not path.is_file():
+        raise ValueError(f'save not found: {profile}/{slot}; use list-saves')
+    try:
+        if path.stat().st_size > 16 * 1024 * 1024:
+            raise ValueError('save is too large to inspect safely')
+        packed = path.read_bytes()
+        with gzip.open(path, 'rb') as f:
+            header = f.read(65536)  # enough for the description and current-map field, not all game state
+        if len(header) < 24 or struct.unpack_from('<I', header)[0] != 1004:
+            raise ValueError('unsupported save header')
+        length = struct.unpack_from('<I', header, 20)[0]
+        if not 1 <= length <= 4096 or 24 + length > len(header):
+            raise ValueError('invalid save description')
+        description = header[24:24 + length].rstrip(b'\0').decode('cp1252', errors='replace')
+        map_match = re.search(rb'maps/([A-Za-z0-9_-]+)\.bsp\x00', header, re.I)
+        if not map_match:
+            raise ValueError('current map not found in save header')
+    except (OSError, EOFError, struct.error, zlib.error) as error:
+        raise ValueError(f'cannot inspect save {profile}/{slot}: {error}') from error
+    return {'save': f'{profile}/{slot}', 'map': map_match[1].decode('ascii').lower(),
+            'description': ' / '.join(description.splitlines()), 'sha256': hashlib.sha256(packed).hexdigest()}
+
+
+def cmd_list_saves():
+    root = Path(GAME) / 'anoxdata/SAVE'
+    found = False
+    for path in sorted(root.glob('*/anoxsave*.sav')):
+        match = re.fullmatch(r'anoxsave([0-9]+)\.sav', path.name)
+        if not match:
+            continue
+        try:
+            info = save_info(f'{path.parent.name}/{match[1]}')
+        except ValueError as error:
+            print(error, file=sys.stderr)
+            continue
+        print(f"{info['save']}\t{info['map']}\t{info['description']}\tsha256={info['sha256']}")
+        found = True
+    if not found:
+        raise RuntimeError('no readable saves found in ' + str(root))
+
+
+def is_console(im):
+    """Recognize gold console text and its build/version footer, including translucent panels."""
+    if im is None:
+        return False
+    sample = im.resize((640, 400))
+    def gold_fraction(box):
+        region = sample.crop(box)
+        pixels = list(region.get_flattened_data() if hasattr(region, 'get_flattened_data') else region.getdata())
+        return sum(r > 60 and g > 25 and r > g * 1.1 and b < g * 0.4 for r, g, b in pixels) / len(pixels)
+    return gold_fraction((0, 0, 640, 200)) > 0.01 and gold_fraction((400, 308, 640, 324)) > 0.015
+
+
+def ensure_console(d, before_enable=None):
+    """Return whether we enabled developer mode, so the caller can turn it back off."""
+    if is_console(grab(d)):
+        return False
+    toggle = os.environ.get('ANOX_CONSOLE_KEY', 'kc49')
+    cmd_key(toggle)
+    time.sleep(0.5)
+    if is_console(grab(d)):
+        return False
+    if before_enable is not None:
+        before_enable()  # register rollback before the first key can change developer mode
+    cmd_chord('Alt_L', 'Shift_L', 'F10')  # game's built-in developer-mode toggle
+    cmd_key(toggle)
+    time.sleep(0.5)
+    if is_console(grab(d)):
+        return True
+    cmd_chord('Alt_L', 'Shift_L', 'F10')
+    raise RuntimeError('developer console not recognized; no load command sent (check ANOX_CONSOLE_KEY)')
+
+
+def console_keys(d, text):
+    """Validate text and keyboard levels before editing the current console line."""
+    result = []
+    for char in text:
+        symbol = ord(char)
+        code = d.keysym_to_keycode(symbol)
+        if not 32 <= symbol <= 126 or not 8 <= code <= 255:
+            raise ValueError('cannot type save selector with the current keyboard layout')
+        if d.keycode_to_keysym(code, 0) == symbol:
+            result.append([code])
+        elif d.keycode_to_keysym(code, 1) == symbol:
+            result.append(keycodes(d, ('Shift_L',)) + [code])
+        else:
+            raise ValueError('save selector needs an unsupported keyboard group')
+    return result
+
+
+def console_line(d, text):
+    typed = console_keys(d, text)
+    if len(text) > 240:
+        raise ValueError('console command is too long')
+    press_keys(d, keycodes(d, ('End',)), 0)
+    backspace = keycodes(d, ('BackSpace',))
+    for _ in range(1024):
+        press_keys(d, backspace, 0)
+    for codes in typed:
+        press_keys(d, codes, 0.03)
+        time.sleep(0.02)
+    press_keys(d, keycodes(d, ('Return',)), 0.08)
+
+
+def console_capture(d, commands, deadline):
+    """Read a nonce-bounded transcript, never a previous run's output."""
+    marker = 'ar_' + uuid.uuid4().hex[:12]
+    path = Path(GAME) / 'anoxdata' / (marker + '.txt')
+    if path.exists():
+        raise RuntimeError('console transcript path already exists')
+    try:
+        console_line(d, f'echo {marker};{commands};echo {marker}_done;condump {marker}.txt')
+        while time.monotonic() < deadline:
+            if path.is_file() and path.stat().st_size <= 2 * 1024 * 1024:
+                lines = path.read_text(errors='replace').splitlines()
+                lines = [line.strip() for line in lines]
+                if marker in lines and marker + '_done' in lines:
+                    start, end = lines.index(marker), lines.index(marker + '_done')
+                    if start < end:
+                        return '\n'.join(lines[start + 1:end])
+            time.sleep(0.1)
+        raise RuntimeError('timed out waiting for a fresh console transcript; no save load confirmed')
+    finally:
+        path.unlink(missing_ok=True)
+
+
+def verify_load_transcript(text, info):
+    # Console rows can wrap the absolute path. Normalize separators and join rows.
+    flat = re.sub(r'/+', '/', ''.join(text.splitlines()).replace('\\', '/')).lower()
+    profile, slot = info['save'].split('/')
+    expected = f'/save/{profile}/anoxsave{slot}.sav"'.lower()
+    if re.search(r'error:|loadgame error|gzopen failed|invalid header|unexpected.*eof|checksum failed', text, re.I):
+        raise RuntimeError('game reported a load/read error; save not confirmed')
+    if expected not in flat or not re.search(r'Parsed and distributed [1-9][0-9]* savegame lumps', text):
+        raise RuntimeError('console did not confirm the requested save and restored game data')
+    # This build's LoadGame2 success flag is never assigned: it prints "Aborted"
+    # even after the restore path. Do not confuse that broken status with read errors.
+
+
+def wait_console_closed(d):
+    # XSync only flushes the input; the game still needs a frame to execute it.
+    end = time.monotonic() + 5
+    time.sleep(0.1)
+    while time.monotonic() < end:
+        if not is_console(grab(d)):
+            return
+        time.sleep(0.1)
+    raise RuntimeError('console did not close; developer-mode restoration needs inspection')
+
+
+def cmd_load_save(selector, timeout='120'):
+    info = save_info(selector)
+    limit = seconds(timeout)
+    deadline = time.monotonic() + limit
+    d = display.Display()
+    original_debug = None
+    enabled = False
+    def remember_disabled():
+        nonlocal original_debug
+        original_debug = 0
+    try:
+        focus_game(d)
+        console_keys(d, 'loadgame ' + info['save'])  # validate the layout before changing UI state
+        enabled = ensure_console(d, before_enable=remember_disabled)
+        if enabled:
+            original_debug = 0
+        query = console_capture(d, 'debug', deadline)
+        debug = re.search(r'"debug" is "([01])"', query)
+        if not debug:
+            raise RuntimeError('cannot determine developer-mode state; no load command sent')
+        if not enabled:
+            original_debug = int(debug[1])
+        transcript = console_capture(d, 'set debug 1;loadgame ' + info['save'], deadline)
+        verify_load_transcript(transcript, info)
+        # Same-map loads leave the console open; the saved camera settles only
+        # after the scene draws again. Close it before waiting or recording viewpos.
+        if is_console(grab(d)):
+            cmd_key(os.environ.get('ANOX_CONSOLE_KEY', 'kc49'))
+        visible_since = None
+        while time.monotonic() < deadline:
+            im = grab(d)
+            if visible_content(im) and not is_console(im):
+                if visible_since is None:
+                    visible_since = time.monotonic()
+                if time.monotonic() - visible_since >= 2:
+                    break
+            else:
+                visible_since = None
+            time.sleep(0.5)
+        else:
+            raise RuntimeError('save restore reported, but no stable visible scene appeared')
+        ensure_console(d)
+        view = console_capture(d, 'viewpos', deadline)
+        pose = re.search(r'\((-?[0-9]+) (-?[0-9]+) (-?[0-9]+)\)\s*:\s*(-?[0-9]+)', view)
+        if not pose:
+            raise RuntimeError('restored scene has no confirmed camera position')
+        if save_info(selector)['sha256'] != info['sha256']:
+            raise RuntimeError('save changed during loading; capture is not reproducible')
+    finally:
+        try:
+            if original_debug is not None:
+                ensure_console(d)
+                console_line(d, f'toggleconsole;set debug {original_debug}')
+                wait_console_closed(d)
+            elif enabled:
+                if is_console(grab(d)):
+                    cmd_key(os.environ.get('ANOX_CONSOLE_KEY', 'kc49'))
+                cmd_chord('Alt_L', 'Shift_L', 'F10')
+        finally:
+            d.close()
+    print(f"loaded {info['save']} map={info['map']} viewpos=({' '.join(pose.groups()[:3])}) yaw={pose[4]} sha256={info['sha256']}")
 
 
 def cmd_wait_bright(secs='90'):

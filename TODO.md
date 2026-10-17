@@ -11,8 +11,8 @@ Ordnat ungefär efter nytta. ✅ = klart, 🔶 = gjort men inte sett i spelet.
 - [ ] 🔶 **Flashblend-ljus** (QindieGL PR #6): testa i en strid/explosion med `gl_flashblend 1`, merga om det fungerar.
 - [ ] **Kartljus i fler banor**: hittills bara jämfört i Rowdy's. Gå igenom några olika miljöer och justera
       `maplights_scale` (eventuellt en skala per bana).
-- [ ] **Testriggen**: fler fasta testplatser. Spara spel vid TimeMinders och lägg till ett riggkommando som
-      laddar en sparfil, så att senare banor går att testa automatiskt.
+- [ ] **Testriggen**: fler fasta testplatser. `list-saves` och `load-save PROFIL/PLATS` finns nu;
+      samla sparfiler vid TimeMinders för utomhusmiljö, vatten och lava. Se [testplatser](docs/test-locations.md).
 - [x] **Testriggens start och rörelse**: `start` känner igen synligt spelinnehåll trots att Remix Plus
       inte skriver kamerameddelandet; `key`/`chord` fokuserar spelet och `hold SEK TANGENT...` håller
       rörelsetangenter. Fokus och rörelse verifierade i nästlad Rowdy's-session 2026-10-17.
