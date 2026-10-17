@@ -1,6 +1,6 @@
 # Handoff: Anachronox + RTX Remix on Linux (for Codex)
 
-This file is identical in both repositories:
+Project context for the two repositories:
 - **felixarvid2/anoxrtx**: the Remix mod (configs, USD layers, tools, installer). Fork of vinevi1/anoxrtx.
   Local checkout: `/home/felix/Documents/jensen2/anoxrtx` (branch `main`).
 - **felixarvid2/QindieGL**: the OpenGL→D3D9 wrapper that makes the game Remix-compatible, with a Linux
@@ -53,8 +53,14 @@ The rig drives the game in a nested X server so the owner's desktop is not distu
    on :7, restart Steam (`DISPLAY=:1 steam -silent`). Always restore this, also when a test fails (use a trap).
 - Logs: `<game>/QindieGL.log` (MapLights, DLights, ProcTex, RTX.conf lines), `<game>/rtx-remix/logs/`
   (`remix-dxvk.log`, `bridge32.log` – "The RTX Remix Runtime has encountered an unexpected issue" = Remix crash).
-- Known rig limits: keyboard input does not move the player (so places away from a map's start point
-  cannot be reached); `start` prints "timeout waiting for Remix camera" with Remix Plus although the game runs.
+- Rig update (2026-10-17): `start [seconds]` checks stable visible game-window content rather than
+  requiring the stock runtime's `Camera cut` message. It reports camera confirmation separately,
+  preserves logs, and exits nonzero on timeout. Visible content is not proof a level is loaded;
+  a black intro may need `key Escape` from another terminal.
+- `key`, `chord`, and `hold SECS KEY...` focus the game. Use `hold 2 w` for movement; short taps are
+  not a navigation command. In a nested Rowdy's test, wrong focus prevented movement, while focusing
+  the game and holding keys moved the logged camera. Keys are released on completion/interruption.
+  Remix overlay/capture hotkeys and repeatable navigation/save loading still need separate work.
 
 ## What exists (see README.md in each repo for details)
 QindieGL options (all in `[game.anox]` of QindieGL.ini unless noted):
@@ -112,4 +118,4 @@ when started with `+map`, so it is untested. Tuning knobs: `rtx.volumetrics.fogR
 2. Weather per map with Remix Plus presets (rain/snow where the game has them).
 3. Remix variables driven by game state (cutscenes, underwater) – 2.2.
 4. Anchor meshes (4.1), anti-culling control (4.2), complete `rtx.uiTextures`/particle/beam lists (TODO.md §3).
-5. Make the rig able to move the player (would allow verifying the items above automatically).
+5. Add repeatable rig navigation/save loading; basic focused movement now works (`hold`).

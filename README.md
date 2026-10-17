@@ -34,6 +34,7 @@ Vulkan-capable NVIDIA GPU; the first full run takes a while (texture upscaling).
 
 The sections below describe what the installer does, step by step.
 
+
 Notes:
 
 1. For game to display correctly install:
@@ -125,3 +126,39 @@ I raise roughness and metalicity of character materials to the max to mask the p
    Tiny posters/signs (32x64) come out smeared from ESRGAN; redraw them with FLUX.1 img2img in a local
    ComfyUI before building the layer: `tools/flux_refine.py maps/posters_flux.tsv <upscaled dir> <flux dir>`
    (denoise 0.65, ~2 min per texture on an 8 GB GPU), then copy the results over the upscaled images.
+
+## Test rig (Linux)
+
+`tools/anoxrig.py` needs Python with `python-xlib` and Pillow. It defaults to the
+nested X display `:7` (`ANOX_DISPLAY` overrides it). Follow `HANDOFF.md` to set up
+the nested session and restore Steam's launch options afterwards.
+
+```sh
+python tools/anoxrig.py start 90
+python tools/anoxrig.py key Escape
+python tools/anoxrig.py hold 2 w
+python tools/anoxrig.py hold 1 w a
+python tools/anoxrig.py shot movement-check
+python tools/anoxrig.py stop
+```
+
+`start` waits for a mapped game window with visible, nonuniform content for at
+least one second. This works with Remix Plus even when it emits no `Camera cut`
+message. The output distinguishes visible content from a confirmed camera; it
+does not prove that a level has finished loading. Old camera messages cannot
+confirm a new run, and the rig no longer deletes logs. A timeout exits nonzero
+with the observed window state; for an intro stuck on black, send `key Escape`
+from another terminal. The default timeout is 180 seconds.
+
+`key`, `chord`, and `hold` focus the game before sending XTest keyboard input.
+Use `hold SECS KEY...` for movement (up to 60 seconds); `key` remains a short tap
+and `chord` keeps the `ANOX_HOLD` duration override. Invalid keys are rejected
+before any input is sent, and held keys are released on completion, Ctrl+C, or
+SIGTERM. This fixes game movement; Remix overlay/capture hotkeys remain a
+separate, unverified input path. `move` controls the mouse, not the player.
+
+Regression checks, without Steam or a running X server:
+
+```sh
+python -m unittest discover -s tools -p 'test_anoxrig.py'
+```
