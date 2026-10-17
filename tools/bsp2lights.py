@@ -30,9 +30,8 @@ here = os.path.dirname(os.path.abspath(__file__))
 spec = importlib.util.spec_from_file_location('bspinfo', os.path.join(here, 'bspinfo.py'))
 bspinfo = importlib.util.module_from_spec(spec); spec.loader.exec_module(bspinfo)
 
-RADIUS = 8.0
+RADIUS = 4.0
 L_REF = 300.0
-LINEAR = True   # True: intensity = light (indoor lights are mostly 100..300; light^2/L_REF made them far too dark)
 SUN_DIV = 200.0
 SUN_ANGLE = 2.0
 
@@ -82,7 +81,7 @@ def main():
             if l['classname'] != 'light':
                 continue
             k = l['keys']; x, y, z = l['origin']; r, g, b = l['color']
-            inten = l['light'] if LINEAR else l['light'] * l['light'] / L_REF
+            inten = l['light'] * l['light'] / L_REF
             row = '%.1f %.1f %.1f %.4f %.4f %.4f %g %g' % (x, y, z, r, g, b, round(inten, 2), RADIUS)
             cone = fnum(k.get('_cone') or k.get('-cone'), 0.0)
             if cone > 0:
