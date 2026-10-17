@@ -195,6 +195,58 @@ with patch('Xlib.display.Display', return_value=display), patch('Xlib.ext.xtest.
                         process.communicate()
 
 
+class ConsoleInputTests(unittest.TestCase):
+    def setUp(self):
+        self.d = Mock()
+        self.d.get_keyboard_control.return_value = Mock(
+            global_auto_repeat=X.AutoRepeatModeOn, auto_repeats=bytes([255] * 32))
+
+    def test_clear_budget_covers_long_line_at_server_rate(self):
+        with patch.object(rig.subprocess, 'run', return_value=Mock(
+                stdout='auto repeat delay: 600 repeat rate: 25')) as query:
+            self.assertAlmostEqual(rig.console_clear_seconds(self.d, 22), 10.7)
+        self.assertEqual(query.call_args.kwargs['timeout'], 5)
+
+    def test_disabled_backspace_repeat_is_rejected(self):
+        self.d.get_keyboard_control.return_value.auto_repeats = bytes(32)
+        with self.assertRaisesRegex(RuntimeError, 'autorepeat is disabled'):
+            rig.console_clear_seconds(self.d, 22)
+
+    def test_unreadable_repeat_rate_is_rejected(self):
+        for result in ('', 'auto repeat delay: 600 repeat rate: 0'):
+            with self.subTest(result=result), patch.object(rig.subprocess, 'run',
+                    return_value=Mock(stdout=result)):
+                with self.assertRaisesRegex(RuntimeError, 'autorepeat rate'):
+                    rig.console_clear_seconds(self.d, 22)
+        with patch.object(rig.subprocess, 'run', side_effect=subprocess.TimeoutExpired('xset', 5)):
+            with self.assertRaisesRegex(RuntimeError, 'autorepeat rate'):
+                rig.console_clear_seconds(self.d, 22)
+
+    def test_console_input_uses_held_clear_and_slow_keys(self):
+        with patch.object(rig, 'console_keys', return_value=[[20], [21]]), \
+                patch.object(rig, 'keycodes', side_effect=lambda d, names: {
+                    ('End',): [10], ('BackSpace',): [11], ('Return',): [12]}[tuple(names)]), \
+                patch.object(rig, 'console_clear_seconds', return_value=10.7), \
+                patch.object(rig, 'press_keys') as press, patch.object(rig.time, 'sleep') as sleep:
+            rig.console_line(self.d, 'ab')
+        self.assertEqual(press.call_args_list, [
+            unittest.mock.call(self.d, [10], 0.2),
+            unittest.mock.call(self.d, [11], 10.7),
+            unittest.mock.call(self.d, [20], 0.12),
+            unittest.mock.call(self.d, [21], 0.12),
+            unittest.mock.call(self.d, [12], 0.12)])
+        self.assertEqual(sleep.call_args_list, [unittest.mock.call(0.5),
+            unittest.mock.call(0.12), unittest.mock.call(0.12)])
+
+    def test_held_backspace_released_when_sync_fails(self):
+        self.d.sync.side_effect = [RuntimeError('sync failed'), None]
+        with patch.object(rig.xtest, 'fake_input') as fake:
+            with self.assertRaisesRegex(RuntimeError, 'sync failed'):
+                rig.press_keys(self.d, [22], 10.7)
+        self.assertEqual(fake.call_args_list, [unittest.mock.call(self.d, X.KeyPress, 22),
+            unittest.mock.call(self.d, X.KeyRelease, 22)])
+
+
 class SaveTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()

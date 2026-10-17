@@ -25,12 +25,16 @@ The game's [editing documentation](https://anachrodox.talonbrave.info/appendix/c
 describes the `loadgame`, `viewpos`, and `condump` commands used by the rig.
 The game console must retain its default layout/gold build footer; customized
 fonts or a different console key may need adjustment (`ANOX_CONSOLE_KEY`).
-Console typing uses 80 ms key holds and 40 ms gaps: faster input dropped
-characters during a loaded Rowdy's session. The timeout is a waiting budget,
-not a hard wall-clock limit; typing and restoration can extend beyond it.
-Those timings can still fail under load. The 2026-10-17 saved-view check needed
-an isolated probe with held Backspace autorepeat and 120 ms key holds/gaps;
-the tracked rig remains unchanged. Always require its fresh transcript checks.
+Console typing uses 120 ms key holds and gaps, matching the isolated probe
+used for the 2026-10-17 saved-view check. Prompt clearing holds Backspace
+instead of sending 1,024 taps. It requires enabled X autorepeat and `xset`;
+the hold duration covers 240 characters at the server's reported repeat rate.
+This assumes a previous rig command no longer than its 240-character limit.
+The timeout is a waiting budget, not a hard wall-clock limit; typing and
+restoration can extend beyond it. These changes are not yet verified for
+complete save loading: a follow-up test failed during compound-command
+handling and was interrupted by a computer restart. Always require fresh
+transcript checks. See [the input investigation](console-input-check.md).
 
 ## Location coverage
 
