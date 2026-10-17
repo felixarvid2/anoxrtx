@@ -33,7 +33,14 @@ I raise roughness and metalicity of character materials to the max to mask the p
    - Use a QindieGL `opengl32.dll` built for Linux/MinGW (https://github.com/felixarvid2/QindieGL, see `linux/`)
      or the official one, and launch with `WINEDLLOVERRIDES="opengl32=n,b;d3d9=n,b" %command%`.
 
-5. Chuncki's 4x AI upscaled level textures (ModDB, v0.9.2) together with this mod:
+5. Map lights and per-map settings (QindieGL `maplights`): generate light files with
+   `tools/bsp2lights.py <Anachronox>/rtx-remix/maplights <maps>/*.bsp`, set `remixapi = 1` and `maplights = 1` in
+   `[game.anox]` of QindieGL.ini and `exposeRemixApi = True` in `.trex/bridge.conf`, and copy `anox_customise.ini`
+   next to anox.exe. Its `[maplights.global]` / `[maplights.<map>]` sections set the light formula (scale,
+   exponent, radius, sun_scale) and `[rtxconf.default]` / `[rtxconf.<map>]` set Remix variables per map. QindieGL
+   rereads the file when it is saved, so light strength can be tuned while playing.
+
+6. Chuncki's 4x AI upscaled level textures (ModDB, v0.9.2) together with this mod:
    - Install as its readme says (Steam version: rename `anoxdata/TEXTURES.dat` instead of `textures.pac`; the
      pack's patched `ref_gl.dll` keeps all exports, QindieGL's hooks keep working).
    - All level textures get new Remix hashes, so material overrides and texture lists in `mod.usda`,
@@ -43,7 +50,7 @@ I raise roughness and metalicity of character materials to the max to mask the p
      Without this, e.g. the glowing light strips in Rowdy's bar go dark.
    - Note: Steam "verify files" restores TEXTURES.dat; rename it again afterwards.
 
-6. HD model textures (posters, characters, objects; MODELS.dat is not covered by the level texture pack):
+7. HD model textures (posters, characters, objects; MODELS.dat is not covered by the level texture pack):
    `tools/adat.py extract anoxdata/MODELS.dat <dir> '*.tga'` (and *.png, *.bmp), name each image by its
    Remix hash (`tools/remixhash.py`), upscale x4 (e.g. realesrgan-ncnn-vulkan -n realesrgan-x4plus),
    keep alpha channels separately, then
