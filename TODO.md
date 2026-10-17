@@ -4,6 +4,9 @@ Läget och tidigare resultat finns i [RESULTS.md](RESULTS.md), planen i [PLAN.md
 Ordnat ungefär efter nytta. ✅ = klart, 🔶 = gjort men inte sett i spelet.
 
 ## 1. Verifiera det som redan är byggt
+- [x] **Rowdy's: normaler och emissiva skyltar i två sparvyer**: separata diagnostikvarianter visar
+      ytstruktur respektive skyltglöd. Behåll standardvärdena; ingen tydlig förbättring motiverar en
+      generell ändring. Se [kontrollen 2026-10-17](docs/rowdys-material-check.md).
 - [ ] 🔶 **HD-himlar** (`hd_sky.usda`): titta i en bana med ljus himmel (t.ex. Sunder, `sunder2`, eller banor
       med `blue`/`outside`/`forest`). Introt visar bara stjärnhimlar.
 - [ ] 🔶 **Vätskematerial** (`liquids.usda`): Limbus (vatten), Levant (lava), Hive/Krapton (kristaller/glöd),
@@ -11,6 +14,10 @@ Ordnat ungefär efter nytta. ✅ = klart, 🔶 = gjort men inte sett i spelet.
 - [ ] 🔶 **Flashblend-ljus** (QindieGL PR #6): testa i en strid/explosion med `gl_flashblend 1`, merga om det fungerar.
 - [ ] **Kartljus i fler banor**: hittills bara jämfört i Rowdy's. Gå igenom några olika miljöer och justera
       `maplights_scale` (eventuellt en skala per bana).
+- [ ] **Kartljusens synliga bidrag i nuvarande Remix Plus-installation**: två fasta Rowdy's-vyer
+      visar ingen tydlig skillnad mellan skala 1, 0,75 och 0 trots bekräftade loggvärden.
+      Kontrollera API-ljusens faktiska rendering innan fortsatt ljuskalibrering; detta bevisar inte
+      att alla kartljus saknar effekt. Tidigare jämförelser gjordes med en annan runtime.
 - [ ] **Testriggen**: fler fasta testplatser. `list-saves` och `load-save PROFIL/PLATS` finns nu;
       samla sparfiler vid TimeMinders för utomhusmiljö, vatten och lava. Se [testplatser](docs/test-locations.md).
 - [x] **Testriggens start och rörelse**: `start` känner igen synligt spelinnehåll trots att Remix Plus
@@ -35,8 +42,8 @@ Ordnat ungefär efter nytta. ✅ = klart, 🔶 = gjort men inte sett i spelet.
 ## 3. Material och texturer
 - [ ] **Uppskala banornas texturer** (TEXTURES.dat) och lägg dem som Remix-ersättningar via hash,
       på samma sätt som himlarna. Undvik eller specialbehandla texturer med fina detaljer (som stjärnor).
-- [ ] **PBR-material**: roughness-, normal- och metal-kartor för de vanligaste texturerna, t.ex.
-      genererade med ett verktyg och finjusterade för hand.
+- [ ] **PBR-material**: generatorn finns; normalernas effekt är sedd i två Rowdy's-vyer.
+      Finjustering av enskilda material och närbilder av misstänkta ljusa kanter återstår.
 - [ ] **Figurmaterial**: med `smoothnormals` behövs inte längre maxad roughness/metalness på figurer
       för att dölja kantigheten; gör om de materialen i `mod.usda`.
 - [ ] **UI och intro**: lägg logotyper/menyer som saknas i `rtx.uiTextures` (hashar från `DumpTextures`),
