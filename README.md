@@ -39,6 +39,13 @@ I raise roughness and metalicity of character materials to the max to mask the p
    next to anox.exe. Its `[maplights.global]` / `[maplights.<map>]` sections set the light formula (scale,
    exponent, radius, sun_scale) and `[rtxconf.default]` / `[rtxconf.<map>]` set Remix variables per map. QindieGL
    rereads the file when it is saved, so light strength can be tuned while playing.
+   Hand fixes per light go in `rtx-remix/maplights/<map>.override` (also reloaded while playing): `N off`,
+   `N scale S`, `N color R G B`, `N move DX DY DZ`, `N radius R`, `sun off`, `sun scale S`, and `add <light line>`
+   for new lights (e.g. lamp objects without light data). To find N, save the file in the game and read
+   "camera at X Y Z" in QindieGL.log (needs `dlights = 1`), then run
+   `tools/lights_near.py rtx-remix/maplights/<map>.lights X Y Z`.
+   With `dlights = 1`, muzzle flashes, explosions and spells also become Remix lights (`dlight_scale`,
+   `dlight_radius` in the ini).
 
 6. Chuncki's 4x AI upscaled level textures (ModDB, v0.9.2) together with this mod:
    - Install as its readme says (Steam version: rename `anoxdata/TEXTURES.dat` instead of `textures.pac`; the
@@ -50,7 +57,12 @@ I raise roughness and metalicity of character materials to the max to mask the p
      Without this, e.g. the glowing light strips in Rowdy's bar go dark.
    - Note: Steam "verify files" restores TEXTURES.dat; rename it again afterwards.
 
-7. HD model textures (posters, characters, objects; MODELS.dat is not covered by the level texture pack):
+7. Approximate PBR materials for the level textures (after 6, since the hashes come from the loose pack):
+   `tools/pbr_layer.py rtx-remix/mods/anoxrt <Anachronox> <maps>/*.bsp` writes normal maps (from the texture's
+   luminance), roughness/metallic by keywords in the texture name, and thin-walled glass for the
+   `SURF_TRANS33/66` glass/window textures, as `pbr.usda`; add `@./pbr.usda@` to mod.usda's subLayers.
+
+8. HD model textures (posters, characters, objects; MODELS.dat is not covered by the level texture pack):
    `tools/adat.py extract anoxdata/MODELS.dat <dir> '*.tga'` (and *.png, *.bmp), name each image by its
    Remix hash (`tools/remixhash.py`), upscale x4 (e.g. realesrgan-ncnn-vulkan -n realesrgan-x4plus),
    keep alpha channels separately, then
