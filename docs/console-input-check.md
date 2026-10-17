@@ -27,8 +27,8 @@ characters, or another console state caused the failure remains unresolved.
 The normal 120-second timeout and a full-length stale prompt were not verified.
 
 The owner then reported a computer restart. The restart removed the temporary
-worktree, guard backups, and screenshots. Its cause has not been established;
-the test did not intentionally request a reboot. The candidate was reconstructed
+worktree, guard backups, and screenshots. Felix confirmed the laptop ran out of battery;
+the test did not request a reboot. The candidate was reconstructed
 in a persistent worktree and tested offline. No further game launch was made.
 
 ## Recovery and remaining checks
