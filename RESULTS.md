@@ -34,6 +34,18 @@ till standardvärdet samt omladdning med samma värde fungerade. Linux-bygget pa
 exporterade 385 funktioner. Inga ljusstandarder ändrades. De två sparvyerna, andra banor,
 animerade stilar, stridsljus, stock Remix och MSVC behöver sina separata kontroller.
 
+## Sparvyer med installerad rättning
+
+- Den mergade QindieGL-rättningen installerades med verifierat DLL-fingeravtryck och säkerhetskopia.
+  Båda Rowdy's-sparningarna återställdes med bekräftade konsoltranskript, positioner och vinklar.
+- Skala 0 tog bort det närliggande kartljusbidraget; skala 1 återställde det tydligt i båda vyerna.
+  Behåll standardvärdet 1. Se [metod och begränsningar](docs/saved-view-lighting-check.md).
+- Första vyns initiala skala-1-bilder var inte en giltig jämförelsebaslinje. Andra vyn var stabil vid
+  omladdning av samma värde. Orsaken till första vyns ljusläge är inte fastställd.
+- Ordinarie konsolinmatning misslyckades innan en sparladdning bekräftades; en isolerad långsammare
+  probe fungerade. Riggens källkod ändrades inte. Sex spelfiler, fem sparfiler och Steam-inställningar
+  verifierades efter återställning; den mergade rättade DLL-filen är fortsatt installerad.
+
 ## Testmetod (fas 0)
 
 - `anoxrig.py timeline PFX 60 90 120 150 180 240` startar ett nytt spel (New Universe → Normal) och tar

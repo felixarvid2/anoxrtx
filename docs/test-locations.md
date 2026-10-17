@@ -28,6 +28,9 @@ fonts or a different console key may need adjustment (`ANOX_CONSOLE_KEY`).
 Console typing uses 80 ms key holds and 40 ms gaps: faster input dropped
 characters during a loaded Rowdy's session. The timeout is a waiting budget,
 not a hard wall-clock limit; typing and restoration can extend beyond it.
+Those timings can still fail under load. The 2026-10-17 saved-view check needed
+an isolated probe with held Backspace autorepeat and 120 ms key holds/gaps;
+the tracked rig remains unchanged. Always require its fresh transcript checks.
 
 ## Location coverage
 
@@ -42,6 +45,12 @@ not a hard wall-clock limit; typing and restoration can extend beyond it.
 `GLOBAL/1` and `GLOBAL/999` are intro saves in `sphere`; `GLOBAL/5` is a Rowdy's
 cinematic. They are not substitutes for stationary gameplay views. Avoid using a
 cinematic as a material/lighting baseline unless its timing is controlled.
+
+The [fixed-wrapper lighting check](saved-view-lighting-check.md) verified visible
+scale-0/scale-1 contribution in both saved views and retained default scale 1.
+A successful save restore does not by itself confirm the initial lighting state:
+the first view's initial scale-1 frames were dim until explicit reload. Validate
+lighting initialization before using such frames as a brightness baseline.
 
 To add a later location, reach a TimeMinder through normal play, save to an
 unused slot, list the saves, and verify a restore. Record the selector, map,
