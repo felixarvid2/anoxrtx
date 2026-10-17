@@ -1,5 +1,19 @@
 # anoxrtx
 
+> **This is a fork of [vinevi1/anoxrtx](https://github.com/vinevi1/anoxrtx) by vinevi1**, an RTX Remix mod for
+> Anachronox. It adds:
+> - **Linux support**: runs under Steam + Proton with fixes in `rtx.conf` and `.trex/bridge.conf` (section 4) and
+>   the Linux build of QindieGL ([felixarvid2/QindieGL](https://github.com/felixarvid2/QindieGL))
+> - DLSS (DLAA by default) under Proton
+> - map lights from the BSP files, with light styles, sun, spotlights, per-map settings and hand overrides
+>   (`tools/bsp2lights.py`, `anox_customise.ini`), and the game's dynamic lights
+> - HD skies, liquid and emissive materials, PBR materials (normal maps, roughness, glass) for the level textures
+> - support for Chuncki's 4x level texture pack (texture hashes remapped)
+> - HD model textures, with AI-redrawn posters (Real-ESRGAN + FLUX.1 via ComfyUI)
+> - tools: ADAT/BSP readers, offline Remix texture hashes, layer generators, a test rig (`tools/`)
+>
+> Game data (textures, generated DDS files) is not included; the tools build it from your own game files.
+
 Notes:
 
 1. For game to display correctly install:
