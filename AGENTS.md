@@ -50,6 +50,36 @@ names exist.
 - Subagents do not commit, push, or merge unless explicitly assigned. Inspect
   their diffs and check output before accepting or shipping changes.
 
+## Model routing and Gemini triage
+
+For Codex work, use this model split requested by Felix:
+
+| Work | Model |
+| --- | --- |
+| Read-only summaries of selected logs, documentation comparisons, fact extraction from supplied excerpts | Gemini `gemini-3.1-flash-lite` through the local `gemini-triage` skill |
+| Repository exploration with tools and exact mechanical edits | GPT-6 Luna |
+| Implementation, code review, and most debugging | GPT-6.1 Sol |
+| Exceptionally hard investigations where Sol's work establishes a need | GPT-6 Astra |
+
+Gemini is an external API helper, not a native Codex subagent. It receives only
+explicitly selected public project excerpts or sanitized logs, has no tools or
+write access, and cannot validate builds. Codex reviews its findings and checks
+source references before acting. Use local search for simple lookups.
+
+The owner's local helper is
+`~/.codex/skills/gemini-triage/scripts/triage.py`; consult that skill's `SKILL.md`
+for invocation. The credential stays in `~/Documents/gemini-api.md`, outside the
+repos, and must never appear in prompts, command arguments, URLs, logs, or git.
+Do not upload game assets or private data as context. Free-tier data handling
+follows Google's applicable terms.
+
+Felix confirmed the API project uses the Free tier with billing disabled on
+2026-10-17. Free pricing depends on that project setting; the API has no
+per-request free-only flag. Do not enable billing. Pin the selected model, keep
+requests bounded, and stop on quota errors; never silently retry or switch to a
+paid service/model. If the helper or quota is unavailable, use the existing
+Codex roles. The helper is a local installation, not a repo dependency.
+
 ## Boundaries and compatibility
 
 - Keep reusable logic in `tools/`, settings in `rtx.conf` and
