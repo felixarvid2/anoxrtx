@@ -14,10 +14,11 @@ Ordnat ungefär efter nytta. ✅ = klart, 🔶 = gjort men inte sett i spelet.
 - [ ] 🔶 **Flashblend-ljus** (QindieGL PR #6): testa i en strid/explosion med `gl_flashblend 1`, merga om det fungerar.
 - [ ] **Kartljus i fler banor**: hittills bara jämfört i Rowdy's. Gå igenom några olika miljöer och justera
       `maplights_scale` (eventuellt en skala per bana).
-- [ ] **Kartljusens synliga bidrag i nuvarande Remix Plus-installation**: två fasta Rowdy's-vyer
-      visar ingen tydlig skillnad mellan skala 1, 0,75 och 0 trots bekräftade loggvärden.
-      Kontrollera API-ljusens faktiska rendering innan fortsatt ljuskalibrering; detta bevisar inte
-      att alla kartljus saknar effekt. Tidigare jämförelser gjordes med en annan runtime.
+- [x] **Kartljusens omladdning i Remix Plus**: återanvända API-identiteter gjorde ändrade ljus
+      osynliga. Nya identiteter per skapande rättar reproduktionen; rött testljus och skalorna
+      0/100/1 verifierade i Rowdy's startkorridor. Se [API-kontrollen](docs/maplight-api-check.md).
+- [ ] **Upprepa ljuskalibreringen i sparvyerna med rättad wrapper**: tidigare skaljämförelser
+      påverkades av omladdningsfelet. Standardvärdena är oförändrade; styrka i andra miljöer återstår.
 - [ ] **Testriggen**: fler fasta testplatser. `list-saves` och `load-save PROFIL/PLATS` finns nu;
       samla sparfiler vid TimeMinders för utomhusmiljö, vatten och lava. Se [testplatser](docs/test-locations.md).
 - [x] **Testriggens start och rörelse**: `start` känner igen synligt spelinnehåll trots att Remix Plus
