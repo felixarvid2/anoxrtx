@@ -442,20 +442,41 @@ def console_keys(d, text):
     return result
 
 
+def console_clear_seconds(d, backspace):
+    controls = d.get_keyboard_control()
+    repeats = controls.auto_repeats[backspace >> 3] & (1 << (backspace & 7))
+    if controls.global_auto_repeat != X.AutoRepeatModeOn or not repeats:
+        raise RuntimeError('X autorepeat is disabled; enable it before using the game console')
+    try:
+        result = subprocess.run(['xset', 'q'], capture_output=True, text=True,
+                                check=True, timeout=5)
+    except (OSError, subprocess.SubprocessError) as error:
+        raise RuntimeError('cannot read X autorepeat rate; console input not sent') from error
+    match = re.search(r'auto repeat delay:\s*(\d+)\s+repeat rate:\s*(\d+)', result.stdout)
+    if not match or int(match[2]) <= 0:
+        raise RuntimeError('cannot read a positive X autorepeat rate; console input not sent')
+    # Cover a previous rig command up to the accepted limit, the repeat delay,
+    # and a margin. A fixed short hold can leave part of a long prompt behind.
+    return int(match[1]) / 1000 + 240 / int(match[2]) + 0.5
+
+
 def console_line(d, text):
     typed = console_keys(d, text)
     if len(text) > 240:
         raise ValueError('console command is too long')
-    press_keys(d, keycodes(d, ('End',)), 0)
     backspace = keycodes(d, ('BackSpace',))
-    for _ in range(1024):
-        press_keys(d, backspace, 0)
-    # Shorter pulses dropped characters under Remix load; keep nonce validation
-    # as the authority on whether the game received the complete command.
+    clear_seconds = console_clear_seconds(d, backspace[0])
+    press_keys(d, keycodes(d, ('End',)), 0.2)
+    # Avoid over 2,000 XSync round trips for 1,024 zero-duration taps.
+    # press_keys releases Backspace even when synchronization or sleep fails.
+    press_keys(d, backspace, clear_seconds)
+    time.sleep(0.5)
+    # Use the successful isolated probe's conservative typing intervals.
+    # Fresh nonce transcripts remain the authority on received commands.
     for codes in typed:
-        press_keys(d, codes, 0.08)
-        time.sleep(0.04)
-    press_keys(d, keycodes(d, ('Return',)), 0.08)
+        press_keys(d, codes, 0.12)
+        time.sleep(0.12)
+    press_keys(d, keycodes(d, ('Return',)), 0.12)
 
 
 def console_capture(d, commands, deadline):
