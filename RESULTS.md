@@ -1,7 +1,24 @@
 # Resultat: fas 0–3 i PLAN.md
 
-Alla tester är gjorda på Linux (GE-Proton 11-9, RTX 5060, Remix 1.5.2 release) i en nästlad
+De ursprungliga testerna i fas 0–3 är gjorda på Linux (GE-Proton 11-9, RTX 5060, Remix 1.5.2 release) i en nästlad
 `Xwayland :7` med testriggen `tools/anoxrig.py`.
+
+## Uppföljning 2026-10-17: två fasta Rowdy's-vyer
+
+Nuvarande Remix Plus-installation testades med två sparplatser, upprepade baslinjer och separata
+diagnostikvarianter. 14 verifierade laddningar gav 42 jämförelsebilder; ytterligare sex bilder
+kontrollerade kartljusskala efter laddning. Se [metod och resultat](docs/rowdys-material-check.md).
+
+- Utan genererade normalreferenser blir väggar och golv plattare; ljusa armaturytor finns kvar.
+- Avstängd emission på fem skyltmaterial gör skyltarna mörkare. Behåll materialens standardvärden;
+  närbilder av misstänkta ljusa kanter och andra miljöer återstår.
+- Kartljusskala 1, 0,75 och 0 gav ingen tydlig rumsljusskillnad i dessa vyer, trots bekräftade
+  loggvärden. Även omladdning av skalan efter sparladdning prövades. Undersök API-ljusens faktiska
+  rendering innan fortsatt kalibrering; resultatet bevisar inte att alla kartljus saknar effekt.
+- Testriggens konsolinmatning tappade tecken med den gamla takten. 80 ms tangenttryck och 40 ms
+  mellanrum klarade de 14 laddningarna; 26 befintliga tester passerade. Inga ljusstandarder ändrades.
+- Återställningsvakten rapporterade återställda filer och Steam-inställningar. Den separata
+  slutkontrollen blockerades av automatisk godkännandegransknings kontogräns och återstår.
 
 ## Testmetod (fas 0)
 

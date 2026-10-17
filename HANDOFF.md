@@ -119,9 +119,14 @@ when started with `+map`, so it is untested. Tuning knobs: `rtx.volumetrics.fogR
 - Lava freeze (`proctex`): look in Levant for "ProcTex: ... frozen ..., Remix texture hash 0x561447B2DFA181FD"
   (proc_lava) / `0x26C0B031CCFA2266` (proc_lavafloe) in QindieGL.log; the rig cannot walk to the lava.
 - Dynamic lights in combat (`dlights`); if they work, close QindieGL PR #6 (flashblend, superseded).
-- PBR normal maps may give bright rims on sharp colour edges (`pbr_layer.py --strength`, default 2).
+- Rowdy's normal maps and five sign emissions have visible effects in two saved views
+  ([2026-10-17 check](docs/rowdys-material-check.md)); retain defaults. Close-up checks for bright
+  rims on sharp colour edges still remain (`pbr_layer.py --strength`, default 2).
 - Numos sun rotation convention (shadow direction) on the five outdoor maps.
 - Map light brightness in environments other than Rowdy's.
+- Current Remix Plus map-light contribution: saved Rowdy's views showed no clear room-lighting
+  change at customise scale 1, 0.75, and 0 despite the logged parameter changes. Investigate actual
+  API-light rendering before further calibration; do not infer that all map lights are broken.
 
 ## Ideas not done yet (from anoxrtx IDEAS2.md and the owner's last question)
 1. In-game menu for lights/overrides (QindieGL already has ImGui code for other games: `qdx_imgui_*`).

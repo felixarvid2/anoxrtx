@@ -450,9 +450,11 @@ def console_line(d, text):
     backspace = keycodes(d, ('BackSpace',))
     for _ in range(1024):
         press_keys(d, backspace, 0)
+    # Shorter pulses dropped characters under Remix load; keep nonce validation
+    # as the authority on whether the game received the complete command.
     for codes in typed:
-        press_keys(d, codes, 0.03)
-        time.sleep(0.02)
+        press_keys(d, codes, 0.08)
+        time.sleep(0.04)
     press_keys(d, keycodes(d, ('Return',)), 0.08)
 
 

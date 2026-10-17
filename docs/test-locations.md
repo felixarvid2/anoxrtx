@@ -25,6 +25,9 @@ The game's [editing documentation](https://anachrodox.talonbrave.info/appendix/c
 describes the `loadgame`, `viewpos`, and `condump` commands used by the rig.
 The game console must retain its default layout/gold build footer; customized
 fonts or a different console key may need adjustment (`ANOX_CONSOLE_KEY`).
+Console typing uses 80 ms key holds and 40 ms gaps: faster input dropped
+characters during a loaded Rowdy's session. The timeout is a waiting budget,
+not a hard wall-clock limit; typing and restoration can extend beyond it.
 
 ## Location coverage
 
