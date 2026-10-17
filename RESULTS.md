@@ -18,7 +18,21 @@ kontrollerade kartljusskala efter laddning. Se [metod och resultat](docs/rowdys-
 - Testriggens konsolinmatning tappade tecken med den gamla takten. 80 ms tangenttryck och 40 ms
   mellanrum klarade de 14 laddningarna; 26 befintliga tester passerade. Inga ljusstandarder ändrades.
 - Återställningsvakten rapporterade återställda filer och Steam-inställningar. Den separata
-  slutkontrollen blockerades av automatisk godkännandegransknings kontogräns och återstår.
+  slutkontrollen blockerades först av automatisk godkännandegransknings kontogräns. Uppföljningen
+  samma dag verifierade fem återställda spelfiler, fem oförändrade sparfiler, återställda
+  Steam-startalternativ och stängd X7.
+
+## Uppföljning samma dag: kartljusens identiteter
+
+En riktad [API-kontroll](docs/maplight-api-check.md) hittade en fungerande reproduktion:
+ett nytt rött testljus syntes, men samma egenskaper på ett befintligt ljus syntes inte efter
+omladdning. API-anropen rapporterade framgång i båda fallen. QindieGL återanvände förstörda
+ljusidentiteter; nya identiteter per skapande rättar den observerade livscykeln i Remix Plus 1.5.1.
+
+Efter rättningen gav skalorna 0/100/1 tydliga bildskillnader i samma startkorridor, och återgång
+till standardvärdet samt omladdning med samma värde fungerade. Linux-bygget passerade och
+exporterade 385 funktioner. Inga ljusstandarder ändrades. De två sparvyerna, andra banor,
+animerade stilar, stridsljus, stock Remix och MSVC behöver sina separata kontroller.
 
 ## Testmetod (fas 0)
 

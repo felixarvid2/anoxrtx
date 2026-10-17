@@ -133,4 +133,11 @@ The cleanup guard reported restoration of original game configs/material layers
 and Steam launch options, closure of the nested session, and desktop Steam
 restart. The separate final restoration-verification command was not executed:
 automatic approval review hit an account usage limit. Independent post-cleanup
-fingerprint verification therefore remains pending.
+fingerprint verification was pending at publication. A follow-up on 2026-10-17
+verified that all five guarded game files and five save fingerprints matched
+their backups, the original Steam launch options were restored, and nested X7
+was closed.
+
+The subsequent [API investigation](maplight-api-check.md) reproduced failed
+updates when destroyed light identities were reused and verified a wrapper fix.
+Repeat saved-view brightness calibration with that corrected build.

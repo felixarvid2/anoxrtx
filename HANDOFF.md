@@ -124,9 +124,11 @@ when started with `+map`, so it is untested. Tuning knobs: `rtx.volumetrics.fogR
   rims on sharp colour edges still remain (`pbr_layer.py --strength`, default 2).
 - Numos sun rotation convention (shadow direction) on the five outdoor maps.
 - Map light brightness in environments other than Rowdy's.
-- Current Remix Plus map-light contribution: saved Rowdy's views showed no clear room-lighting
-  change at customise scale 1, 0.75, and 0 despite the logged parameter changes. Investigate actual
-  API-light rendering before further calibration; do not infer that all map lights are broken.
+- Repeat saved-view calibration with the corrected QindieGL map-light identity lifecycle.
+  Reusing destroyed identities prevented visible reload updates on installed Remix Plus 1.5.1;
+  fresh identities fixed an existing-light edit and scales 0/100/1 in the startup hallway.
+  See the [API investigation](docs/maplight-api-check.md). Defaults are unchanged; the test DLL
+  was restored afterward, so install the corrected build before repeating calibration.
 
 ## Ideas not done yet (from anoxrtx IDEAS2.md and the owner's last question)
 1. In-game menu for lights/overrides (QindieGL already has ImGui code for other games: `qdx_imgui_*`).
