@@ -3,12 +3,14 @@
 Run with the rig's Python environment: python -m unittest discover -s tools -p 'test_anoxrig.py'
 """
 import contextlib
+import gzip
 import importlib.util
 import io
 from pathlib import Path
 import select
 import signal
 import subprocess
+import struct
 import sys
 import tempfile
 import unittest
@@ -191,6 +193,160 @@ with patch('Xlib.display.Display', return_value=display), patch('Xlib.ext.xtest.
                     if process.poll() is None:
                         process.kill()
                         process.communicate()
+
+
+class SaveTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.game = Path(self.temp.name)
+        self.save_root = self.game / 'anoxdata/SAVE/steamuser'
+        self.save_root.mkdir(parents=True)
+        self.autoexec = self.game / 'anoxdata/CONFIGS/autoexec.cfg'
+        self.autoexec.parent.mkdir()
+        label = b"Bricks:\nRowdy's Bar\x00"
+        data = struct.pack('<6I', 1004, 988, 432, 0, len(label) + 32, len(label))
+        data += label + b'\x00maps/rowdys.bsp\x00'
+        self.save = self.save_root / 'anoxsave1.sav'
+        self.save.write_bytes(gzip.compress(data))
+        p = patch.object(rig, 'GAME', str(self.game))
+        p.start()
+        self.addCleanup(p.stop)
+
+    def test_save_metadata_and_fingerprint(self):
+        info = rig.save_info('steamuser/1')
+        self.assertEqual(info['save'], 'steamuser/1')
+        self.assertEqual(info['map'], 'rowdys')
+        self.assertEqual(info['description'], "Bricks: / Rowdy's Bar")
+        self.assertEqual(len(info['sha256']), 64)
+
+    def test_bad_selectors_never_touch_game(self):
+        for name in ('../1', 'steamuser/../1', '/1', 'steamuser/1;quit', 'steamuser/1000', 'steamuser/-1'):
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                rig.save_info(name)
+
+    def test_missing_or_corrupt_saves_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'not found'):
+            rig.save_info('steamuser/2')
+        self.save.write_bytes(b'invalid')
+        with self.assertRaisesRegex(ValueError, 'save'):
+            rig.save_info('steamuser/1')
+
+    def test_list_saves_does_not_write_files(self):
+        before = self.save.read_bytes()
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            rig.cmd_list_saves()
+        self.assertIn('steamuser/1', out.getvalue())
+        self.assertIn('rowdys', out.getvalue())
+        self.assertEqual(before, self.save.read_bytes())
+        self.assertFalse(self.autoexec.exists())
+
+    def test_invalid_save_never_stops_game_or_changes_config(self):
+        with patch.object(rig, 'cmd_stop') as stop, self.assertRaises(ValueError):
+            rig.cmd_load_save('steamuser/2')
+        stop.assert_not_called()
+        self.assertFalse(self.autoexec.exists())
+
+    def transcript(self, slot=1):
+        return (f'LoadGame2: "S:\\steamapps\\common\\Anachronox\\anoxdata/save/steamuser/anoxsave{slot}.sav"\n'
+                'Parsed and distributed 313 savegame lumps.\nATIME: Timer (1) is being reset.\nLoadGame2: Aborted.')
+
+    def test_transcript_requires_requested_file_and_complete_data_without_errors(self):
+        info = rig.save_info('steamuser/1')
+        rig.verify_load_transcript(self.transcript(), info)
+        rig.verify_load_transcript(self.transcript().replace('/steamuser/', '/steam\nuser/'), info)
+        for text in (self.transcript(2), 'old maplights loaded', self.transcript() + '\nERROR: unexpected EOF'):
+            with self.subTest(text=text), self.assertRaises(RuntimeError):
+                rig.verify_load_transcript(text, info)
+
+    def test_capture_accepts_only_nonce_bounded_output_and_cleans_dump(self):
+        marker = 'ar_123456789abc'
+        dump = self.game / 'anoxdata' / (marker + '.txt')
+        def execute(d, command):
+            dump.write_text('old evidence\n' + marker + '\nnew evidence\n' + marker + '_done\n')
+        with patch.object(rig.uuid, 'uuid4', return_value=Mock(hex='123456789abcdef')):
+            with patch.object(rig, 'console_line', side_effect=execute):
+                self.assertEqual(rig.console_capture(Mock(), 'debug', rig.time.monotonic() + 1), 'new evidence')
+        self.assertFalse(dump.exists())
+
+    def test_capture_rejects_stale_transcript(self):
+        marker = 'ar_123456789abc'
+        dump = self.game / 'anoxdata' / (marker + '.txt')
+        with patch.object(rig.uuid, 'uuid4', return_value=Mock(hex='123456789abcdef')):
+            with patch.object(rig, 'console_line', side_effect=lambda *args: dump.write_text('old marker\nold data\n')):
+                with patch.object(rig.time, 'monotonic', side_effect=[0, 2]), patch.object(rig.time, 'sleep'):
+                    with self.assertRaisesRegex(RuntimeError, 'fresh console transcript'):
+                        rig.console_capture(Mock(), 'debug', 1)
+        self.assertFalse(dump.exists())
+
+    def test_load_save_success_and_failure_restore_debug_and_preserve_save(self):
+        before = self.save.read_bytes()
+        for status, fails, debug in ((self.transcript(), False, 0), (self.transcript(), False, 1), (self.transcript(2), True, 0)):
+            with self.subTest(fails=fails, debug=debug):
+                clock = [0]
+                def advance(seconds):
+                    clock[0] += seconds
+                with contextlib.ExitStack() as stack:
+                    stack.enter_context(patch.object(rig.display, 'Display', return_value=Mock()))
+                    for name in ('focus_game', 'console_keys', 'ensure_console', 'grab'):
+                        stack.enter_context(patch.object(rig, name, return_value=False))
+                    line = stack.enter_context(patch.object(rig, 'console_line'))
+                    stack.enter_context(patch.object(rig, 'is_console', return_value=False))
+                    stack.enter_context(patch.object(rig, 'visible_content', return_value=True))
+                    stack.enter_context(patch.object(rig, 'console_capture', side_effect=[f'"debug" is "{debug}"', status, '(1 2 3) : 4']))
+                    stack.enter_context(patch.object(rig.time, 'monotonic', side_effect=lambda: clock[0]))
+                    stack.enter_context(patch.object(rig.time, 'sleep', side_effect=advance))
+                    out = stack.enter_context(contextlib.redirect_stdout(io.StringIO()))
+                    if fails:
+                        with self.assertRaises(RuntimeError):
+                            rig.cmd_load_save('steamuser/1', '10')
+                        self.assertNotIn('loaded steamuser/1', out.getvalue())
+                    else:
+                        rig.cmd_load_save('steamuser/1', '10')
+                        self.assertIn('viewpos=(1 2 3) yaw=4', out.getvalue())
+                    self.assertEqual(line.call_args.args[1], f'toggleconsole;set debug {debug}')
+                    self.assertEqual(before, self.save.read_bytes())
+
+    def test_console_detection_handles_translucent_backgrounds(self):
+        for background in ('black', (100, 100, 100)):
+            im = Image.new('RGB', (640, 400), background)
+            for y in range(0, 200, 4):
+                for x in range(100):
+                    im.putpixel((x, y), (255, 180, 0))
+            for y in range(310, 320):
+                for x in range(420, 600):
+                    im.putpixel((x, y), (255, 180, 0))
+            self.assertTrue(rig.is_console(im))
+        self.assertFalse(rig.is_console(Image.new('RGB', (640, 400), 'black')))
+
+    def test_console_typing_handles_shift_and_rejects_unsupported_groups(self):
+        d = Mock()
+        d.keysym_to_keycode.side_effect = lambda symbol: {65: 38, 65505: 50}.get(symbol, 0)
+        d.keycode_to_keysym.side_effect = lambda code, level: (97, 65)[level]
+        self.assertEqual(rig.console_keys(d, 'A'), [[50, 38]])
+        d.keycode_to_keysym.return_value = 0
+        d.keycode_to_keysym.side_effect = None
+        with self.assertRaises(ValueError):
+            rig.console_keys(d, 'A')
+
+    def test_interruption_while_enabling_console_registers_rollback_first(self):
+        rollback = Mock()
+        with patch.object(rig, 'grab'), patch.object(rig, 'is_console', return_value=False):
+            with patch.object(rig, 'cmd_key'), patch.object(rig.time, 'sleep'):
+                def interrupt(*args):
+                    rollback.assert_called_once()
+                    raise KeyboardInterrupt
+                with patch.object(rig, 'cmd_chord', side_effect=interrupt):
+                    with self.assertRaises(KeyboardInterrupt):
+                        rig.ensure_console(Mock(), before_enable=rollback)
+
+    def test_cleanup_waits_for_game_to_close_console(self):
+        clock = [0]
+        with patch.object(rig, 'grab'), patch.object(rig, 'is_console', side_effect=[True, True, False]) as console:
+            with patch.object(rig.time, 'monotonic', side_effect=lambda: clock[0]):
+                with patch.object(rig.time, 'sleep', side_effect=lambda delay: clock.__setitem__(0, clock[0] + delay)):
+                    rig.wait_console_closed(Mock())
+        self.assertEqual(console.call_count, 3)
 
 
 if __name__ == '__main__':
