@@ -10,6 +10,8 @@
 > - HD skies, liquid and emissive materials, PBR materials (normal maps, roughness, glass) for the level textures
 > - support for Chuncki's 4x level texture pack (texture hashes remapped)
 > - HD model textures, with AI-redrawn posters (Real-ESRGAN + FLUX.1 via ComfyUI)
+> - optional [Remix Plus](https://github.com/RemixProjGroup/dxvk-remix) runtime with a physical sky (Numos) on the
+>   outdoor maps, and replaceable lava (procedural textures frozen by QindieGL)
 > - tools: ADAT/BSP readers, offline Remix texture hashes, layer generators, a test rig (`tools/`)
 >
 > Game data (textures, generated DDS files) is not included; the tools build it from your own game files.
@@ -76,7 +78,27 @@ I raise roughness and metalicity of character materials to the max to mask the p
    luminance), roughness/metallic by keywords in the texture name, and thin-walled glass for the
    `SURF_TRANS33/66` glass/window textures, as `pbr.usda`; add `@./pbr.usda@` to mod.usda's subLayers.
 
-8. HD model textures (posters, characters, objects; MODELS.dat is not covered by the level texture pack):
+8. Remix Plus (optional, tested with v1.5.1 x86 under GE-Proton 11-9): unzip
+   `Remix_Plus_v1.5.1_x86_games_release.zip` over the game folder (replaces `d3d9.dll` and `.trex/`; keep a copy
+   of the stock ones and of `.trex/bridge.conf`, which must be copied back). Needs the felixarvid2/QindieGL build
+   from PR #15 or later; older builds crash at startup with it (its Remix API layout differs).
+   - Its first start shows a "Welcome to RTX Remix" dialog that waits for a click, and crash/usage reporting to
+     NVIDIA defaults to on. To decide up front, create
+     `<prefix>/drive_c/users/steamuser/AppData/Local/NVIDIA/RTXRemix/user_settings/<xxh3 of "S:\steamapps\common\Anachronox">.conf`
+     with `neverShowFirstUseGuide = True`, `allowCrashReporting = False`, `allowUsageTracking = False`.
+     Do not use `rtx.automation.disableBlockingDialogBoxes`: it is for NVIDIA's CI and grants the consent.
+   - `anox_customise.ini` turns on the Numos sky (`rtx.skyMode = 1`) only on the maps with an ArghRad sun
+     (sunstrip, starport, comhills, baltown, baltownr), with the sun direction from the map and the map light
+     sun turned off there. Globally it would replace the space and city skies with a daytime sky.
+   - For testing, Steam launch options `%command% +map <name>` start straight into a map.
+
+9. Lava (QindieGL `proctex = 1`): the Levant lava is generated every frame, so Remix cannot replace it.
+   QindieGL freezes it to a flat colour derived from its name; `tools/proctex_layer.py rtx-remix/mods/anoxrt
+   <Anachronox>` writes `proctex.usda` with an emissive HD lava material for those hashes (add `@./proctex.usda@`
+   to mod.usda's subLayers). QindieGL.log prints the hash when it freezes a texture; it should match the one the
+   tool prints.
+
+10. HD model textures (posters, characters, objects; MODELS.dat is not covered by the level texture pack):
    `tools/adat.py extract anoxdata/MODELS.dat <dir> '*.tga'` (and *.png, *.bmp), name each image by its
    Remix hash (`tools/remixhash.py`), upscale x4 (e.g. realesrgan-ncnn-vulkan -n realesrgan-x4plus),
    keep alpha channels separately, then
