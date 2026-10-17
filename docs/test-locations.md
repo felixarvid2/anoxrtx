@@ -31,10 +31,13 @@ instead of sending 1,024 taps. It requires enabled X autorepeat and `xset`;
 the hold duration covers 240 characters at the server's reported repeat rate.
 This assumes a previous rig command no longer than its 240-character limit.
 The timeout is a waiting budget, not a hard wall-clock limit; typing and
-restoration can extend beyond it. These changes are not yet verified for
-complete save loading: a follow-up test failed during compound-command
-handling and was interrupted by a computer restart. Always require fresh
-transcript checks. See [the input investigation](console-input-check.md).
+restoration can extend beyond it. Console text uses the game's US physical
+positions, resolved from XKB key names by `xkbcomp`, without changing the
+keyboard layout. Symbol-based typing is incorrect when Xwayland reports
+Swedish symbols. Both saved views passed with the default waiting budget on
+2026-10-18, including console closure and developer-mode restoration. A full
+240-character stale prompt and signal-driven key release also passed. Always
+require fresh transcript checks. See [the input investigation](console-input-check.md).
 
 ## Location coverage
 

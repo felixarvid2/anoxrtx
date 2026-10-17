@@ -183,6 +183,13 @@ Recognition targets this game's default gold-text console and build footer;
 custom fonts/layouts can require adjustment. If recognition fails, no load
 command is sent. Wait for initial material loading to finish before trying it.
 
+Console text uses the game's US physical key positions, resolved from XKB key
+names with `xkbcomp`. This also works when Xwayland reports Swedish symbols;
+symbol-based typing can turn `_`, `;`, and `/` into `?`, `<`, and `&` in the
+game. The rig does not change your keyboard layout. Console input requires
+`xkbcomp`, `xset`, and enabled X autorepeat; unavailable key positions or repeat
+settings are rejected before editing the prompt.
+
 The installed game build prints `LoadGame2: Aborted` even after restoring a
 save, so that line alone is not a failure. The rig checks the requested filename,
 restored save lumps, fresh read errors, a visible scene, and settled `viewpos`.

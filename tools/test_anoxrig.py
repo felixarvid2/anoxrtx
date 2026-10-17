@@ -371,15 +371,53 @@ class SaveTests(unittest.TestCase):
             self.assertTrue(rig.is_console(im))
         self.assertFalse(rig.is_console(Image.new('RGB', (640, 400), 'black')))
 
-    def test_console_typing_handles_shift_and_rejects_unsupported_groups(self):
+    def test_console_typing_handles_shift_and_requires_valid_physical_keys(self):
         d = Mock()
-        d.keysym_to_keycode.side_effect = lambda symbol: {65: 38, 65505: 50}.get(symbol, 0)
-        d.keycode_to_keysym.side_effect = lambda code, level: (97, 65)[level]
-        self.assertEqual(rig.console_keys(d, 'A'), [[50, 38]])
-        d.keycode_to_keysym.return_value = 0
-        d.keycode_to_keysym.side_effect = None
-        with self.assertRaises(ValueError):
-            rig.console_keys(d, 'A')
+        d.get_display_name.return_value = ':7'
+        with patch.object(rig.subprocess, 'run', return_value=Mock(
+                stdout='<AC01> = 38; <LFSH> = 50;')):
+            self.assertEqual(rig.console_keys(d, 'A'), [[50, 38]])
+        for mapping in ('<AC01> = 38;', '<AC01> = 0; <LFSH> = 50;'):
+            with self.subTest(mapping=mapping), patch.object(rig.subprocess, 'run',
+                    return_value=Mock(stdout=mapping)), self.assertRaises(ValueError):
+                rig.console_keys(d, 'A')
+
+    def test_console_typing_uses_physical_keys_despite_swedish_symbols(self):
+        d = Mock()
+        # These Swedish symbols are valid X bindings but wrong for the game.
+        stale = {ord('_'): (61, (ord('-'), ord('_'))),
+                 ord(';'): (59, (ord(','), ord(';'))),
+                 ord('/'): (16, (ord('7'), ord('/'))), 65505: (50, (65505,))}
+        d.keysym_to_keycode.side_effect = lambda symbol: stale[symbol][0]
+        d.keycode_to_keysym.side_effect = lambda code, level: next(
+            values[level] for key, values in stale.values() if key == code)
+        d.display.info.min_keycode = 8
+        d.display.info.max_keycode = 255
+        current = [(0, 0)] * 248
+        for code, values in {61: (ord('-'), ord('_')), 59: (ord(','), ord(';')),
+                             16: (ord('7'), ord('/')), 50: (65505, 0)}.items():
+            current[code - 8] = values
+        d.get_keyboard_mapping.return_value = current
+        d.get_display_name.return_value = ':7'
+        with patch.object(rig.subprocess, 'run', return_value=Mock(
+                stdout='<AE11> = 20; <AC10> = 47; <AB10> = 61; <LFSH> = 50;')) as query:
+            self.assertEqual(rig.console_keys(d, '_;/'), [[50, 20], [47], [61]])
+        self.assertEqual(query.call_args.args[0], ['xkbcomp', '-xkb', ':7', '-'])
+        self.assertEqual(query.call_args.kwargs['timeout'], 5)
+        d.get_keyboard_mapping.assert_not_called()
+        d.keysym_to_keycode.assert_not_called()
+        # Key names, not assumed evdev numbers, are the source of the codes.
+        with patch.object(rig.subprocess, 'run', return_value=Mock(
+                stdout='<AE11> = 120; <LFSH> = 150;')):
+            self.assertEqual(rig.console_keys(d, '_'), [[150, 120]])
+
+    def test_unreadable_physical_keymap_prevents_console_input(self):
+        for error in (FileNotFoundError(), subprocess.TimeoutExpired('xkbcomp', 5)):
+            with self.subTest(error=error), patch.object(rig.subprocess, 'run', side_effect=error):
+                with patch.object(rig, 'press_keys') as press:
+                    with self.assertRaisesRegex(RuntimeError, 'physical keymap'):
+                        rig.console_line(Mock(), 'echo test')
+                    press.assert_not_called()
 
     def test_interruption_while_enabling_console_registers_rollback_first(self):
         rollback = Mock()

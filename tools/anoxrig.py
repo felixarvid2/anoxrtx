@@ -2,7 +2,8 @@
 """Test rig for Anachronox + RTX Remix on Linux (Steam/Proton).
 
 Runs against an X display (default :7, a nested `Xwayland :7 -geometry 1920x1200 -decorate`; put
-`DISPLAY=:7` in the game's Steam launch options). Needs python-xlib and Pillow.
+`DISPLAY=:7` in the game's Steam launch options). Needs python-xlib, Pillow,
+xkbcomp, xset, and enabled X autorepeat for console input.
 
   anoxrig.py start [SECS]          launch via Steam, wait for visible content (default 180 s)
   anoxrig.py stop                  kill the game (and the Remix bridge server)
@@ -427,18 +428,33 @@ def ensure_console(d, before_enable=None):
 
 def console_keys(d, text):
     """Validate text and keyboard levels before editing the current console line."""
+    if any(not 32 <= ord(char) <= 126 for char in text):
+        raise ValueError('cannot type save selector with the current keyboard layout')
+    # The game reads US physical keys, even when Xwayland reports Swedish
+    # symbols. Resolve XKB positions instead of symbols or Xlib's cached map.
+    try:
+        query = subprocess.run(['xkbcomp', '-xkb', d.get_display_name(), '-'],
+                               capture_output=True, text=True, check=True, timeout=5)
+    except (OSError, subprocess.SubprocessError) as error:
+        raise RuntimeError('cannot read X physical keymap; console input not sent') from error
+    physical = {name: int(code) for name, code in
+                re.findall(r'<([A-Z0-9]+)>\s*=\s*(\d+)\s*;', query.stdout)}
+    positions = {' ': ('SPCE', False), chr(96): ('TLDE', False), '~': ('TLDE', True),
+                 chr(92): ('BKSL', False), '|': ('BKSL', True)}
+    for row, plain, shifted in (('AE', '1234567890-=', '!@#$%^&*()_+'),
+                                ('AD', 'qwertyuiop[]', 'QWERTYUIOP{}'),
+                                ('AC', "asdfghjkl;'", 'ASDFGHJKL:"'),
+                                ('AB', 'zxcvbnm,./', 'ZXCVBNM<>?')):
+        for index, (lower, upper) in enumerate(zip(plain, shifted), 1):
+            positions[lower] = (f'{row}{index:02}', False)
+            positions[upper] = (f'{row}{index:02}', True)
     result = []
     for char in text:
-        symbol = ord(char)
-        code = d.keysym_to_keycode(symbol)
-        if not 32 <= symbol <= 126 or not 8 <= code <= 255:
-            raise ValueError('cannot type save selector with the current keyboard layout')
-        if d.keycode_to_keysym(code, 0) == symbol:
-            result.append([code])
-        elif d.keycode_to_keysym(code, 1) == symbol:
-            result.append(keycodes(d, ('Shift_L',)) + [code])
-        else:
-            raise ValueError('save selector needs an unsupported keyboard group')
+        name, shifted = positions[char]
+        codes = [physical.get('LFSH', 0), physical.get(name, 0)] if shifted else [physical.get(name, 0)]
+        if any(not 8 <= code <= 255 for code in codes):
+            raise ValueError('save selector needs an unavailable physical key')
+        result.append(codes)
     return result
 
 

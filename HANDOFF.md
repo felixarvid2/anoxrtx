@@ -73,11 +73,14 @@ The rig drives the game in a nested X server so the owner's desktop is not distu
 - Same-map restores need console closure before the camera settles. This game's `LoadGame2: Aborted`
   message is emitted even after restoration; fresh filename/lump/read-error evidence and final
   camera position are used instead. A map-light hot reload alone is not save-load evidence.
-- Console input candidate: 120 ms key holds/gaps and a repeat-rate-aware held
-  Backspace replace the old tap loop. Complete save loading remains unverified:
-  a follow-up run failed during compound-command handling and the computer
-  subsequently restarted. See [investigation and recovery](docs/console-input-check.md).
-  Keep future worktrees and runtime recovery backups on persistent storage.
+- Console input verified 2026-10-18: the game interprets US physical keys even
+  when Xwayland reports Swedish symbols. The rig resolves XKB key names with
+  `xkbcomp`, retains 120 ms typing and repeat-rate-aware held Backspace, and
+  rejects unavailable maps/repeat settings before input. Both saves passed with
+  the default waiting budget, correct poses, console closure and developer-mode
+  restoration. A full stale prompt, disabled repeat, and SIGINT/SIGTERM key
+  release were checked. See [investigation and recovery](docs/console-input-check.md).
+  Keep worktrees and runtime recovery backups on persistent storage.
 
 ## What exists (see README.md in each repo for details)
 QindieGL options (all in `[game.anox]` of QindieGL.ini unless noted):

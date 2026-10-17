@@ -22,10 +22,10 @@ Ordnat ungefär efter nytta. ✅ = klart, 🔶 = gjort men inte sett i spelet.
 - [ ] **Första ljusläget efter sparladdning**: första vyns initiala skala-1-bilder var lika mörka som
       skala 0 tills ljusen laddades om. Andra vyn var stabil även vid omladdning av samma värde.
       Orsaken är inte fastställd; skilj detta från ljuskalibrering.
-- [ ] **Testriggens konsolinput under last**: ordinarie inmatning misslyckades innan en sparladdning
-      bekräftades. Kandidaten använder 120 ms-inmatning och hållen Backspace med serverns repetitionshastighet.
-      Komplett sparladdning misslyckades i uppföljningen; datorn startades sedan om. Ingen rättning är
-      spelverifierad ännu; se [undersökningen](docs/console-input-check.md).
+- [x] **Testriggens konsolinput under last**: spelet tolkar fysiska US-tangenter även när Xwayland
+      visar svenska symboler. Rättningen använder XKB-tangentnamn samt 120 ms-inmatning och hållen
+      Backspace. Båda sparvyerna, 240 teckens gammal prompt, avstängd repetition och tangentfrisläppning
+      vid SIGINT/SIGTERM verifierade 2026-10-18; se [undersökningen](docs/console-input-check.md).
 - [ ] **Testriggen**: fler fasta testplatser. `list-saves` och `load-save PROFIL/PLATS` finns nu;
       samla sparfiler vid TimeMinders för utomhusmiljö, vatten och lava. Se [testplatser](docs/test-locations.md).
 - [x] **Testriggens start och rörelse**: `start` känner igen synligt spelinnehåll trots att Remix Plus
