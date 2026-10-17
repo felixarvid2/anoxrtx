@@ -17,8 +17,13 @@ Ordnat ungefär efter nytta. ✅ = klart, 🔶 = gjort men inte sett i spelet.
 - [x] **Kartljusens omladdning i Remix Plus**: återanvända API-identiteter gjorde ändrade ljus
       osynliga. Nya identiteter per skapande rättar reproduktionen; rött testljus och skalorna
       0/100/1 verifierade i Rowdy's startkorridor. Se [API-kontrollen](docs/maplight-api-check.md).
-- [ ] **Upprepa ljuskalibreringen i sparvyerna med rättad wrapper**: tidigare skaljämförelser
-      påverkades av omladdningsfelet. Standardvärdena är oförändrade; styrka i andra miljöer återstår.
+- [x] **Kartljus i två sparvyer med rättad wrapper**: båda Rowdy's-vyerna visar tydlig skillnad
+      mellan skala 0 och 1. Behåll standardvärdet 1; se [sparvykontrollen](docs/saved-view-lighting-check.md).
+- [ ] **Första ljusläget efter sparladdning**: första vyns initiala skala-1-bilder var lika mörka som
+      skala 0 tills ljusen laddades om. Andra vyn var stabil även vid omladdning av samma värde.
+      Orsaken är inte fastställd; skilj detta från ljuskalibrering.
+- [ ] **Testriggens konsolinput under last**: ordinarie inmatning misslyckades innan en sparladdning
+      bekräftades. Isolerad 120 ms-inmatning och hållen Backspace fungerade; härda den ordinarie riggen.
 - [ ] **Testriggen**: fler fasta testplatser. `list-saves` och `load-save PROFIL/PLATS` finns nu;
       samla sparfiler vid TimeMinders för utomhusmiljö, vatten och lava. Se [testplatser](docs/test-locations.md).
 - [x] **Testriggens start och rörelse**: `start` känner igen synligt spelinnehåll trots att Remix Plus

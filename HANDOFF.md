@@ -31,11 +31,13 @@ The owner (Felix) writes in Swedish; answer in Swedish. Repo text, commits and c
 - Steam launch options (localconfig.vdf, app 242940):
   `__NV_PRIME_RENDER_OFFLOAD=1 __VK_LAYER_NV_optimus=NVIDIA_only __GLX_VENDOR_LIBRARY_NAME=nvidia VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/nvidia_icd.json DXVK_LOG_LEVEL=info WINEDLLOVERRIDES="opengl32=n,b;d3d9=n,b" %command%`
   Steam must be shut down (`steam -shutdown`) before editing localconfig.vdf, or it overwrites the change.
-- Installed now: QindieGL build from `master` (opengl32.dll), **Remix Plus 1.5.1** runtime (stock Remix 1.5.2 is
+- Installed now: QindieGL `master` light-identity fix (source `642a5e5`, merged `99881f0`), **Remix Plus 1.5.1** runtime (stock Remix 1.5.2 is
   kept as `.trex.remix152` + `d3d9.dll.remix152`), Chuncki's 4x texture pack (`anoxdata/textures`,
   `TEXTURES.dat` renamed `.orig`, the pack's `ref_gl.dll`), mod at `rtx-remix/mods/anoxrt` with sublayers
   hd_sky, liquids, emissive, models_hd, pbr, proctex. QindieGL.ini `[game.anox]`: remixapi, maplights,
   maplights_scale 100, dlights, proctex, smoothnormals, camera detection. `anox_customise.ini` next to anox.exe.
+  The verified fixed DLL remains installed after the 2026-10-17 saved-view test. Its fingerprint and
+  previous-DLL backup are recorded in `~/.cache/anoxrtx/backups/maplight-identity-install.json`.
 - Tools: llvm-mingw in `~/.local/llvm-mingw`; Python venv with Pillow, numpy, xxhash, usd-core, python-xlib:
   `/tmp/claude-1000/-home-felix-Documents-jensen2/bd228632-acec-45ae-b061-56839c96ea01/scratchpad/venv/bin/python`
   (temporary; `tools/install.sh` creates its own in `~/.cache/anoxrtx/venv`). Real-ESRGAN ncnn is downloaded by the
@@ -124,11 +126,10 @@ when started with `+map`, so it is untested. Tuning knobs: `rtx.volumetrics.fogR
   rims on sharp colour edges still remain (`pbr_layer.py --strength`, default 2).
 - Numos sun rotation convention (shadow direction) on the five outdoor maps.
 - Map light brightness in environments other than Rowdy's.
-- Repeat saved-view calibration with the corrected QindieGL map-light identity lifecycle.
-  Reusing destroyed identities prevented visible reload updates on installed Remix Plus 1.5.1;
-  fresh identities fixed an existing-light edit and scales 0/100/1 in the startup hallway.
-  See the [API investigation](docs/maplight-api-check.md). Defaults are unchanged; the test DLL
-  was restored afterward, so install the corrected build before repeating calibration.
+- Initial post-load light state still needs investigation: the first saved view's initial scale-1
+  frames looked like scale 0 until explicit reload, while the second view's initial, same-value
+  reload and final scale-1 frames agreed. Both views show clear 0/1 contribution after confirmed
+  reloads; retain defaults. See the [saved-view check](docs/saved-view-lighting-check.md).
 
 ## Ideas not done yet (from anoxrtx IDEAS2.md and the owner's last question)
 1. In-game menu for lights/overrides (QindieGL already has ImGui code for other games: `qdx_imgui_*`).
