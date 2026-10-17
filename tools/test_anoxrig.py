@@ -195,6 +195,58 @@ with patch('Xlib.display.Display', return_value=display), patch('Xlib.ext.xtest.
                         process.communicate()
 
 
+class ConsoleInputTests(unittest.TestCase):
+    def setUp(self):
+        self.d = Mock()
+        self.d.get_keyboard_control.return_value = Mock(
+            global_auto_repeat=X.AutoRepeatModeOn, auto_repeats=bytes([255] * 32))
+
+    def test_clear_budget_covers_long_line_at_server_rate(self):
+        with patch.object(rig.subprocess, 'run', return_value=Mock(
+                stdout='auto repeat delay: 600 repeat rate: 25')) as query:
+            self.assertAlmostEqual(rig.console_clear_seconds(self.d, 22), 10.7)
+        self.assertEqual(query.call_args.kwargs['timeout'], 5)
+
+    def test_disabled_backspace_repeat_is_rejected(self):
+        self.d.get_keyboard_control.return_value.auto_repeats = bytes(32)
+        with self.assertRaisesRegex(RuntimeError, 'autorepeat is disabled'):
+            rig.console_clear_seconds(self.d, 22)
+
+    def test_unreadable_repeat_rate_is_rejected(self):
+        for result in ('', 'auto repeat delay: 600 repeat rate: 0'):
+            with self.subTest(result=result), patch.object(rig.subprocess, 'run',
+                    return_value=Mock(stdout=result)):
+                with self.assertRaisesRegex(RuntimeError, 'autorepeat rate'):
+                    rig.console_clear_seconds(self.d, 22)
+        with patch.object(rig.subprocess, 'run', side_effect=subprocess.TimeoutExpired('xset', 5)):
+            with self.assertRaisesRegex(RuntimeError, 'autorepeat rate'):
+                rig.console_clear_seconds(self.d, 22)
+
+    def test_console_input_uses_held_clear_and_slow_keys(self):
+        with patch.object(rig, 'console_keys', return_value=[[20], [21]]), \
+                patch.object(rig, 'keycodes', side_effect=lambda d, names: {
+                    ('End',): [10], ('BackSpace',): [11], ('Return',): [12]}[tuple(names)]), \
+                patch.object(rig, 'console_clear_seconds', return_value=10.7), \
+                patch.object(rig, 'press_keys') as press, patch.object(rig.time, 'sleep') as sleep:
+            rig.console_line(self.d, 'ab')
+        self.assertEqual(press.call_args_list, [
+            unittest.mock.call(self.d, [10], 0.2),
+            unittest.mock.call(self.d, [11], 10.7),
+            unittest.mock.call(self.d, [20], 0.12),
+            unittest.mock.call(self.d, [21], 0.12),
+            unittest.mock.call(self.d, [12], 0.12)])
+        self.assertEqual(sleep.call_args_list, [unittest.mock.call(0.5),
+            unittest.mock.call(0.12), unittest.mock.call(0.12)])
+
+    def test_held_backspace_released_when_sync_fails(self):
+        self.d.sync.side_effect = [RuntimeError('sync failed'), None]
+        with patch.object(rig.xtest, 'fake_input') as fake:
+            with self.assertRaisesRegex(RuntimeError, 'sync failed'):
+                rig.press_keys(self.d, [22], 10.7)
+        self.assertEqual(fake.call_args_list, [unittest.mock.call(self.d, X.KeyPress, 22),
+            unittest.mock.call(self.d, X.KeyRelease, 22)])
+
+
 class SaveTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -319,15 +371,53 @@ class SaveTests(unittest.TestCase):
             self.assertTrue(rig.is_console(im))
         self.assertFalse(rig.is_console(Image.new('RGB', (640, 400), 'black')))
 
-    def test_console_typing_handles_shift_and_rejects_unsupported_groups(self):
+    def test_console_typing_handles_shift_and_requires_valid_physical_keys(self):
         d = Mock()
-        d.keysym_to_keycode.side_effect = lambda symbol: {65: 38, 65505: 50}.get(symbol, 0)
-        d.keycode_to_keysym.side_effect = lambda code, level: (97, 65)[level]
-        self.assertEqual(rig.console_keys(d, 'A'), [[50, 38]])
-        d.keycode_to_keysym.return_value = 0
-        d.keycode_to_keysym.side_effect = None
-        with self.assertRaises(ValueError):
-            rig.console_keys(d, 'A')
+        d.get_display_name.return_value = ':7'
+        with patch.object(rig.subprocess, 'run', return_value=Mock(
+                stdout='<AC01> = 38; <LFSH> = 50;')):
+            self.assertEqual(rig.console_keys(d, 'A'), [[50, 38]])
+        for mapping in ('<AC01> = 38;', '<AC01> = 0; <LFSH> = 50;'):
+            with self.subTest(mapping=mapping), patch.object(rig.subprocess, 'run',
+                    return_value=Mock(stdout=mapping)), self.assertRaises(ValueError):
+                rig.console_keys(d, 'A')
+
+    def test_console_typing_uses_physical_keys_despite_swedish_symbols(self):
+        d = Mock()
+        # These Swedish symbols are valid X bindings but wrong for the game.
+        stale = {ord('_'): (61, (ord('-'), ord('_'))),
+                 ord(';'): (59, (ord(','), ord(';'))),
+                 ord('/'): (16, (ord('7'), ord('/'))), 65505: (50, (65505,))}
+        d.keysym_to_keycode.side_effect = lambda symbol: stale[symbol][0]
+        d.keycode_to_keysym.side_effect = lambda code, level: next(
+            values[level] for key, values in stale.values() if key == code)
+        d.display.info.min_keycode = 8
+        d.display.info.max_keycode = 255
+        current = [(0, 0)] * 248
+        for code, values in {61: (ord('-'), ord('_')), 59: (ord(','), ord(';')),
+                             16: (ord('7'), ord('/')), 50: (65505, 0)}.items():
+            current[code - 8] = values
+        d.get_keyboard_mapping.return_value = current
+        d.get_display_name.return_value = ':7'
+        with patch.object(rig.subprocess, 'run', return_value=Mock(
+                stdout='<AE11> = 20; <AC10> = 47; <AB10> = 61; <LFSH> = 50;')) as query:
+            self.assertEqual(rig.console_keys(d, '_;/'), [[50, 20], [47], [61]])
+        self.assertEqual(query.call_args.args[0], ['xkbcomp', '-xkb', ':7', '-'])
+        self.assertEqual(query.call_args.kwargs['timeout'], 5)
+        d.get_keyboard_mapping.assert_not_called()
+        d.keysym_to_keycode.assert_not_called()
+        # Key names, not assumed evdev numbers, are the source of the codes.
+        with patch.object(rig.subprocess, 'run', return_value=Mock(
+                stdout='<AE11> = 120; <LFSH> = 150;')):
+            self.assertEqual(rig.console_keys(d, '_'), [[150, 120]])
+
+    def test_unreadable_physical_keymap_prevents_console_input(self):
+        for error in (FileNotFoundError(), subprocess.TimeoutExpired('xkbcomp', 5)):
+            with self.subTest(error=error), patch.object(rig.subprocess, 'run', side_effect=error):
+                with patch.object(rig, 'press_keys') as press:
+                    with self.assertRaisesRegex(RuntimeError, 'physical keymap'):
+                        rig.console_line(Mock(), 'echo test')
+                    press.assert_not_called()
 
     def test_interruption_while_enabling_console_registers_rollback_first(self):
         rollback = Mock()
