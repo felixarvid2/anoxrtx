@@ -1,94 +1,78 @@
-# Att göra: förbättra RTX Remix för Anachronox
+# Att göra: Anachronox RTX
 
-Läget och tidigare resultat finns i [RESULTS.md](RESULTS.md), planen i [PLAN.md](PLAN.md).
-Ordnat ungefär efter nytta. ✅ = klart, 🔶 = gjort men inte sett i spelet.
+Uppdaterad 2026-10-18. Prioritering och acceptanskriterier finns i
+[PLAN.md](PLAN.md), nuläge och källor i [STATUS.md](STATUS.md).
+`[x]` betyder bara att den avgränsade leveransen nedan är klar;
+implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 
-## 1. Verifiera det som redan är byggt
-- [x] **Rowdy's: normaler och emissiva skyltar i två sparvyer**: separata diagnostikvarianter visar
-      ytstruktur respektive skyltglöd. Behåll standardvärdena; ingen tydlig förbättring motiverar en
-      generell ändring. Se [kontrollen 2026-10-17](docs/rowdys-material-check.md).
-- [ ] 🔶 **HD-himlar** (`hd_sky.usda`): titta i en bana med ljus himmel (t.ex. Sunder, `sunder2`, eller banor
-      med `blue`/`outside`/`forest`). Introt visar bara stjärnhimlar.
-- [ ] 🔶 **Vätskematerial** (`liquids.usda`): Limbus (vatten), Levant (lava), Hive/Krapton (kristaller/glöd),
-      Ballotine (slem). Justera IOR, `transmittance_measurement_distance` och glödstyrka efter vad som syns.
-- [ ] 🔶 **Flashblend-ljus** (QindieGL PR #6): testa i en strid/explosion med `gl_flashblend 1`, merga om det fungerar.
-- [ ] **Kartljus i fler banor**: hittills bara jämfört i Rowdy's. Gå igenom några olika miljöer och justera
-      `maplights_scale` (eventuellt en skala per bana).
-- [x] **Kartljusens omladdning i Remix Plus**: återanvända API-identiteter gjorde ändrade ljus
-      osynliga. Nya identiteter per skapande rättar reproduktionen; rött testljus och skalorna
-      0/100/1 verifierade i Rowdy's startkorridor. Se [API-kontrollen](docs/maplight-api-check.md).
-- [x] **Kartljus i två sparvyer med rättad wrapper**: båda Rowdy's-vyerna visar tydlig skillnad
-      mellan skala 0 och 1. Behåll standardvärdet 1; se [sparvykontrollen](docs/saved-view-lighting-check.md).
-- [ ] **Första ljusläget efter sparladdning**: första vyns initiala skala-1-bilder var lika mörka som
-      skala 0 tills ljusen laddades om. Andra vyn var stabil även vid omladdning av samma värde.
-      Orsaken är inte fastställd; skilj detta från ljuskalibrering.
-- [x] **Testriggens konsolinput under last**: spelet tolkar fysiska US-tangenter även när Xwayland
-      visar svenska symboler. Rättningen använder XKB-tangentnamn samt 120 ms-inmatning och hållen
-      Backspace. Båda sparvyerna, 240 teckens gammal prompt, avstängd repetition och tangentfrisläppning
-      vid SIGINT/SIGTERM verifierade 2026-10-18; se [undersökningen](docs/console-input-check.md).
-- [ ] **Testriggen**: fler fasta testplatser. `list-saves` och `load-save PROFIL/PLATS` finns nu;
-      samla sparfiler vid TimeMinders för utomhusmiljö, vatten och lava. Se [testplatser](docs/test-locations.md).
-- [x] **Testriggens start och rörelse**: `start` känner igen synligt spelinnehåll trots att Remix Plus
-      inte skriver kamerameddelandet; `key`/`chord` fokuserar spelet och `hold SEK TANGENT...` håller
-      rörelsetangenter. Fokus och rörelse verifierade i nästlad Rowdy's-session 2026-10-17.
+## Nästa implementationer, i ordning
 
-## 2. Ljus
-- [ ] **Kalibrera tumregeln för `cap`/`falloff`/`_cone`** mot banornas egna ljuskartor: BSP-filerna har
-      ljuskartorna kvar, så ljusstyrka nära varje ljus kan mätas och jämföras med Remix-bilden.
-- [ ] **Ljusstilar och tändbara ljus**: ljus med `style`/`targetname` blinkar eller tänds och släcks i spelet,
-      men är statiska i Remix nu.
-- [ ] **Lampobjekt** (`ob_streetlight1`, `ob_light-1`, `ob_spotlight`, `ob_volight`, `cine_spotlight` …):
-      har egna positioner men räknas inte som ljus än.
-- [ ] **Självlysande ytor** (`SURF_LIGHT`, t.ex. `bricks/lightstrip1(450)`): gör dem till emissiva
-      Remix-material via `remixhash.py`, så att lysrör och skyltar lyser upp omgivningen.
-- [ ] **Dimma**: 72 banor har `fog` i `worldspawn`; se till att Remix-dimman (`rtx.enableFog`,
-      volumetrik) matchar.
-- [ ] **Sol/himmelsljus** för utomhusbanor (riktat ljus per bana).
-- [ ] **De två `proc_lava*`-texturerna** genereras medan spelet kör: hasha dem med `DumpTextures` i Levant
-      och lägg till i `liquids.usda`.
+- [ ] **0. Första ljusläget efter sparladdning:** upprepa båda sparvyerna före
+  reload, jämför samma värde och 0 → 1, förklara/rätta orsaken utan ljuskalibrering.
+- [ ] **1. Automatisk bildregression:** manifest, verifierad pose/miljö,
+  flerbildsjämförelse, rapport/differensbilder och kontrollerad baslinjeuppdatering.
+- [ ] **2. Debug-overlay:** utöka befintlig ImGui med Anachronox-ljus,
+  tillstånd, reloadorsak och cullingdiagnostik; verifiera Proton-input.
+- [ ] **3. Händelsestyrt animerat ljus:** verkliga stil-/switchsignaler,
+  START_OFF, speltid och paus-/save-/kartlivscykel; bevara befintliga dlights.
+- [ ] **4. BSP/PVS:** börja mätning tidigt; implementera konservativ synlighet
+  som bevarar skuggor/reflektioner och verifiera CPU/GPU/VRAM.
+- [ ] **5. Dynamisk emission:** synkronisera ett verifierat material med
+  ljushändelser, utan kvarhängande tillstånd eller dubbel illumination.
+- [ ] **6. PBR-klassificering:** vidareutveckla befintliga namnregler med
+  dataregler, undantag, BSP-flaggor och osäkerhetsrapport; kan gå parallellt.
+- [ ] **7. Ankarmeshar:** stabila författar-ID:n, per-karta-data, ersättnings-
+  och resurslivscykel; statiska ankare först.
+- [ ] **8. Dimma/miljötillstånd:** mjuka, verifierade övergångar och återgång
+  till kartbaslinjen; ingen global Numos-himmel.
+- [ ] **9. Väta/regn:** en utomhuskarta först, skydd inomhus, upptorkning,
+  runtime-fallback och uppmätt prestanda.
 
-## 3. Material och texturer
-- [ ] **Uppskala banornas texturer** (TEXTURES.dat) och lägg dem som Remix-ersättningar via hash,
-      på samma sätt som himlarna. Undvik eller specialbehandla texturer med fina detaljer (som stjärnor).
-- [ ] **PBR-material**: generatorn finns; normalernas effekt är sedd i två Rowdy's-vyer.
-      Finjustering av enskilda material och närbilder av misstänkta ljusa kanter återstår.
-- [ ] **Figurmaterial**: med `smoothnormals` behövs inte längre maxad roughness/metalness på figurer
-      för att dölja kantigheten; gör om de materialen i `mod.usda`.
-- [ ] **UI och intro**: lägg logotyper/menyer som saknas i `rtx.uiTextures` (hashar från `DumpTextures`),
-      så att det överexponerade introt och menyerna ritas som vanligt.
-- [ ] **Partiklar och strålar** (`rtx.particleTextures`, `rtx.beamTextures`): komplettera listorna med dumpen.
+## Befintligt som fortfarande behöver spelverifiering
 
-## 4. Geometri
-- [ ] **Vatten**: kontrollera att vattenytornas geometrihash är stabil (spelet varpar vattnet), och att
-      genomskinligheten inte bryts av det.
-- [ ] **Dörrar och andra brush-entiteter** får också genererade normaler av `smoothnormals`: kontrollera att
-      det ser rätt ut.
-- [ ] **Himmelsdetektering**: kontrollera i Remix debug-vy att himlen klassas rätt i alla banor (nu 103 hashar).
+- [ ] Utomhusbaslinje: HD-himmel och Numos sol-/skuggriktning på avsedda kartor.
+- [ ] Vatten: genomskinlighet, stabil geometrihash och material i relevant vy.
+- [ ] Lava: `proc_lava`/`proc_lavafloe`-frysloggar och synligt ersättningsmaterial.
+- [ ] Strid: icke-noll dlights och synligt ljus från vapen/explosioner.
+  QindieGL #6 är redan mergad; välj flashblend-fallback bara från evidens
+  och kontrollera att samma händelse inte belyses dubbelt.
+- [ ] Fler TimeMinder-testplatser och repeterbara händelsescenarier.
+- [ ] Kartljus utanför Rowdy's; kalibrera formeln först efter korrekt initiering.
+- [ ] PBR-närbilder: ljusa kanter, glas och materialundantag; figurmaterialens
+  roughness/metalness efter `smoothnormals`.
+- [ ] Dimma i fler miljöer, inklusive den tidigare blockerade whitecaves-b-vyn.
+- [ ] Dörrar/brush-normaler, partiklar, strålar och himmelsklassning i fler kartor.
 
-## 5. Bild och prestanda
-- [ ] **Rätt bildformat**: svarta kanter (4:3) i stället för utsträckt bild i `BorderlessFullscreen`.
-- [ ] **Högre renderupplösning**: låt Remix rendera i skärmens upplösning i stället för spelets 640×480.
-- [ ] **DLSS under Proton**: NGX laddas inte nu (`PROTON_ENABLE_NGX_UPDATER=1`, `PROTON_ENABLE_NVAPI=1`).
-- [ ] **Neural Radiance Cache** startar inte under Wine; undersök eller stäng av inställningarna för den.
-- [ ] **Mät FPS** på testplatserna och justera `rtx.graphicsPreset`, antal studsar m.m.
+## Separat bild- och underhållsarbete
 
-## 6. Teknik och underhåll
-- [ ] **Remix-input under Wine**: riktiga tangenter fungerar (Alt+X), men syntetiska (XTest) når inte Remix.
-      Löses detta kan riggen göra fångster automatiskt.
-- [ ] **Windows-bygget av QindieGL**: alla ändringar är bara byggda med llvm-mingw; bygg och testa med MSVC.
-- [ ] **Skicka ändringar uppströms** till whisperglen/QindieGL (Linux-bygget, `BorderlessFullscreen`,
-      `smoothnormals`, `maplights`, `DumpTextures`) och vinevi1/anoxrtx (Linux-fixarna i `rtx.conf`).
-- [ ] **Paketering**: ett skript som installerar allt (QindieGL-DLL, Remix, `.trex`-config, `rtx.conf`,
-      kartljus, uppskalade himlar/vätskor) och sätter Steams startalternativ.
-- [ ] **Nya Remix-versioner**: kontrollera Linux-fixarna (`rtx.dlfg.enable`, `rtx.useNewGuiInputMethod`) och
-      hashregeln vid varje uppdatering.
+- [ ] Rätt bildformat och högre renderupplösning utan felaktig UI-/musmappning.
+- [ ] Komplettera UI-/intro-, partikel- och stråltexturlistor.
+- [ ] Fasta CPU-/GPU-bildtider och VRAM-baslinjer innan prestandainställningar ändras.
+- [ ] Remix overlay-/capture-hotkeys från riggen; konsolinput är separat och rättad.
+- [ ] MSVC-bygge och Windows-verifiering; Linux-bygge bevisar inte dessa.
+- [ ] Installations-/toggle-regression vid relevanta ändringar, runtime-uppgraderingar
+  med Wine-fixarna bevarade, samt lämpliga upstream-PR:ar.
+- [ ] Granska externa modellroutningsförslag separat: anoxrtx #28 och QindieGL #23
+  var öppna vid dokumentationsöversynen.
 
-## Redan klart
-- ✅ QindieGL byggs på Linux (llvm-mingw), per-spel-hookar portade.
-- ✅ Remix fungerar under Proton (frame generation av, ny GUI-input av, present-semaforen av).
-- ✅ Kantlös helskärm (`BorderlessFullscreen`).
-- ✅ Mjuka normaler på figurer (`smoothnormals`).
-- ✅ Stabila geometrihashar för figurer (`rtx.geometryAssetHashRuleString`).
-- ✅ Kartljus ur banfilerna via Remix API (`maplights`), med spotljus.
-- ✅ Remix texturhashar utan fångst (`DumpTextures`, `tools/remixhash.py`).
-- ✅ Verktyg: `adat.py`, `bspinfo.py`, `bsp2lights.py`, `make_layers.py`, testriggen `anoxrig.py`.
+## Implementerat och avgränsat verifierat
+
+- [x] Linux-crossbygge med 385 exporter och fungerande Proton/Remix-grund.
+- [x] Borderless fullscreen, mjuka modellnormaler och stabilare figurhashregel.
+- [x] BSP-kartljus, spot/sol, per-karta-formel/config och filbaserade overrides.
+- [x] QindieGL #21: nya Remix-identiteter rättar reproducerad ljusreload;
+  båda Rowdy's-sparvyerna visar skala 0/1. Initialt ljusläge är fortfarande öppet.
+- [x] Timerstilar 1–11 implementerade; detta är inte spelstyrda switchhändelser.
+- [x] Emissiv-, PBR-/glas-, HD-himmel-/vätske-/modellgeneratorer samt Chuncki-
+  hashmappning finns. Normaler och fem emissiva skyltar har synlig effekt i två
+  Rowdy's-vyer; detta verifierar inte alla material eller miljöer.
+- [x] DLSS fungerar under GE-Proton; DLAA är standard. NRC fungerar inte och
+  hålls avstängt med `rtx.integrateIndirectMode = 0`.
+- [x] GL-dimremap och per-karta-Numos finns; haze sedd i bricksb, sunstrip och Rowdy's.
+- [x] Installerare och toggle-script finns; speldata genereras lokalt.
+- [x] Riggstart, fokuserad rörelse och nonce-verifierad sparladdning finns.
+- [x] anoxrtx #27: fysisk XKB-input rättad; 33 offline-tester, båda sparvyerna,
+  lång gammal prompt, repeat-avvisning och avbrottsfrisläppning dokumenterade.
+
+Detta är en dokumentationsavstämning av tidigare resultat, inte nya speltester.
+Se [RESULTS.md](RESULTS.md) och de daterade rapporterna under `docs/`.

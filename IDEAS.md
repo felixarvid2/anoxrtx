@@ -1,5 +1,11 @@
 # Ideas for improving RTX Remix in Anachronox
 
+> Historical idea survey. Implementation status and ordering were reconciled
+> on 2026-10-18 in [STATUS.md](STATUS.md), [TODO.md](TODO.md) and
+> [PLAN.md](PLAN.md). Several proposals below are already implemented; source
+> project capability descriptions are historical, not newly verified claims.
+
+
 Collected from other RTX Remix projects on id Tech 2 / id Tech 3 (and two other engines with very
 relevant renderer work), compared with what we have seen running Anachronox through QindieGL + Remix 1.5.2.
 Each idea says where it comes from and roughly how much work it is.

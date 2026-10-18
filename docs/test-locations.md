@@ -64,10 +64,19 @@ unused slot, list the saves, and verify a restore. Record the selector, map,
 fingerprint, reported position/yaw, runtime, geometry, and the feature visible
 from that saved view. Keep the save and screenshots outside tracked files.
 
+## Planned regression automation
+
+The commands below are the existing manual capture workflow. Automated
+manifests, pose/environment rejection, multi-frame comparison, masks and
+baseline management are planned in [PLAN.md](../PLAN.md), step 1; they are
+not existing CLI commands. Combat and event-controlled on/off scenarios also
+need verified local baselines. Keep these separate from static indoor views.
+
 ## Capture before and after
 
 ```sh
-python tools/anoxrig.py load-save steamuser/1 > /tmp/rowdys-before.txt
+mkdir -p ~/.cache/anoxrtx
+python tools/anoxrig.py load-save steamuser/1 > ~/.cache/anoxrtx/rowdys-before.txt
 sleep 8
 python tools/anoxrig.py shot rowdys-before
 ```
@@ -75,7 +84,7 @@ python tools/anoxrig.py shot rowdys-before
 Make one intended lighting/material/config change, then repeat:
 
 ```sh
-python tools/anoxrig.py load-save steamuser/1 > /tmp/rowdys-after.txt
+python tools/anoxrig.py load-save steamuser/1 > ~/.cache/anoxrtx/rowdys-after.txt
 sleep 8
 python tools/anoxrig.py shot rowdys-after
 ```

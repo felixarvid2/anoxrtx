@@ -1,5 +1,11 @@
 # Rowdy's lighting and material check — 2026-10-17
 
+> Historical test record. Follow [current status](../STATUS.md) and
+> [the implementation plan](../PLAN.md) for present priorities. Console input
+> was subsequently fixed and accepted in [PR #27](console-input-check.md);
+> initial post-save-load lighting remains a separate open investigation.
+
+
 This check covers two stationary indoor save views, not the outdoor, water,
 lava, combat-light, or sun-direction tasks. See [test locations](test-locations.md)
 for the save workflow and remaining location coverage.
