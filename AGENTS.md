@@ -127,7 +127,9 @@ Documentation-only edits need diff and link/path review.
 For QindieGL code changes, follow its Linux build and 385-export checks. Report
 MSVC and in-game verification separately from the cross-build result.
 
-Follow `HANDOFF.md` for game paths and `tools/anoxrig.py` usage. Confirm those
+Follow `HANDOFF.md` for game paths and `tools/anoxrig.py` usage. Run game tests through
+`tools/rigsession.sh` (it prepares the nested display/Steam and always restores them; workflow in
+`.claude/skills/anox-game-test/SKILL.md`). Confirm those
 local paths and tools still exist rather than relying on its temporary venv.
 Use the nested Xwayland test display, back up game files before replacement, and
 restore launch options, display settings, and Steam after every test, including
