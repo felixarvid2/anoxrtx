@@ -23,5 +23,20 @@ maps get the global `-2.0` (also in `rtx.conf`). Autoexposure absorbs part of a 
 needed for tenements and sunstrip. Remaining visible difference: characters (Boots) are darker under Remix than
 with the original lighting, which is a lighting/material difference, not exposure.
 
+## All maps
+
+A second run covered the other 79 maps (all except `cine*`, `black`, `flashback`, `whitecaves*`, `sphere*` and
+the seven above), measured at the global bias `-2.0` with `--settle 15`. Per-map bias = `-2.0 + EV`, rounded to
+0.1, written for the 54 maps with |EV| >= 0.3 (the values are in `anox_customise.ini`, from `mystech2 -5.2` /
+`sexmach -6.3` to `baltown -0.5`). Maps with |EV| < 0.3 keep the global value.
+
+Re-check of the five largest changes (after, EV): baltown +0.12, hephtower2 -0.21, mystech2 -0.22, whitendon -0.06,
+sexmach -1.04 at -5.3, so a second pass set it to -6.3 (-0.23).
+
+Not set (no usable comparison): ballotine, basement, braintrain, braintrain-b, commbase, commiteon,
+crevicelanding, fortress1, fortress2, hivebay, kraptonbay, labbuilding, mburger, servicetunnel, slevant (black
+frames, a scene still moving between the two shots, or a start view that differs between the runs), and
+baltownr (Remix start frame mostly black). These need a hand-picked view (`--views`) to measure.
+
 To match another map: run the `--ab-original` check for it, take the EV from the report (or the corrected value
 as above), set `rtx.tonemap.exposureBias` in its `[rtxconf.<map>]` section and check once more.
