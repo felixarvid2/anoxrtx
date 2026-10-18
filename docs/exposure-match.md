@@ -40,3 +40,13 @@ baltownr (Remix start frame mostly black). These need a hand-picked view (`--vie
 
 To match another map: run the `--ab-original` check for it, take the EV from the report (or the corrected value
 as above), set `rtx.tonemap.exposureBias` in its `[rtxconf.<map>]` section and check once more.
+
+## Characters
+
+The original lights models with the lightmap value under them (`R_LightPoint`) plus a per-map model light
+(e.g. rowdys 0.6/1/1, the teal on Boots' coat); path tracing has neither, so characters were about 2.2 EV
+darker than in the original although whole frames matched. QindieGL #30 adds a fill light per character
+(`[maplights.*] model_fill`). Rowdys character region (linear luminance): 0.0031 without, 0.0155 with
+`model_fill = 10`, 0.0139 in the original; museum and tenements checked side by side. The fill light also
+brightens the floor right around a character a little.
+
