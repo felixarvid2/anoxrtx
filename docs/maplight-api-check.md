@@ -3,7 +3,8 @@
 > Historical test record. Follow [current status](../STATUS.md) and
 > [the implementation plan](../PLAN.md) for present priorities. Console input
 > was subsequently fixed and accepted in [PR #27](console-input-check.md);
-> initial post-save-load lighting remains a separate open investigation.
+> the later [startup lighting check](startup-lighting-check.md) records the
+> device-lifecycle reproduction and correction.
 
 
 Reusing an API light identity after destroying it prevented visible updates on

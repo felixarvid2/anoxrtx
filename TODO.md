@@ -7,10 +7,14 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 
 ## Nästa implementationer, i ordning
 
-- [ ] **0. Första ljusläget efter sparladdning:** upprepa båda sparvyerna före
-  reload, jämför samma värde och 0 → 1, förklara/rätta orsaken utan ljuskalibrering.
-- [ ] **1. Automatisk bildregression:** manifest, verifierad pose/miljö,
-  flerbildsjämförelse, rapport/differensbilder och kontrollerad baslinjeuppdatering.
+- [x] **0. Första ljusläget efter sparladdning:** startup bytte grafikdevice utan
+  att återskapa ljusen. Livscykelrättning och Rowdy's-jämförelser verifierade;
+  se [evidens](docs/startup-lighting-check.md). Andra kartor/runtimes återstår.
+- [x] **1. Automatisk bildregression, första version:** `anoxcapture.py` och
+  `anoxcompare.py` ger verifierade manifest, flerbildsjämförelser och rapporter.
+  61 Python-tester passerar; positiva/negativa Rowdy's-kontroller verifierade.
+  Baslinjepromovering är uttrycklig och manuell. Fler testmiljöer återstår;
+  se [arbetsflödet](docs/screenshot-regression.md).
 - [ ] **2. Debug-overlay:** utöka befintlig ImGui med Anachronox-ljus,
   tillstånd, reloadorsak och cullingdiagnostik; verifiera Proton-input.
 - [ ] **3. Händelsestyrt animerat ljus:** verkliga stil-/switchsignaler,
