@@ -1,6 +1,8 @@
 # Handoff: Anachronox + RTX Remix on Linux (for Codex)
 
-Project context for the two repositories:
+Project context for the two repositories (this file lives in anoxrtx; QindieGL's `HANDOFF.md` points here).
+Doc map: [docs/README.md](docs/README.md); how things fit: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md);
+known problems: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
 - **felixarvid2/anoxrtx**: the Remix mod (configs, USD layers, tools, installer). Fork of vinevi1/anoxrtx.
   Local checkout: `/home/felix/Documents/jensen2/anoxrtx` (branch `main`).
 - **felixarvid2/QindieGL**: the OpenGL→D3D9 wrapper that makes the game Remix-compatible, with a Linux
