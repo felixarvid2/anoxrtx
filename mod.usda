@@ -2475,7 +2475,7 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -2483,7 +2483,7 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -2491,7 +2491,7 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -2499,7 +2499,7 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -2507,7 +2507,7 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -2549,7 +2549,7 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -2581,7 +2581,7 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -2661,8 +2661,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:metallic_constant = 1
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -2670,7 +2670,7 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -2678,8 +2678,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:metallic_constant = 1
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -2740,8 +2740,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:metallic_constant = 0.8
-                custom float inputs:reflection_roughness_constant = 0
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -3049,8 +3049,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:metallic_constant = 1
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -3058,8 +3058,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:metallic_constant = 1
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -3076,8 +3076,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:metallic_constant = 0.995
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -3085,8 +3085,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:metallic_constant = 1
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -3094,8 +3094,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:metallic_constant = 1
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -3103,8 +3103,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:metallic_constant = 1
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -3324,7 +3324,7 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -3381,8 +3381,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:metallic_constant = 1
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -3415,8 +3415,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:metallic_constant = 1
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -3424,8 +3424,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:metallic_constant = 1
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -3671,8 +3671,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:metallic_constant = 1
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -3680,8 +3680,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:metallic_constant = 1
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -3906,8 +3906,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:metallic_constant = 1
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
@@ -3916,8 +3916,8 @@ over "RootNode"
             over "Shader"
             {
                 custom bool inputs:enable_emission = 0
-                custom float inputs:metallic_constant = 1
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.7
                 custom float inputs:subsurface_measurement_distance = 0
                 custom bool inputs:thin_film_thickness_from_albedo_alpha = 0
             }
@@ -3927,8 +3927,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:metallic_constant = 1
-                custom float inputs:reflection_roughness_constant = 1
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.7
             }
         }
 
