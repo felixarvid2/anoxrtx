@@ -6,7 +6,19 @@ GE-Proton 11-9, RTX 5060 och Remix 1.5.2 release i nästlad `Xwayland :7`.
 Senare rapporter använder Remix Plus 1.5.1. Nuläge: [STATUS.md](STATUS.md);
 ny plan: [PLAN.md](PLAN.md), kvarvarande arbete: [TODO.md](TODO.md).
 
-## Avstämning 2026-10-18
+## Uppföljning: startup-ljus och bildregression 2026-10-18
+
+Gamla wrappern behöll kartljushandtag när spelet ersatte grafikdevice. Omladdning
+av oförändrad config ändrade 52,83% av bilden i första sparvyn. Den nya wrappern
+frigör före teardown och bygger om efter devicebyte; initialvyn matchar nu den
+manuellt reparerade referensen. Ljus-/materialstandarder ändrades inte.
+Se [kontroller och begränsningar](docs/startup-lighting-check.md).
+
+Capture-/jämförelseverktyg tillagda; 61 Python-tester passerar. Linux-bygget
+behåller 385 exporter. Speldata och runtime-artefakter är lokala; MSVC, stock
+Remix och andra kartor omfattas inte av denna verifiering.
+
+## Tidigare avstämning 2026-10-18
 
 DLSS/DLAA, installerare, emissiv/PBR-generering, dimremap och per-karta-Numos
 finns nu. Fokuserad rörelse och sparladdning fungerar; konsolinput är rättad

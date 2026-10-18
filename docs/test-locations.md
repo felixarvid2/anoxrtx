@@ -55,22 +55,25 @@ cinematic as a material/lighting baseline unless its timing is controlled.
 
 The [fixed-wrapper lighting check](saved-view-lighting-check.md) verified visible
 scale-0/scale-1 contribution in both saved views and retained default scale 1.
-A successful save restore does not by itself confirm the initial lighting state:
-the first view's initial scale-1 frames were dim until explicit reload. Validate
-lighting initialization before using such frames as a brightness baseline.
+The subsequent [startup lighting investigation](startup-lighting-check.md)
+reproduced stale handles across graphics-device replacement and verified
+automatic rebuilding with the corrected wrapper. Use the corrected DLL for
+new baselines; successful save restoration alone is not proof of lighting.
 
 To add a later location, reach a TimeMinder through normal play, save to an
 unused slot, list the saves, and verify a restore. Record the selector, map,
 fingerprint, reported position/yaw, runtime, geometry, and the feature visible
 from that saved view. Keep the save and screenshots outside tracked files.
 
-## Planned regression automation
+## Automated capture and comparison
 
-The commands below are the existing manual capture workflow. Automated
-manifests, pose/environment rejection, multi-frame comparison, masks and
-baseline management are planned in [PLAN.md](../PLAN.md), step 1; they are
-not existing CLI commands. Combat and event-controlled on/off scenarios also
-need verified local baselines. Keep these separate from static indoor views.
+`tools/anoxcapture.py` now loads a verified saved view and records frames,
+fingerprints and logs; `tools/anoxcompare.py` rejects incompatible manifests
+and writes multi-frame comparison reports. See
+[screenshot regression](screenshot-regression.md) for commands, tolerances,
+masks and explicit manual baseline promotion. The manual workflow below
+remains useful for diagnostics. Combat and event-controlled scenarios still
+need verified baselines separate from static indoor views.
 
 ## Capture before and after
 

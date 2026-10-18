@@ -18,8 +18,10 @@ Distinguish implemented, tested in the game, and still unverified; do not mark
 a visual task complete just because its generator or DLL builds. Keep README,
 STATUS, HANDOFF and task status consistent when completing a milestone.
 
-Next work is initial post-save-load lighting plus screenshot regression, then
-Anachronox overlay diagnostics and game-driven event lighting. Timer styles
+Startup device-replacement lighting is corrected and capture/comparison tools
+are implemented; see `docs/startup-lighting-check.md` and
+`docs/screenshot-regression.md`. Next work is Anachronox overlay diagnostics,
+then game-driven event lighting. Timer styles
 1–11, static emission, approximate PBR and the generic overlay already exist.
 Keep model-routing proposals (#28 / QindieGL #23) separate from feature work.
 

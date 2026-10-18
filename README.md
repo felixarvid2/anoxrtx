@@ -4,8 +4,11 @@ Current implementation/verification status: [STATUS.md](STATUS.md).
 The [ordered implementation plan](https://github.com/felixarvid2/anoxrtx/blob/main/PLAN.md)
 includes screenshot regression, event lighting, BSP/PVS, dynamic emission,
 PBR classification, anchors, environment transitions and rain/wetness.
-These are planned extensions; implemented foundations and remaining visual
-checks are distinguished in the status table.
+Capture/comparison tools and the startup map-light lifecycle correction are
+now implemented; see the [controlled lighting report](https://github.com/felixarvid2/anoxrtx/blob/main/docs/startup-lighting-check.md)
+and [capture workflow](https://github.com/felixarvid2/anoxrtx/blob/main/docs/screenshot-regression.md).
+Other entries are planned extensions; remaining visual coverage is explicit
+in the status table.
 
 > **This is a fork of [vinevi1/anoxrtx](https://github.com/vinevi1/anoxrtx) by vinevi1**, an RTX Remix mod for
 > Anachronox. It adds:

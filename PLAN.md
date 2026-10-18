@@ -5,6 +5,16 @@ den gamla fasordningen. [STATUS.md](STATUS.md) anger vad som faktiskt finns och
 vad som har verifierats; [TODO.md](TODO.md) är arbetslistan. Äldre resultat och
 idéfiler behålls som historik, inte som nya implementationskrav.
 
+## Levererat 2026-10-18
+
+Steg 0 är rättat för den verifierade startup-/devicevägen i Rowdy's. Steg 1 har
+en första fungerande capture-/jämförelseversion med oföränderliga manifest,
+miljö-/posekontroll och positiva/negativa bildkontroller. Se
+[runtime-evidens](docs/startup-lighting-check.md) och
+[verktygen](docs/screenshot-regression.md). Fler miljöbaslinjer återstår.
+Nästa funktionsarbete är steg 2, Anachronox-diagnostik i befintlig overlay.
+Acceptanskriterierna nedan behålls för fortsatta regressionskontroller.
+
 ## Prioritering och beroenden
 
 Ordningen väger synlig nytta mot beroenden och risken att bygga vidare på ett
