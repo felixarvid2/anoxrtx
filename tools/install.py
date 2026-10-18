@@ -327,7 +327,8 @@ class Installer:
     def step_lights(self):
         out = os.path.join(self.game, 'rtx-remix', 'maplights')
         self.backup(out)
-        self.py('bsp2lights.py', out, *self.maps())
+        # --events: styles 1..63 and START_OFF lights for QindieGL's game-driven light styles (QindieGL #27+)
+        self.py('bsp2lights.py', '--events', out, *self.maps())
 
     def step_sky(self):
         from PIL import Image

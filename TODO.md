@@ -15,10 +15,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   61 Python-tester passerar; positiva/negativa Rowdy's-kontroller verifierade.
   Baslinjepromovering är uttrycklig och manuell. Fler testmiljöer återstår;
   se [arbetsflödet](docs/screenshot-regression.md).
-- [ ] **2. Debug-overlay:** utöka befintlig ImGui med Anachronox-ljus,
-  tillstånd, reloadorsak och cullingdiagnostik; verifiera Proton-input.
-- [ ] **3. Händelsestyrt animerat ljus:** verkliga stil-/switchsignaler,
-  START_OFF, speltid och paus-/save-/kartlivscykel; bevara befintliga dlights.
+- [x] **2. Debug-overlay:** Anachronox-panel (F8 / Alt+C) med karta, kamera, tillstånd, reloadorsak,
+  ljus och ljusstilar; verifierad under Proton (QindieGL #27). Kvar: cullingdiagnostik.
+- [x] **3. Händelsestyrt animerat ljus:** spelets ljusstilar 1–63 styr ljusen, START_OFF exporteras och
+  hålls släckt av spelets stil; verifierat i crevice och levant1 (QindieGL #27). Kvar att se i spelet:
+  ett ljus som tänds under spel, paus och save-återställning.
 - [ ] **4. BSP/PVS:** börja mätning tidigt; implementera konservativ synlighet
   som bevarar skuggor/reflektioner och verifiera CPU/GPU/VRAM.
 - [ ] **5. Dynamisk emission:** synkronisera ett verifierat material med
