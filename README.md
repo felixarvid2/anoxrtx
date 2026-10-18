@@ -236,4 +236,5 @@ load/create/draw results and light styles. With `--ab LAYER` every map is run wi
 `MAP NAME X Y Z PITCH YAW` from `tools/find_views.py MAP.bsp TEXTURE[,…]`, which places the camera in open space
 in front of surfaces using that texture), so surfaces the player cannot reach in the rig can be checked;
 `--ab-cfg "set CVAR VALUE"` A/B-tests a config line and reports frame times. Culling result:
-[docs/culling-check.md](docs/culling-check.md).
+[docs/culling-check.md](docs/culling-check.md). `--ab-original` compares with the original rasterised renderer; exposure was matched
+to it per map: [docs/exposure-match.md](docs/exposure-match.md).

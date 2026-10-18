@@ -11,6 +11,9 @@ For every map (started with "+map MAP" through tools/rigsession.sh, which restor
 With --ab LAYER (e.g. emissive, pbr): the same maps are run twice, once with LAYER in mod.usda's subLayers and
 once without it (mod.usda is restored afterwards, also on failure); the report shows both views side by side
 with the per-pixel difference, mean brightness change and the share of changed pixels.
+With --ab-original: "on" is RTX Remix, "off" the original rasterised look (Remix' d3d9.dll moved aside for the
+run, so QindieGL renders through Wine's D3D9 with the game's lightmaps; the rig camera still works). The report
+adds the exposure difference in EV (log2 of mean linear luminance, original / Remix) for matching brightness.
 With --ab-cfg "set r_novis 1": the A/B switch is that line appended to anoxdata/CONFIGS/Default.cfg (restored
 afterwards), e.g. to compare culling settings; the report adds frame times from QindieGL's "Perf:" log lines.
 With --views FILE (lines "MAP NAME X Y Z PITCH YAW", e.g. from tools/find_views.py) each listed view of a map is
@@ -41,6 +44,7 @@ $RIG start > "$out/$tag-$map.start.txt" 2>&1
 end=$((SECONDS + wait))
 while [ $SECONDS -lt $end ]; do
   grep -aq "MapLights: $map CreateLight" "$QLOG" 2>/dev/null && break
+  [ -f "$GAME/d3d9.dll" ] || { grep -aq "MapLights: map '$map'" "$QLOG" 2>/dev/null && break; }
   sleep 2
 done
 sleep "$settle"
@@ -144,6 +148,13 @@ def frame_checks(a, b):
     return res
 
 
+def lin_mean(a):
+    """mean linear luminance, ignoring the top 40 px (Remix notification bar)"""
+    c = a[40:] / 255.0
+    c = np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
+    return float((c @ np.array([0.2126, 0.7152, 0.0722])).mean())
+
+
 def ab_compare(on, off, path, mp, layer):
     if on is None or off is None or on.shape != off.shape:
         return None
@@ -158,7 +169,8 @@ def ab_compare(on, off, path, mp, layer):
     for i, (t, lbl) in enumerate(zip(tiles, ('%s on' % layer, '%s off' % layer, 'difference x3'))):
         sheet.paste(t, (i * (w + 10), 22)); dr.text((i * (w + 10) + 4, 4), '%s: %s' % (mp, lbl), fill='black')
     sheet.save(path)
-    return {'changed_pct': changed, 'brightness_change': dmean}
+    ev = round(float(np.log2(max(lin_mean(off), 1e-4) / max(lin_mean(on), 1e-4))), 2)
+    return {'changed_pct': changed, 'brightness_change': dmean, 'ev_off_vs_on': ev}
 
 
 def report(out, maps, label, views):
@@ -199,7 +211,7 @@ def report(out, maps, label, views):
         row = '| %s | %s | %s | ' % (key, 'FAIL' if r['fails'] else 'ok', x['mean'])
         if label:
             ab = r.get('ab') or {}
-            row += ('%s%% | %+.2f |' % (ab['changed_pct'], ab['brightness_change'])) if ab else '- | - |'
+            row += ('%s%% | %+.2f (EV %+.2f) |' % (ab['changed_pct'], ab['brightness_change'], ab['ev_off_vs_on'])) if ab else '- | - |'
             row += ' %s | %s |' % (r['on']['frame_ms'], r['off']['frame_ms'])
         else:
             row += '%s |' % x['frame_ms']
@@ -218,16 +230,20 @@ def report(out, maps, label, views):
 
 class Switch:
     """A/B switch: a USD layer in mod.usda, or a line appended to Default.cfg. Always restored."""
-    def __init__(self, out, layer, cfg_line):
-        self.layer, self.cfg_line = layer, cfg_line
-        self.path = MOD if layer else GAME / 'anoxdata' / 'CONFIGS' / 'Default.cfg'
+    def __init__(self, out, layer, cfg_line, original=False):
+        self.layer, self.cfg_line, self.original = layer, cfg_line, original
+        self.path = MOD if layer else GAME / ('d3d9.dll' if original else 'anoxdata/CONFIGS/Default.cfg')
         if layer and '@./%s.usda@' % layer not in self.path.read_text():
             sys.exit('layer %s is not in %s' % (layer, self.path))
         self.backup = out / (self.path.name + '.orig')
         shutil.copy2(self.path, self.backup)
-        self.label = layer or cfg_line
+        self.label = layer or cfg_line or 'RTX Remix (off = original)'
 
     def set(self, on):
+        if self.original:
+            if on: shutil.copy2(self.backup, self.path)
+            elif self.path.exists(): self.path.unlink()
+            return
         s = self.backup.read_text(errors='replace')
         if self.layer and not on:
             s = re.sub(r',?\s*@\./%s\.usda@' % re.escape(self.layer), '', s, count=1).replace('[, ', '[')
@@ -256,6 +272,8 @@ def main():
             i = args.index(n); v = args[i + 1]; del args[i:i + 2]; return v
         return default
     layer = opt('--ab', ''); cfg_line = opt('--ab-cfg', ''); views_file = opt('--views', '')
+    original = '--ab-original' in args
+    args = [a for a in args if a != '--ab-original']
     wait = int(opt('--wait', '120')); settle = int(opt('--settle', '20'))
     report_only = '--report-only' in args
     args = [a for a in args if a != '--report-only']
@@ -267,10 +285,10 @@ def main():
         sys.exit(0 if report(out, meta['maps'], meta['label'], meta['views']) else 1)
     maps = [m.lower() for m in args[1:]]
     views = read_views(views_file) if views_file else {}
-    label = layer or cfg_line
+    label = layer or cfg_line or ('RTX Remix (off = original)' if original else '')
     (out / 'meta.json').write_text(json.dumps({'maps': maps, 'label': label, 'views': views, 'started': time.ctime()}))
     if label:
-        sw = Switch(out, layer, cfg_line)
+        sw = Switch(out, layer, cfg_line, original)
         try:
             for tag, on in (('on', True), ('off', False)):
                 sw.set(on)
