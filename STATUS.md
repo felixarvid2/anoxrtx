@@ -20,12 +20,12 @@ observed at their dates; they are not the current backlog.
 | Wine compatibility | Frame generation/present metering off; old GUI input; present semaphore off; NRC disabled with `rtx.integrateIndirectMode = 0` | Recheck on runtime upgrades; no claim NRC works |
 | Map lights | BSP point/spot/sun lights, per-map formulas/settings, overrides and hot reload | Calibration outside Rowdy's; broader device/reset/runtime coverage |
 | Light identity correction | QindieGL #21 merged; fresh identities fixed the reproduced reload failure; both saved views show scale 0/1 contribution | Startup device replacement now releases/rebuilds lights; stock/MSVC coverage remains |
-| Animated / event lights | Timer-driven Quake styles 1–11 exist; frame dlights hook exists | Game-controlled styles/switches, pause/save synchronization, visible combat-light verification |
+| Animated / event lights | Game-driven light styles (QindieGL #27): styles 1–63 follow the game, START_OFF lights exported (`bsp2lights.py --events`) and held by the game's style; verified in crevice (32 styled lights, 5364 updates) and levant1 (18 START_OFF kept off); timer fallback; frame dlights hook | A light switched on during play, pause/save synchronization, visible combat-light verification |
 | Emissive / PBR | Static emissive generator; approximate normal/roughness/metallic and glass generation; visible normals and five sign emissions in two Rowdy's views | Dynamic emission, better classification, close-up rims and other environments |
 | Textures / procedural lava | Chuncki hash remapping; HD sky/model/liquid generators; stable procedural replacement hashes | Visible lava freeze/replacement, water geometry/transparency and outdoor HD skies |
 | Fog / sky | GL fog remapping; haze observed in bricksb, sunstrip and Rowdy's; per-map Numos sky on five outdoor maps | State-driven transitions, sun/shadow direction and whitecaves-b fog |
 | Rig | Focused movement, verified save loading; physical XKB console input fix (#27 merged), 33 offline tests and both saved views recorded | Capture manifests and offline multi-frame comparison now implemented; outdoor/water/lava/combat locations remain |
-| Debug UI | Generic ImGui overlay exists in QindieGL | Anachronox state/light/culling diagnostics and current Proton input validation |
+| Debug UI | Anachronox diagnostics panel (F8 / Alt+C, QindieGL #27): map, camera, config, API layout, device generation, light load/draw results, dynamic lights, light styles; verified under Proton | Culling diagnostics; overlay-free capture path |
 | Culling / anchors / weather | Existing culling-related config experiments; Remix mesh/material API pointers | Anachronox BSP/PVS policy, anchor subsystem, wetness and rain are planned |
 | Installation | `tools/install.sh`, `tools/install.py`, `tools/toggle.sh` exist | Repeat installation/recovery checks when those paths change |
 

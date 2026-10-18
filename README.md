@@ -87,6 +87,10 @@ I raise roughness and metalicity of character materials to the max to mask the p
    next to anox.exe. Its `[maplights.global]` / `[maplights.<map>]` sections set the light formula (scale,
    exponent, radius, sun_scale) and `[rtxconf.default]` / `[rtxconf.<map>]` set Remix variables per map. QindieGL
    rereads the file when it is saved, so light strength can be tuned while playing.
+   With `bsp2lights.py --events` (the installer's default) lights keep their map style (1–63) and START_OFF
+   lights are kept; QindieGL then follows the game's own light styles (flicker in sync, switches turn lights on
+   and off; `event_lights` in the ini). In-game diagnostics: press F8 (or Alt+C) for the Anachronox panel
+   (map, camera, lights, Remix API state, light styles). Format: [docs/event-light-format.md](docs/event-light-format.md).
    Hand fixes per light go in `rtx-remix/maplights/<map>.override` (also reloaded while playing): `N off`,
    `N scale S`, `N color R G B`, `N move DX DY DZ`, `N radius R`, `sun off`, `sun scale S`, and `add <light line>`
    for new lights (e.g. lamp objects without light data). To find N, save the file in the game and read
