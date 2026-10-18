@@ -7,7 +7,8 @@ asset generators, installer, and a Linux/Proton test rig. The companion
 [felixarvid2/QindieGL](https://github.com/felixarvid2/QindieGL) fork supplies the
 OpenGL-to-D3D9 wrapper and game hooks.
 
-Start with `HANDOFF.md`, `README.md`, and `TODO.md`; consult `RESULTS.md` and
+Start with `HANDOFF.md`, `README.md`, `TODO.md` and the doc map `docs/README.md` (architecture and
+troubleshooting are in `docs/`); consult `RESULTS.md` and
 `PLAN.md` for history and intended verification. For wrapper work, also read
 QindieGL's `CLAUDE.md`, `AGENTS.md`, and `linux/README.md`.
 

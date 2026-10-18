@@ -26,6 +26,9 @@ in the status table.
 >
 > Game data (textures, generated DDS files) is not included; the tools build it from your own game files.
 
+Documentation: [docs/README.md](docs/README.md) (map of all docs), [STATUS.md](STATUS.md) (current state),
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
+
 ## Quick install (Linux, Steam + Proton)
 
 ```
@@ -121,7 +124,7 @@ I raise roughness and metalicity of character materials to the max to mask the p
      sun turned off there. Globally it would replace the space and city skies with a daytime sky.
    - For testing, Steam launch options `%command% +map <name>` start straight into a map.
 
-9. Lava (QindieGL `proctex = 1`): the Levant lava is generated every frame, so Remix cannot replace it.
+9. Lava (QindieGL `proctex = 1`; implemented, not yet seen in the game – see STATUS.md): the Levant lava is generated every frame, so Remix cannot replace it.
    QindieGL freezes it to a flat colour derived from its name; `tools/proctex_layer.py rtx-remix/mods/anoxrt
    <Anachronox>` writes `proctex.usda` with an emissive HD lava material for those hashes (add `@./proctex.usda@`
    to mod.usda's subLayers). QindieGL.log prints the hash when it freezes a texture; it should match the one the
