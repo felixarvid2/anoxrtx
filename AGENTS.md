@@ -87,7 +87,15 @@ was absent from this environment; check availability before using it and fall
 back to local work when missing. No Gemini request was made for the update.
 The credential stays in `~/Documents/gemini-api.md`, outside the
 repos, and must never appear in prompts, command arguments, URLs, logs, or git.
-Do not upload game assets or private data as context. Free-tier data handling
+Do not upload game assets or private data as context. Exception approved by Felix on 2026-10-18:
+`tools/jev_classify.py --gemini` may send 128 px texture thumbnails (contact sheets) to Gemini for
+material classification; no other game assets.
+
+TypeSafe Jev (decision model: yes/no, choice, score) classifies textures in `tools/jev_classify.py`
+from Gemini's descriptions; Gemini looks, Jev decides, results are cached. Its key is in
+`~/Documents/jev-api.md` (same rules as the Gemini key). Felix's budget for Jev is 5 USD in total; a full
+classification is about 2.9 M input tokens (~0.12 USD at 0.042 USD per million). Keep `--max-tokens` set
+and reuse the cache instead of reclassifying. Free-tier data handling
 follows Google's applicable terms.
 
 Felix confirmed the API project uses the Free tier with billing disabled on

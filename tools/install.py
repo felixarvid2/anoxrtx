@@ -364,7 +364,10 @@ class Installer:
         if not self.has_pack():
             self.log('pbr: needs the texture pack, skipped'); return
         self.backup(os.path.join(self.mod, 'pbr.usda'))
-        self.py('pbr_layer.py', self.mod, self.game, *self.maps())
+        # tools/jev_classify.py results (Gemini + Jev) replace the name keywords when present
+        classes = os.path.join(self.work, 'jev_classes.json')
+        extra = ['--classes', classes] if os.path.exists(classes) else []
+        self.py('pbr_layer.py', self.mod, self.game, *self.maps(), *extra)
 
     def step_proctex(self):
         if not self.has_pack():

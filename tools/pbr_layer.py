@@ -8,7 +8,10 @@ For every texture the maps use (BSP texinfo) that exists in the loose texture pa
 - normal map: the texture's luminance as a height field (blurred, Sobel, wraps around since textures tile),
   encoded the way Remix reads `normalmap_texture` (unorm hemi-octahedral in R/G: t = n.xy / (|x|+|y|+|z|),
   p = (t.x + t.y, t.x - t.y)), DirectX tangent space, written as DXT1 with mips, longest side <= --max;
-- reflection_roughness_constant / metallic_constant from keywords in the texture name (see CLASSES);
+- reflection_roughness_constant / metallic_constant from keywords in the texture name (see CLASSES), or with
+  --classes CLASSES.json from tools/jev_classify.py (Gemini looks, Jev decides): roughness = Jev's score
+  (clamped 0.05..1), metallic = Jev's metal probability when it is at least 0.5, otherwise 0; textures missing
+  from the file fall back to the keywords;
 - glass: SURF_TRANS33/66 textures named glass/win/clear become thin-walled AperturePBR_Translucent with
   the texture as transmittance.
 Sky (SURF_SKY) and liquid (SURF_WARP) surfaces are skipped; liquids.usda handles those.
@@ -80,6 +83,11 @@ def main():
         return default
     maxside = int(opt('--max', '512')); strength = float(opt('--strength', '2.0'))
     only = set(opt('--only', '').split(',')) - {''}
+    classes_file = opt('--classes', '')
+    jev = {}
+    if classes_file:
+        import json
+        jev = {k: v for k, v in json.load(open(classes_file)).items() if not k.startswith('_')}
     if len(args) < 3:
         print(__doc__); sys.exit(1)
     moddir, gamedir, maps = args[0], args[1], args[2:]
@@ -97,7 +105,7 @@ def main():
 
     outdir = os.path.join(moddir, 'hd', 'pbr'); os.makedirs(outdir, exist_ok=True)
     tmp = os.path.join(outdir, '_tmp.png')
-    out = layers.header(); done = set(); n = nglass = nskip = 0
+    out = layers.header(); done = set(); n = nglass = nskip = njev = 0
     for k in sorted(flags):
         f = flags[k]
         if (only and k not in only) or f & (SURF_SKY | SURF_WARP) or k not in files:
@@ -110,7 +118,12 @@ def main():
             continue
         done.add(h)
         hx = '%016X' % h
-        rough, metal = classify(k)
+        if k in jev:
+            rough = round(min(1.0, max(0.05, jev[k]['roughness'])), 3)
+            metal = round(jev[k]['metal'], 3) if jev[k]['metal'] >= 0.5 else 0.0
+            njev += 1
+        else:
+            rough, metal = classify(k)
         lines = ['        # %s' % k, '        over "mat_%s"' % hx, '        {', '            over "Shader"', '            {']
         if f & (SURF_TRANS33 | SURF_TRANS66) and any(w in k.split('/')[-1] for w in GLASS_WORDS):
             Image.open(files[k]).convert('RGB').save(tmp)
@@ -138,7 +151,7 @@ def main():
     if os.path.exists(tmp):
         os.remove(tmp)
     open(os.path.join(moddir, 'pbr.usda'), 'w').write('\n'.join(out + layers.footer()))
-    print('%d materials (%d glass), %d skipped (sky/liquid/not in pack) -> %s' % (n, nglass, nskip,
+    print('%d materials (%d glass, %d from Jev classes), %d skipped (sky/liquid/not in pack) -> %s' % (n, nglass, njev, nskip,
           os.path.join(moddir, 'pbr.usda')))
 
 
