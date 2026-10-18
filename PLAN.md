@@ -1,120 +1,173 @@
-# Plan framåt: RTX Remix för Anachronox
+# Implementationsplan: Anachronox RTX
 
-Den här planen bygger på det vi fått att fungera hittills (Linux, GE-Proton, QindieGL-bygget) och på
-idéerna i [IDEAS.md](IDEAS.md). Den är ordnad så att varje fas går att testa innan nästa börjar.
+Uppdaterad 2026-10-18 efter ägarens utökade önskelista. Den här planen ersätter
+den gamla fasordningen. [STATUS.md](STATUS.md) anger vad som faktiskt finns och
+vad som har verifierats; [TODO.md](TODO.md) är arbetslistan. Äldre resultat och
+idéfiler behålls som historik, inte som nya implementationskrav.
 
-## Läget i dag
+## Prioritering och beroenden
 
-**Fungerar**
-- QindieGL byggs på Linux (llvm-mingw) med samma 385 exporter som originalet, inklusive per-spel-hookarna.
-- RTX Remix 1.5.2 (release) körs under GE-Proton 11-9 med ett RTX 5060. Introt path-tracas och Remix
-  hittar kameran.
-- Fixar som krävs på Linux finns i `rtx.conf` och README:
-  - `rtx.dlfg.enable = False` och `rtx.dlfg.enablePresentMetering = False` (annars hänger Remix i Present).
-  - `rtx.useNewGuiInputMethod = False` (annars täcks spelet av ett vitt overlay-fönster).
-  - `presentSemaphoreEnabled = False` i `.trex/bridge.conf`.
-- Helskärm som fyller skärmen via QindieGL:s nya `BorderlessFullscreen = 1`.
+Ordningen väger synlig nytta mot beroenden och risken att bygga vidare på ett
+felaktigt ljusläge. Bildjämförelser kommer tidigt för att kunna bedöma resten.
+Culling undersöks tidigt, men en ny policy införs först efter mätningar av
+saknad geometri, skuggor, reflektioner och kostnad. PBR-spåret kan genomföras
+oberoende av nya spelhookar när bildbaslinjerna finns.
 
-**Kända problem**
-| Problem | Orsak (känd eller trolig) | Åtgärd |
-|---|---|---|
-| Musklick hamnar fel i helskärm | Fönstret är 1920×1200 men spelet räknar i 640×480 | Fix skriven (gren `borderless-mouse` i QindieGL), **inte testad i spelet än** |
-| Bilden är utsträckt 4:3 → 16:10 | Backbuffern sträcks till hela fönstret | Fas 5: svarta kanter (pillarbox) |
-| Introt är överexponerat (vita logotyper) | Självlysande/additiv geometri utan ljus | Fas 1 |
-| Banor utan egna Remix-ljus blir mörka | `rtx.fallbackLightMode = 0`, modden har bara ljus där bilderna togs | Fas 2 |
-| `+map` vid start hänger på "One moment......" med Remix | Okänt; utan Remix ignoreras `+map` helt | Undvik, ladda sparade spel via menyn |
-| DLSS laddas inte | NGX hittas inte under Wine | Fas 5 |
-| Neural Radiance Cache startar inte | Fel vid kontroll av GPU-funktioner under Wine | Remix faller tillbaka själv; bevaka |
-| Spelet pausar (svart) när fönstret saknar fokus | Normalt Quake 2-beteende | Testriggen måste ge fönstret fokus |
+| Ordning | Leverans | Förväntad nytta | Svårighet | Huvudrepo / beroende |
+| --- | --- | --- | --- | --- |
+| 0 | Förklara/rätta första ljusläget efter sparladdning | Förutsättning för tillförlitliga ljusresultat | Medel, orsak okänd | Båda; rättad input och wrapper finns |
+| 1 | Automatiska skärmbildsregressioner, första version | Hög för utveckling | Medel | anoxrtx; byggs under steg 0 |
+| 2 | Runtime-overlay med Anachronox-diagnostik | Medel, underlättar felsökning | Medel | QindieGL; utöka befintlig ImGui |
+| 3 | Händelsestyrt animerat ljus och gemensam tillståndsläsning | Mycket hög | Medel, hooklayout måste verifieras | Båda; steg 0–2 |
+| 4 | Förbättrad BSP/PVS-culling och sceninlämning | Mycket hög potential | Hög | QindieGL + BSP-verktyg; mätningar börjar i steg 1–2 |
+| 5 | Dynamiska emissiva material | Hög | Medel, runtime-stöd måste provas | Båda; steg 3 |
+| 6 | Förbättrad automatisk PBR-klassificering | Hög | Medel | anoxrtx; steg 1, kan gå parallellt med steg 3–5 |
+| 7 | Ankarmeshar för ersättningsinnehåll | Hög | Medel | Båda; stabil identitet och livscykel |
+| 8 | Animerad dimma och miljötillstånd | Hög | Medel | Båda; tillståndsläsning från steg 3 |
+| 9 | Väta och regn | Medel–hög | Hög | Båda; material, miljötillstånd och culling verifierade |
 
-## Fas 0: Grund och testrigg (först)
+Detta täcker samtliga nio önskade funktioner; numreringen i önskelistan saknade
+punkt 4. Steg 0 är ett befintligt fel, inte en ersättning för någon funktion.
 
-Mål: kunna testa ändringar automatiskt och jämföra bilder, utan att störa skrivbordet.
+## Steg 0–1: ljusinitialisering och reproducerbara jämförelser
 
-1. **Testa musfixen** (`borderless-mouse`): klicka i menyn, ladda ett sparat spel, prova muslook.
-   Fungerar den: merga. Krockar den med Remix egen fönsterhantering (bryggan varnade för
-   `WndProc::set` utan `unset`): byt till att bara hooka `GetCursorPos`/`SetCursorPos`/`ClipCursor` och
-   skippa subclassen.
-2. **Nästlad testsession som standard**: `Xwayland :7 -geometry 1920x1200 -decorate` och `DISPLAY=:7`
-   i startalternativet. Där har spelet alltid fokus, och en krasch tar bara med sig det fönstret.
-3. **Skript för test** (finns i grova drag): starta, vänta på `Camera cut` i Remix-loggen, läs spelfönstret
-   med python-xlib, klicka med XTest i spelets koordinater. Bygg ut till:
-   - `load-save <nr>`: menyklick Restore Universe → välj sparfil;
-   - `shot <namn>`: bild + medelljus + Remix-loggens felrader;
-   - `compare A B`: två bilder sida vid sida.
-4. **Fasta testplatser**: 3–4 sparfiler på olika miljöer (inomhus Bricks, utomhus, en bana med vatten, en
-   med mycket partiklar). Samma vy varje gång gör att ändringar går att jämföra rättvist.
-5. Spara testskripten i repot (`tools/`), så att de går att köra igen.
+**Första implementationen:** en liten regressionskörning kring den befintliga
+riggen, samtidigt som första ljusläget undersöks. Behåll ljus- och materialvärden.
 
-## Fas 1: Snabba konfig-vinster (bara inställningar)
+1. Upprepa kallstart och sparladdning i båda Rowdy's-vyerna, även omvänd
+   laddningsordning och återladdning av samma sparfil. Verifiera nonce,
+   sparfingeravtryck och kameraposition innan bilden godtas.
+2. Fånga efter samma insvängningstid före varje config-/override-omladdning;
+   jämför sedan omladdning av samma värde samt skala 0 → 1 vid samma pose.
+   Knyt API-/initieringsloggar till bilderna. Ändra livscykeln först när
+   en reproduktion motiverar det; ljusstyrkekalibrering är ett separat arbete.
+3. Lägg till manifest med DLL-/runtime-/config-/lagerfingeravtryck, upplösning,
+   sparfil, pose, väntetid och flera bildrutor. Avvisa olika miljöer och misslyckade
+   laddningar. Börja med rapporter, före/efter-bilder och differensbilder.
+4. Mät variationen mellan oförändrade körningar. Använd områden/masker för
+   rörliga figurer och toleranser som fångar tydliga ljusbortfall; kräv inte
+   pixelidentiska bilder från en temporal renderer. Bildmedelvärde räcker inte.
+5. Lägg till utomhus-, vatten-, lava- och stridsvyer när giltiga lokala sparfiler
+   eller verifierade scenarier finns. Markera saknade vyer som ej testade.
 
-Testa en ändring i taget på testplatserna, behåll det som blir bättre (se IDEAS.md avsnitt 1):
-1. `[game.anox]` i QindieGL.ini: `orthoskipuntextureddraws = 1`, `depthOffDisablesWrites = 1`
-   (samma som Quake 2- och Heretic 2-profilerna).
-2. Spelvariabler (finns i Anachronox, kontrollerat): `r_novis 1`, `gl_dynamic 0`, `gl_flashblend 0`,
-   `gl_polyblend 0`, prova `gl_lightmap`/`gl_monolightmap`, och Anachronox egna `cl_distancecull`,
-   `cl_noheadcull`, `cl_weathercull` (avstängd culling ger stabilare path tracing).
-3. `rtx.conf`: `rtx.suppressLightKeeping`, `rtx.viewModel.enable`, `rtx.skyAutoDetect`,
-   `rtx.sceneScale` (Quake-enheter är små), exponering (`rtx.autoExposure.evMinValue`).
-4. Intro/meny: lägg logotyp- och menytexturer i `rtx.uiTextures` så att de inte path-tracas.
+**Klart när:** första ljusläget är förklarat och vid behov rättat, upprepade
+laddningar visar rätt bidrag utan manuell reload, och jämföraren accepterar
+upprepade baslinjer men upptäcker en avsiktligt avstängd ljusvariant. Riggen
+återställer filer, Steam och display även vid fel. Baslinjer godkänns uttryckligen
+vid avsiktliga bildändringar; misslyckade körningar skriver inte över dem.
 
-Klart när: menyer och intro ser ut som originalet, och testplatserna inte flimrar eller tappar geometri.
+## Steg 2: utöka befintlig debug-overlay
 
-## Fas 2: Ljus (störst synlig skillnad)
+Visa karta/pose, runtime/API-layout, aktiv config, initierings-/reloadorsak,
+antal skapade/ritade ljus, fel, observerade spelstilar och senare cullingräknare.
+Använd samma diagnostik i loggarna så bildtester inte kräver UI-input. Börja
+med läsning; ljusredigering kan följa senare.
 
-1. **Tillfälligt ljus överallt**: prova `rtx.fallbackLightMode` (distant/ambient), så att banor utan
-   handgjorda ljus syns alls. Ger en grund att bygga vidare på.
-2. **Spelets dynamiska ljus som Remix-ljus**: QindieGL har redan `remixapi` och `qdx_light_add()`.
-   Hitta ref_gl:s dlight-funktion i Anachronox (mönster/offset i `[game.anox]`, som för FAKK2) och skicka
-   varje dlight som ett Remix-ljus. Kräver `exposeRemixApi = True` i `.trex/bridge.conf`.
-   Ger explosioner, vapenblixtar och skriptade ljus.
-3. **Ljus från banornas egna ljuskällor**: om BSP-filerna har kvar sina `light`-entiteter kan ett skript
-   läsa ut dem och skriva Remix-ljus i `mod.usda` per bana: ett automatiskt första utkast för alla 97 banor
-   i stället för handplacering. Inte kontrollerat än: `MAPS.dat` är komprimerad och måste packas upp först.
+**Klart när:** panelen går att öppna/stänga under Proton utan vit overlay eller
+fastnade tangenter, visar samma data som loggen och inte kommer med i normala
+regressionsbilder. Avstängd diagnostik ska ha försumbar mätbar kostnad.
 
-Klart när: alla testplatser är rimligt upplysta utan att varje ljus är handplacerat.
+## Steg 3: händelsestyrt ljus och tillståndsläsning
 
-## Fas 3: Geometri och modeller (QindieGL)
+Behåll befintliga dlights och timerstilar 1–11. Verifiera Anachronox egen
+frame-/lightstyle-layout och läs verkliga stilvärden, av/på-signaler och speltid
+vid den befintliga renderhooken. Anta inte standard-Quake-layout. Utöka
+`bsp2lights.py` och wrapperns format tillsammans: START_OFF-ljus får inte
+försvinna ur underlaget, och dynamiska stil-/entitetskopplingar behöver bestå.
+Behåll kompatibilitet med äldre `.lights`-filer och skilj beständiga
+författar-ID:n från flyktiga Remix-identiteter. Lägg till datadrivna
+övergångar/keyframes för en verifierad händelse, med timerfallback när giltig
+speldata saknas. Dela ett litet observerat tillstånd med senare material/dimma;
+bygg inget generellt skriptsystem innan det behövs.
 
-1. **Stabila hashar** för världens ytor: statiska ytor i fasta vertexbuffrar (som QuakeRTX), så att utbytta
-   material och meshar fastnar varje gång. Mät först: logga hur ofta samma vägg byter hash.
-2. **Mjuka normaler på figurer**: beräkna per-vertex-normaler i QindieGL för entitetsritning (Heretic 2-
-   koden finns som förebild). Gör sedan om modden utan max-roughness/metalness-tricket på figurer.
-   Görs **innan** mer innehåll skapas, eftersom normalerna ändrar hasharna.
-3. **Himmel**: kontrollera i Remix debug-vy att himlen klassas rätt på alla testplatser; annars rita om den
-   som riktig skybox.
-4. **Kamera i filmsekvenser**: Anachronox har eget filmkamerasystem; logga kameraklipp i cutscenes och
-   bygg ut kamerauppfattningen om den tappar.
+**Klart när:** ett START_OFF-ljus kan tändas och släckas från spelet, en animerad
+stil följer speltid inklusive paus/laddning, och omladdning/kartbyte varken ger
+spökljus eller dubbla ljus. Verifiera även synliga dlights i ett stridsscenario.
 
-## Fas 4: Innehåll
+## Steg 4: BSP/PVS med hänsyn till path tracing
 
-1. Material/texturer per område, med ett `mod.usda`-lager per bana så att arbetet kan delas upp
-   (som Quake 3-remastern, 27 banor).
-2. Vatten: fasta UV + Remix-vattenmaterial i stället för spelets vertexvarpning.
-3. Partiklar: gå igenom `rtx.particleTextures`/`rtx.beamTextures`, låt vissa effekter bli ljuskällor.
-4. Notera: RTX Remix Toolkit (för att redigera) finns bara för Windows. På Linux går det att fånga
-   scener och redigera USD-filer för hand eller med skript; större innehållsarbete görs enklast i Windows.
+Börja med diagnos av nuvarande cullingvariabler och renderinlämning vid dörrar,
+hörn och reflekterande ytor. Skilj geometri som spelet aldrig skickar från
+wrapperns ljus-/objekturval. Vanlig kamera-PVS får inte ta bort ytor som behövs
+för skuggor, reflektioner eller indirekt ljus. Heretic 2-koden är en referens,
+inte en färdig Anachronox/Linux-lösning.
 
-## Fas 5: Putsa
+Prova därefter en konservativ policy med kamera-/områdeskoppling, relevanta
+grannområden och säkra undantag, styrd per karta och med fallback. Mät först;
+undvik att göra full avstängning av all culling till standard. Hookar kräver
+verifierade signaturer och opt-in. Format för eventuell BSP-metadata måste
+versioneras tillsammans med verktygen.
 
-1. **Rätt bildformat**: pillarbox (svarta kanter) i stället för utsträckt bild, t.ex. genom att QindieGL
-   ritar spelets 640×480 centrerat i en skärmstor backbuffer.
-2. **Högre upplösning**: låt Remix rendera i skärmens upplösning och skala upp spelets 2D-gränssnitt,
-   i stället för att sträcka en 640×480-bild.
-3. **DLSS under Proton**: prova `PROTON_ENABLE_NGX_UPDATER=1`/`PROTON_ENABLE_NVAPI=1`, annars en annan
-   uppskalare uttryckligen.
-4. Prestanda: mät FPS på testplatserna (Remix kan visa det), justera `rtx.graphicsPreset`, studsar mm.
-5. Paketera: en zip/installationsskript för Linux (QindieGL-DLL, `.trex`, configs, startalternativ).
+**Klart när:** valda hörn-/dörr-/spegeltester inte tappar synlig geometri,
+skuggor eller indirekt ljus; spara jämförelser för nuvarande, konservativ och
+fullständigt synlig referens. Redovisa CPU-/GPU-bildtider, inlämnad geometri
+och VRAM mot budgeten på 8 GB. Aktivera enbart styrkta kartprofiler.
 
-## Risker
+## Steg 5: dynamiska emissiva material
 
-- Binära patchar i spelet (fas 2.2, 3) kan krascha om adresser/mönster är fel; görs alltid bakom en
-  inställning i QindieGL.ini och testas i den nästlade sessionen.
-- `PROTON_ENABLE_WAYLAND=1` kraschade skrivbordssessionen en gång: testa inte det utanför nästlad session.
-- Remix-uppdateringar kan ändra standardvärden (t.ex. ny GUI-input), så Linux-fixarna i `rtx.conf` ska
-  kontrolleras vid varje ny Remix-version.
+Använd samma observerade tillstånd som ljusen. Prova först en skylt/lampa med
+två emissiva lägen i den installerade runtimen; kontrollera vilken material-API
+eller stabil ersättningsväg som faktiskt fungerar innan resten byggs. Det
+befintliga emissiva USD-lagret är statiskt och lavafrysning är inte ett
+händelsesystem. Behåll stabil texturidentitet och undvik dubbel belysning från
+emission och kompletterande API-ljus.
 
-## Nästa konkreta steg
+**Klart när:** yta och belysning följer samma av/på-händelse, återställs vid
+sparladdning och kartbyte och saknar kvarhängande material/ljus. Dokumentera
+stock/Plus-stöd och fallback separat.
 
-1. Du: testa musen i menyn när du är vid datorn (eller låt mig göra det i nästlad session).
-2. Jag: bygga ut testriggen (fas 0.3–0.5) och sedan köra fas 1 punkt för punkt med före/efter-bilder.
+## Steg 6: vidareutveckla PBR-klassificeringen
+
+Utgå från `tools/pbr_layer.py`: första match på delsträngar i filens basnamn
+ger redan materialvärden. Flytta regler till granskningsbar data, prioritera
+explicita materialundantag, kombinera sökväg/BSP-flaggor och rapportera
+regel, klass och osäkra fall. Använd representativa metall-, sten-, trä-,
+glas- och skyltmaterial; sky/vätska och handgjorda lager ska behålla sina
+avsedda regler. Ingen extern bildmodell krävs för första versionen.
+
+**Klart när:** klassificering och lager är reproducerbara, tvetydiga namn får
+konservativ fallback, lagerstyrka och hashar bevaras och granskade närbilder
+visar bättre material utan nya ljusa normalränder.
+
+## Steg 7: ankarmeshar
+
+Inför ett litet versionsmärkt per-karta-format med beständigt ID och transform.
+Bevisa först en unik, stabil ankarmesh och en fast ersättning i en karta.
+Kontrollera hashregler, kollisioner, synlighet, material-/meshresurser och Remix
+ersättningsbeteende; funktionspekare i API:t är inte bevis på fungerande ankare.
+Rörliga föräldrar följer efter den statiska leveransen.
+
+**Klart när:** ersättningen sitter kvar efter omstart och reload, två ankare
+inte byter innehåll, kartbyte rensar resurser och eventuell rörlig förälder
+verifieras separat. Modellinnehåll hålls utanför generator-/kodcommits.
+
+## Steg 8–9: miljöövergångar, sedan väta/regn
+
+Utöka befintlig per-karta-config/GL-dimma med verifierade undervattens-,
+film- eller andra speltillstånd, uttrycklig prioritet och återgång till
+kartans grundvärden. Testa vilka variabler som kan ändras mjukt under drift.
+Ingen global Numos-himmel eller återaktivering av NRC. **Klart för steg 8:**
+övergång och återgång fungerar även vid paus, sparladdning och kartbyte, med
+en definierad fallback där en runtime saknar stöd.
+
+Regn/väta börjar sedan på en enda utomhuskarta: separat nederbörd och
+materialväta, skyddade inomhusytor och mjuk upptorkning. Utred Plus-specifika
+effekter och stock-fallback, rörelse/culling och prestanda innan fler kartor.
+**Klart för steg 9:** regn syns utomhus, tak skyddar, torra/våta tillstånd
+återställs korrekt och uppmätt bildtid/VRAM ligger inom vald budget.
+
+## Gemensamma leveranskrav
+
+Varje steg delas i små granskbara PR:ar med källkod/format, relevant test och
+evidensrapport. QindieGL ansvarar för hookar, GPU-/API-livscykel, synlighet och
+overlay; anoxrtx för generatorer, författardata, installerare och bildrigg.
+Bygg wrapperändringar med Linux/MinGW och kontrollera 385 exporter. Redovisa
+MSVC, stock/Plus och faktisk spelverifiering separat. Dokumentationsändringar
+kräver diff-/länkgranskning, inte en ny DLL-byggnad.
+
+Ändra inte standardljus för att dölja initieringsfel. Behåll Wine-fixarna,
+ägarens telemetriinställningar och reproducerbara lokala assetbyggen. Kör en
+spel-/GPU-session åt gången med nätström, beständiga backupper och verifierad
+återställning. Saknade testplatser är en uttrycklig begränsning, inte ett godkänt
+resultat. Bildformat/upplösning, UI/partiklar och MSVC kvarstår som separata
+underhållsspår i TODO, utan att försvinna bakom nya funktioner.

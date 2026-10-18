@@ -1,5 +1,11 @@
 # More ideas from other RTX Remix projects (round 2, October 2026)
 
+> Historical idea survey. Implementation status and ordering were reconciled
+> on 2026-10-18 in [STATUS.md](STATUS.md), [TODO.md](TODO.md) and
+> [PLAN.md](PLAN.md). Several proposals below are already implemented; source
+> project capability descriptions are historical, not newly verified claims.
+
+
 A second sweep of RTX Remix projects on GitHub, looking for things that can be brought to Anachronox
 (QindieGL + Remix 1.5.2 under Proton). [IDEAS.md](IDEAS.md) covers the first sweep (QuakeRTX,
 DeusExEchelonRenderer, q3-rtx-demo, whisperglen's repos); this file only lists what is new.

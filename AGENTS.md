@@ -11,11 +11,17 @@ Start with `HANDOFF.md`, `README.md`, and `TODO.md`; consult `RESULTS.md` and
 `PLAN.md` for history and intended verification. For wrapper work, also read
 QindieGL's `CLAUDE.md`, `AGENTS.md`, and `linux/README.md`.
 
-`TODO.md` contains older open items that later documentation describes as
-implemented, including DLSS, light styles, emissive/PBR materials, fog, and
-packaging. Reconcile these with the current code and handoff before choosing
-work. Distinguish implemented, tested in the game, and still unverified; do not
-mark a visual task complete just because its generator or DLL builds.
+Read `STATUS.md` for the reconciled implementation/verification snapshot and
+`PLAN.md` for the ordered roadmap. `TODO.md` tracks those deliverables; older
+`RESULTS.md`, `IDEAS.md`, `IDEAS2.md` and dated reports preserve history.
+Distinguish implemented, tested in the game, and still unverified; do not mark
+a visual task complete just because its generator or DLL builds. Keep README,
+STATUS, HANDOFF and task status consistent when completing a milestone.
+
+Next work is initial post-save-load lighting plus screenshot regression, then
+Anachronox overlay diagnostics and game-driven event lighting. Timer styles
+1–11, static emission, approximate PBR and the generic overlay already exist.
+Keep model-routing proposals (#28 / QindieGL #23) separate from feature work.
 
 Check branch and working-tree status in both repositories before cross-repository
 work. QindieGL has multiple worktrees; verify which contains the required code.
@@ -73,7 +79,10 @@ source references before acting. Use local search for simple lookups.
 
 The owner's local helper is
 `~/.codex/skills/gemini-triage/scripts/triage.py`; consult that skill's `SKILL.md`
-for invocation. The credential stays in `~/Documents/gemini-api.md`, outside the
+for invocation. At the 2026-10-18 documentation update, that local skill/helper
+was absent from this environment; check availability before using it and fall
+back to local work when missing. No Gemini request was made for the update.
+The credential stays in `~/Documents/gemini-api.md`, outside the
 repos, and must never appear in prompts, command arguments, URLs, logs, or git.
 Do not upload game assets or private data as context. Free-tier data handling
 follows Google's applicable terms.

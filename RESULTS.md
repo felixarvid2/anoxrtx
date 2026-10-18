@@ -1,7 +1,24 @@
 # Resultat: fas 0–3 i PLAN.md
 
-De ursprungliga testerna i fas 0–3 är gjorda på Linux (GE-Proton 11-9, RTX 5060, Remix 1.5.2 release) i en nästlad
-`Xwayland :7` med testriggen `tools/anoxrig.py`.
+Detta är historiska resultat från den ursprungliga fasplanen, inte den nya
+implementationsordningen. Den första testserien nedan använde Linux,
+GE-Proton 11-9, RTX 5060 och Remix 1.5.2 release i nästlad `Xwayland :7`.
+Senare rapporter använder Remix Plus 1.5.1. Nuläge: [STATUS.md](STATUS.md);
+ny plan: [PLAN.md](PLAN.md), kvarvarande arbete: [TODO.md](TODO.md).
+
+## Avstämning 2026-10-18
+
+DLSS/DLAA, installerare, emissiv/PBR-generering, dimremap och per-karta-Numos
+finns nu. Fokuserad rörelse och sparladdning fungerar; konsolinput är rättad
+och accepterad i anoxrtx #27 (33 offline-tester och två sparvyer). QindieGL
+#21 rättar ljusreload-identiteter; båda sparvyerna visar skala 0/1, men första
+ljusläget efter laddning återstår. QindieGL #6 är redan mergad. Äldre uppgifter
+nedan om saknade sparfiler, konsol, DLSS och öppna PR:ar är historik.
+Denna dokumentationsavstämning innebär inga nya speltester.
+
+Se [input](docs/console-input-check.md), [API-ljus](docs/maplight-api-check.md),
+[sparvyer](docs/saved-view-lighting-check.md) och
+[material](docs/rowdys-material-check.md) för avgränsad evidens.
 
 ## Uppföljning 2026-10-17: två fasta Rowdy's-vyer
 

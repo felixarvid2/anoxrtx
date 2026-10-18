@@ -1,5 +1,11 @@
 # Map-light reload investigation — 2026-10-17
 
+> Historical test record. Follow [current status](../STATUS.md) and
+> [the implementation plan](../PLAN.md) for present priorities. Console input
+> was subsequently fixed and accepted in [PR #27](console-input-check.md);
+> initial post-save-load lighting remains a separate open investigation.
+
+
 Reusing an API light identity after destroying it prevented visible updates on
 the installed Remix Plus runtime. Giving every creation a fresh identity fixes
 the reproduced existing-light edit and restores visible scale changes. No
