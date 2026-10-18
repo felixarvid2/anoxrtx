@@ -358,7 +358,9 @@ class Installer:
 
     def step_emissive(self):
         self.backup(os.path.join(self.mod, 'emissive.usda'))
-        self.py('emissive_layer.py', self.mod, self.game, *self.maps(), *(['--pack'] if self.has_pack() else []))
+        classes = os.path.join(self.work, 'jev_classes.json')
+        extra = ['--classes', classes] if self.has_pack() and os.path.exists(classes) else []
+        self.py('emissive_layer.py', self.mod, self.game, *self.maps(), *(['--pack'] if self.has_pack() else []), *extra)
 
     def step_pbr(self):
         if not self.has_pack():
@@ -411,7 +413,7 @@ class Installer:
     def step_mod(self):
         dst = os.path.join(self.mod, 'mod.usda')
         self.put(os.path.join(REPO, 'mod.usda'), dst)
-        layers = [l for l in ('hd_sky', 'liquids', 'emissive', 'models_hd', 'pbr', 'proctex')
+        layers = [l for l in ('hd_sky', 'liquids', 'emissive', 'emissive_jev', 'models_hd', 'pbr', 'proctex')
                   if os.path.exists(os.path.join(self.mod, l + '.usda'))]
         if not self.a['dry_run']:
             s = open(dst).read()
