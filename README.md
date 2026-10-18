@@ -232,3 +232,8 @@ screenshots and checks Remix crash, black/white frames, Remix log errors about m
 load/create/draw results and light styles. With `--ab LAYER` every map is run with the layer on and off
 (mod.usda restored afterwards) and `OUTDIR/compare_<map>.png` shows on, off and the difference. Writes
 `report.md`/`report.json`; exit status 1 when a check fails. About 2 minutes per map and run.
+`--views FILE` shoots chosen views per map through QindieGL's rig camera (`rtx-remix/rigcam.txt`; lines
+`MAP NAME X Y Z PITCH YAW` from `tools/find_views.py MAP.bsp TEXTURE[,…]`, which places the camera in open space
+in front of surfaces using that texture), so surfaces the player cannot reach in the rig can be checked;
+`--ab-cfg "set CVAR VALUE"` A/B-tests a config line and reports frame times. Culling result:
+[docs/culling-check.md](docs/culling-check.md).
