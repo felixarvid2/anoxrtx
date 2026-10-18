@@ -36,6 +36,7 @@ items: QindieGL [linux/REMIX-NOTES.md](https://github.com/felixarvid2/QindieGL/b
 | Starry skies lose their stars | Upscaler wipes fine points | Dark skies are excluded by `make_layers.is_dark()` |
 | Space/city skies replaced by a daytime sky | Numos sky (`rtx.skyMode = 1`, Remix Plus) enabled globally | Keep it per map in `[rtxconf.<map>]` |
 | Shots/explosions give double light | QindieGL `flashblendlights` and `dlights` both on | Use `dlights` only |
+| Lava never logs "frozen", texture 16x16 | The texture pack's upscaled `textures/levant/proc_lava/` sources: anoxgfx needs a palette exactly 256 px wide and falls back to a 16x16 default | `tools/install.sh proctex` restores the originals from `TEXTURES.dat(.orig)` |
 | Lava stays animated / flat teal-cyan | `proctex` off, or its hash differs from `proctex.usda` | `[game.anox] proctex = 1`; compare the "ProcTex: ... Remix texture hash" line in `QindieGL.log` with `tools/proctex_layer.py` output |
 
 ## Test rig and machine
