@@ -24,9 +24,9 @@ observed at their dates; they are not the current backlog.
 | Emissive / PBR | Static emissive generator; approximate normal/roughness/metallic and glass generation; visible normals and five sign emissions in two Rowdy's views | Dynamic emission, better classification, close-up rims and other environments |
 | Textures / procedural lava | Chuncki hash remapping; HD sky/model/liquid generators; stable procedural replacement hashes | Visible lava freeze/replacement, water geometry/transparency and outdoor HD skies |
 | Fog / sky | GL fog remapping; haze observed in bricksb, sunstrip and Rowdy's; per-map Numos sky on five outdoor maps | State-driven transitions, sun/shadow direction and whitecaves-b fog |
-| Rig | Focused movement, verified save loading; physical XKB console input fix (#27 merged), 33 offline tests and both saved views recorded | Capture manifests and offline multi-frame comparison now implemented; outdoor/water/lava/combat locations remain |
+| Rig | Focused movement, verified save loading; physical XKB console input fix (#27 merged), 33 offline tests and both saved views recorded | Capture manifests and offline multi-frame comparison now implemented; outdoor/water/lava/combat locations remain; rig camera (QindieGL #28, `rtx-remix/rigcam.txt`) + `tools/find_views.py` + `tools/anoxcheck.py` reach any view automatically |
 | Debug UI | Anachronox diagnostics panel (F8 / Alt+C, QindieGL #27): map, camera, config, API layout, device generation, light load/draw results, dynamic lights, light styles; verified under Proton | Culling diagnostics; overlay-free capture path |
-| Culling / anchors / weather | Existing culling-related config experiments; Remix mesh/material API pointers | Anachronox BSP/PVS policy, anchor subsystem, wetness and rain are planned |
+| Culling / anchors / weather | PVS measured (docs/culling-check.md): r_novis 1 shows no visible gain in six views and costs up to 60 % frame time, so the game's PVS stays; r_nocull 1 / gl_cull 0 set | Outdoor maps and known light leaks; anchor subsystem, wetness and rain are planned |
 | Installation | `tools/install.sh`, `tools/install.py`, `tools/toggle.sh` exist | Repeat installation/recovery checks when those paths change |
 
 ## Evidence and open proposals

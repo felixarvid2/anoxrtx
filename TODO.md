@@ -20,8 +20,9 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [x] **3. Händelsestyrt animerat ljus:** spelets ljusstilar 1–63 styr ljusen, START_OFF exporteras och
   hålls släckt av spelets stil; verifierat i crevice och levant1 (QindieGL #27). Kvar att se i spelet:
   ett ljus som tänds under spel, paus och save-återställning.
-- [ ] **4. BSP/PVS:** börja mätning tidigt; implementera konservativ synlighet
-  som bevarar skuggor/reflektioner och verifiera CPU/GPU/VRAM.
+- [x] **4. BSP/PVS:** mätt med riggkamera och `--ab-cfg "set r_novis 1"` (docs/culling-check.md): ingen synlig
+  skillnad i sex vyer, upp till 60 % längre bildtid i votowne. Spelets PVS behålls; prova `r_novis 1` per bana
+  om ljusläckor eller saknade skuggor syns.
 - [ ] **5. Dynamisk emission:** synkronisera ett verifierat material med
   ljushändelser, utan kvarhängande tillstånd eller dubbel illumination.
 - [ ] **6. PBR-klassificering:** vidareutveckla befintliga namnregler med
