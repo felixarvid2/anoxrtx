@@ -113,6 +113,10 @@ I raise roughness and metalicity of character materials to the max to mask the p
    `tools/pbr_layer.py rtx-remix/mods/anoxrt <Anachronox> <maps>/*.bsp` writes normal maps (from the texture's
    luminance), roughness/metallic by keywords in the texture name, and thin-walled glass for the
    `SURF_TRANS33/66` glass/window textures, as `pbr.usda`; add `@./pbr.usda@` to mod.usda's subLayers.
+   Better roughness/metallic: `tools/jev_classify.py <Anachronox> ~/.cache/anoxrtx/work/jev_classes.json
+   <maps>/*.bsp --gemini` lets Gemini describe the textures (128 px contact sheets; free tier) and TypeSafe Jev
+   decide material, roughness, metal and glow (about 0.12 USD for all textures; cached). `pbr_layer.py
+   --classes` (and the installer, when that file exists) then uses those values instead of name keywords.
 
 8. Remix Plus (optional, tested with v1.5.1 x86 under GE-Proton 11-9): unzip
    `Remix_Plus_v1.5.1_x86_games_release.zip` over the game folder (replaces `d3d9.dll` and `.trex/`; keep a copy
