@@ -40,7 +40,11 @@ def pids(pattern):
 
 def game_window(d):
     def find(w):
-        for c in w.query_tree().children:
+        try:
+            children = w.query_tree().children
+        except Exception:      # the window vanished while walking the tree (e.g. during game start)
+            return None
+        for c in children:
             try:
                 if c.get_wm_name() == 'Anachronox' and c.get_attributes().map_state == X.IsViewable:
                     return c

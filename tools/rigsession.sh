@@ -34,7 +34,11 @@ VDF=$(ls "$HOME"/.steam/debian-installation/userdata/*/config/localconfig.vdf 2>
 [ -f "$VDF" ] || { echo "rigsession: localconfig.vdf not found"; exit 1; }
 
 xw_pid() { for p in $(pgrep -x Xwayland); do tr '\0' ' ' < /proc/$p/cmdline | grep -q ' :7 ' && echo $p; done; }
-steam_down() { steam -shutdown >/dev/null 2>&1; for _ in $(seq 1 30); do pgrep -x steam >/dev/null || return 0; sleep 2; done; }
+steam_down() {   # only when running: "steam -shutdown" on a stopped Steam starts it
+    pgrep -x steam >/dev/null || return 0
+    steam -shutdown >/dev/null 2>&1 </dev/null
+    for _ in $(seq 1 30); do pgrep -x steam >/dev/null || return 0; sleep 2; done
+}
 started_xw=""
 
 restore() {
@@ -42,8 +46,12 @@ restore() {
     $RIG stop >/dev/null 2>&1
     steam_down
     sed -i 's|%command% +map [A-Za-z0-9_-]*|%command%|; s|"LaunchOptions"\t\t"DISPLAY=:7 |"LaunchOptions"\t\t"|' "$VDF"
-    [ -n "$started_xw" ] && kill "$started_xw" 2>/dev/null
-    [ $keep_off = 1 ] || (cd "$HOME" && DISPLAY="${DESKTOP_DISPLAY:-:1}" nohup steam -silent >/dev/null 2>&1 &)
+    if [ -n "$started_xw" ]; then
+        kill "$started_xw" 2>/dev/null
+        for _ in $(seq 1 20); do kill -0 "$started_xw" 2>/dev/null || break; sleep 0.5; done
+    fi
+    # fully detached, so this script (and pipes reading its output) can exit
+    [ $keep_off = 1 ] || (cd "$HOME" && DISPLAY="${DESKTOP_DISPLAY:-:1}" setsid -f steam -silent </dev/null >/dev/null 2>&1)
     if grep -q 'DISPLAY=:7\|+map ' "$VDF"; then echo "rigsession: WARNING launch options not fully restored"; fi
     echo "rigsession: restored"
 }
@@ -52,8 +60,10 @@ trap 'exit 130' INT TERM
 
 if [ -z "$(xw_pid)" ]; then
     setsid Xwayland :7 -geometry 1920x1200 -decorate -noreset >/dev/null 2>&1 < /dev/null &
-    sleep 2; started_xw=$(xw_pid)
+    sleep 1; started_xw=$(xw_pid)
 fi
+for _ in $(seq 1 20); do [ -S /tmp/.X11-unix/X7 ] && xdpyinfo -display :7 >/dev/null 2>&1 && break; sleep 0.5; done
+xdpyinfo -display :7 >/dev/null 2>&1 || { echo "rigsession: display :7 did not come up"; exit 1; }
 steam_down
 sed -i 's|"LaunchOptions"\t\t"__NV_PRIME|"LaunchOptions"\t\t"DISPLAY=:7 __NV_PRIME|' "$VDF"
 [ -n "$map" ] && sed -i "s|%command%\\(\"\\)|%command% +map $map\\1|; s|%command% +map [A-Za-z0-9_-]* +map|%command% +map|" "$VDF"

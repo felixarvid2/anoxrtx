@@ -18,7 +18,7 @@ Never edit Steam's `localconfig.vdf` or start Xwayland by hand.
    $RIG start                      # launches via Steam, waits for visible content
    sleep 40                        # with +map: let the map load
    $RIG shot my_check              # -> tools/shots/my_check.png (+ prints brightness)
-   grep -E "MapLights|DLights|ProcTex|RTX.conf|Remix API" "$QLOG" | tail -20
+   grep -aE "MapLights|DLights|ProcTex|RTX.conf|Remix API" "$QLOG" | tail -20   # -a: binary bytes in the log
    echo "remix crash: $(grep -c 'err:   The RTX' "$LOGS/bridge32.log")"
    ```
    Other rig commands: `load-save SLOT`, `to-rowdys`, `timeline PFX T...`, `hold SECS KEY`, `key`, `chord`,
