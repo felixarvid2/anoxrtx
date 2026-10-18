@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Make light-emitting map surfaces (Quake 2 SURF_LIGHT texinfo) emissive Remix materials.
 
-usage: emissive_layer.py MODDIR GAMEDIR MAP.bsp... [--pack]
+usage: emissive_layer.py MODDIR GAMEDIR MAP.bsp... [--pack] [--classes CLASSES.json [--glow-min 0.7]]
 
 Collects every texture used with SURF_LIGHT (0x1) in the given maps and its highest light value, and writes
 MODDIR/emissive.usda (+ MODDIR/hd/emissive/*.dds): enable_emission, emissive_mask_texture = the texture,
@@ -9,6 +9,11 @@ emissive_intensity = clamp(value / 100, 1, 15).
 Texture source / hash: with --pack the loose files in GAMEDIR/anoxdata/textures (e.g. Chuncki's 4x pack),
 otherwise GAMEDIR/anoxdata/TEXTURES.dat (or TEXTURES.dat.orig). Add @./emissive.usda@ to mod.usda's subLayers.
 Material overrides in mod.usda itself are stronger than this layer, so hand-made materials win.
+--classes (tools/jev_classify.py output, needs --pack): textures Jev rates as glowing (emissive >= --glow-min)
+that are not SURF_LIGHT also emit. Their mask keeps only the bright parts (luminance above the texture's 60th
+percentile and at least 0.3, softened), so a lamp's frame stays dark; intensity 1.5..4 by Jev's probability.
+They go to a separate layer, MODDIR/emissive_jev.usda (add @./emissive_jev.usda@ to mod.usda's subLayers), so
+they can be switched off on their own.
 """
 import glob, importlib.util, io, os, sys
 
@@ -22,8 +27,14 @@ SURF_LIGHT, SURF_SKY, SURF_WARP = 0x1, 0x4, 0x8
 
 
 def main():
-    args = [a for a in sys.argv[1:] if not a.startswith('--')]
-    pack = '--pack' in sys.argv
+    argv = sys.argv[1:]
+    def opt(n, default):
+        if n in argv:
+            i = argv.index(n); v = argv[i + 1]; del argv[i:i + 2]; return v
+        return default
+    classes = opt('--classes', ''); glow_min = float(opt('--glow-min', '0.7'))
+    args = [a for a in argv if not a.startswith('--')]
+    pack = '--pack' in argv
     if len(args) < 3:
         print(__doc__); sys.exit(1)
     moddir, gamedir, maps = args[0], args[1], args[2:]
@@ -81,9 +92,57 @@ def main():
                 '                    colorSpace = "auto"', '                )',
                 '                float inputs:emissive_intensity = %g' % inten,
                 '            }', '        }', '']
+    njev = 0
+    jout = layers.header()
+    if classes:
+        import json
+        import numpy as np
+        from PIL import Image, ImageFilter
+        jev = {k: v for k, v in json.load(open(classes)).items() if not k.startswith('_')}
+        skip = set()
+        for m in maps:
+            _, _, tex = bspinfo.load(m)
+            for name, flags, value in tex:
+                if flags & (SURF_SKY | SURF_WARP):
+                    skip.add(name.replace('\\', '/').lower())
+        for k, c in sorted(jev.items()):
+            if c['emissive'] < glow_min or k in want or k in skip or k not in files or files[k][0] != 'file':
+                continue
+            path = files[k][1]
+            try:
+                h, _ = rh.remix_hash(path)
+            except Exception:
+                continue
+            if h in done:
+                continue
+            done.add(h)
+            rgb = Image.open(path).convert('RGB')
+            a = np.asarray(rgb, dtype=np.float32) / 255.0
+            lum = a @ np.array([0.2126, 0.7152, 0.0722], dtype=np.float32)
+            t = max(0.3, float(np.percentile(lum, 60)))
+            w = np.clip((lum - t) / max(1e-3, 1.0 - t) * 3.0, 0.0, 1.0)
+            wim = Image.fromarray((w * 255).astype(np.uint8), 'L').filter(ImageFilter.GaussianBlur(1.0))
+            w = np.asarray(wim, dtype=np.float32)[..., None] / 255.0
+            base = k.replace('/', '__') + '.jev'
+            png = os.path.join(tmp, base + '.png')
+            Image.fromarray((a * w * 255).astype(np.uint8), 'RGB').save(png)
+            dds = os.path.join(tmp, base + '.dds')
+            layers.dds(png, dds); os.remove(png)
+            rel = os.path.relpath(dds, moddir).replace(os.sep, '/')
+            inten = round(1.5 + 2.5 * (c['emissive'] - glow_min) / max(1e-3, 1.0 - glow_min), 2)
+            jout += ['        # %s (Jev glow %.2f, %s)' % (k, c['emissive'], c['material']), '        over "mat_%016X"' % h,
+                    '        {', '            over "Shader"', '            {',
+                    '                bool inputs:enable_emission = 1',
+                    '                asset inputs:emissive_mask_texture = @./%s@ (' % rel,
+                    '                    colorSpace = "auto"', '                )',
+                    '                float inputs:emissive_intensity = %g' % inten,
+                    '            }', '        }', '']
+            njev += 1
     open(os.path.join(moddir, 'emissive.usda'), 'w').write('\n'.join(out + layers.footer()))
-    print('%d light textures, %d emissive materials, %d not found%s' % (len(want), len(done), len(missing),
-          (': ' + ', '.join(missing[:10])) if missing else ''))
+    if classes:
+        open(os.path.join(moddir, 'emissive_jev.usda'), 'w').write('\n'.join(jout + layers.footer()))
+    print('%d light textures, %d emissive materials (%d from Jev glow >= %g), %d not found%s' % (
+          len(want), len(done), njev, glow_min, len(missing), (': ' + ', '.join(missing[:10])) if missing else ''))
 
 
 if __name__ == '__main__':

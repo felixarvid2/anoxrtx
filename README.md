@@ -117,6 +117,8 @@ I raise roughness and metalicity of character materials to the max to mask the p
    <maps>/*.bsp --gemini` lets Gemini describe the textures (128 px contact sheets; free tier) and TypeSafe Jev
    decide material, roughness, metal and glow (about 0.12 USD for all textures; cached). `pbr_layer.py
    --classes` (and the installer, when that file exists) then uses those values instead of name keywords.
+   `emissive_layer.py --classes` also makes the textures Jev rates as glowing (>= 0.7, not already SURF_LIGHT)
+   emissive, bright parts only, in their own layer `emissive_jev.usda`.
 
 8. Remix Plus (optional, tested with v1.5.1 x86 under GE-Proton 11-9): unzip
    `Remix_Plus_v1.5.1_x86_games_release.zip` over the game folder (replaces `d3d9.dll` and `.trex/`; keep a copy
@@ -223,3 +225,10 @@ Regression checks, without Steam or a running X server:
 ```sh
 python -m unittest discover -s tools -p 'test_anoxrig.py'
 ```
+
+
+Automatic in-game check: `tools/anoxcheck.py OUTDIR MAP... [--ab LAYER]` starts each map (`+map`), takes two
+screenshots and checks Remix crash, black/white frames, Remix log errors about mod files, map-light
+load/create/draw results and light styles. With `--ab LAYER` every map is run with the layer on and off
+(mod.usda restored afterwards) and `OUTDIR/compare_<map>.png` shows on, off and the difference. Writes
+`report.md`/`report.json`; exit status 1 when a check fails. About 2 minutes per map and run.
