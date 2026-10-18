@@ -9,7 +9,8 @@ largest faces that use it (one per texture, up to --count) the view is placed --
 in front of the face along its normal, raised a little, looking at the face centre. Prints lines for
 tools/anoxcheck.py --views:   MAP NAME X Y Z PITCH YAW
 (QindieGL renders world views from rtx-remix/rigcam.txt "X Y Z PITCH YAW", Quake 2 angles: pitch > 0 = down.)
-Camera positions are checked against the BSP tree: only empty leaves inside the map (cluster >= 0) are used,
+Camera positions are checked against the BSP tree: only empty leaves inside the map (cluster >= 0, no solid or
+liquid contents) are used,
 trying shorter distances and, for floors, oblique views from four sides.
 """
 import math, os, struct, sys
@@ -64,7 +65,7 @@ class Tree:
         for _ in range(4096):
             if n < 0:
                 contents, cluster = struct.unpack_from('<ih', self.d, self.loff + (-1 - n) * 28)
-                return contents & 1 == 0 and cluster >= 0      # not CONTENTS_SOLID, inside the map
+                return contents & 0x39 == 0 and cluster >= 0   # not solid/lava/slime/water, inside the map
             plane, c0, c1 = struct.unpack_from('<iii', self.d, self.noff + n * 28)
             nx, ny, nz, dist = struct.unpack_from('<ffff', self.d, self.poff + plane * 20)
             n = c0 if nx * p[0] + ny * p[1] + nz * p[2] - dist >= 0 else c1

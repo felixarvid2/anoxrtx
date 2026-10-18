@@ -38,7 +38,7 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 
 - [ ] Utomhusbaslinje: HD-himmel och Numos sol-/skuggriktning på avsedda kartor.
 - [ ] Vatten: genomskinlighet, stabil geometrihash och material i relevant vy.
-- [ ] Lava: `proc_lava`/`proc_lavafloe`-frysloggar och synligt ersättningsmaterial.
+- [x] Lava: `proc_lava` fryses (256x256, hash 0x561447B2DFA181FD) och ersättningsmaterialet syns i levant2 (2026-10-18). Orsak: HD-paketets uppskalade palett (anoxgfx kräver 256 px bred) + QindieGL fyllde gammal D3D-textur. `proc_lavafloe` ej sedd i bild än.
 - [ ] Strid: icke-noll dlights och synligt ljus från vapen/explosioner.
   QindieGL #6 är redan mergad; välj flashblend-fallback bara från evidens
   och kontrollera att samma händelse inte belyses dubbelt.

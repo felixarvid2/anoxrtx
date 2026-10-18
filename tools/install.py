@@ -374,6 +374,18 @@ class Installer:
     def step_proctex(self):
         if not self.has_pack():
             self.log('proctex: needs the texture pack, skipped'); return
+        # the pack upscales the procedural textures' sources too; anoxgfx needs a palette exactly 256 pixels
+        # wide, otherwise the texture falls back to a 16x16 default and the lava is never drawn
+        if not self.a['dry_run']:
+            a = _load('adat'); dat = self.textures_dat(); n = 0
+            with open(dat, 'rb') as f:
+                for name, o, ln, c in a.entries(dat):
+                    key = name.replace('\\', '/').lower()
+                    if re.match(r'levant/proc_lava/', key):
+                        dst = os.path.join(self.game, 'anoxdata', 'textures', *key.split('/'))
+                        self.backup(dst)
+                        open(dst, 'wb').write(a.read(f, o, ln, c)); n += 1
+            self.log('proctex: %d original source images restored' % n)
         self.py('proctex_layer.py', self.mod, self.game)
 
     def step_models(self):

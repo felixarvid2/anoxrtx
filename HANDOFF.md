@@ -158,7 +158,7 @@ when started with `+map`, so it is untested. Tuning knobs: `rtx.volumetrics.fogR
 
 ## Not yet verified in the game
 - Lava freeze (`proctex`): look in Levant for "ProcTex: ... frozen ..., Remix texture hash 0x561447B2DFA181FD"
-  (proc_lava) / `0x26C0B031CCFA2266` (proc_lavafloe) in QindieGL.log. Focused movement works; a verified lava location/route is still missing.
+  (proc_lava) / `0x26C0B031CCFA2266` (proc_lavafloe) in QindieGL.log. Verified 2026-10-18 in levant2 with the rig camera (`tools/find_views.py MAP.bsp proc_lava`).
 - Dynamic lights in combat (`dlights`). QindieGL PR #6 (flashblend) is already merged; evaluate the later dlights path first and avoid duplicate illumination.
 - Rowdy's normal maps and five sign emissions have visible effects in two saved views
   ([2026-10-17 check](https://github.com/felixarvid2/anoxrtx/blob/main/docs/rowdys-material-check.md)); retain defaults. Close-up checks for bright
