@@ -44,9 +44,30 @@ as above), set `rtx.tonemap.exposureBias` in its `[rtxconf.<map>]` section and c
 ## Characters
 
 The original lights models with the lightmap value under them (`R_LightPoint`) plus a per-map model light
-(e.g. rowdys 0.6/1/1, the teal on Boots' coat); path tracing has neither, so characters were about 2.2 EV
-darker than in the original although whole frames matched. QindieGL #30 adds a fill light per character
-(`[maplights.*] model_fill`). Rowdys character region (linear luminance): 0.0031 without, 0.0155 with
-`model_fill = 10`, 0.0139 in the original; museum and tenements checked side by side. The fill light also
-brightens the floor right around a character a little.
+(e.g. rowdys 0.6/1/1, the teal on Boots' coat); path tracing has neither, so characters were about 2 EV
+darker than in the original although whole frames matched. QindieGL adds a fill light per character
+(`[maplights.*] model_fill`, QindieGL #30/#32): a spot aimed at each `RF_DIRLIGHT` model (characters, not
+props) within 350 units of the camera, as bright as `model_fill` times the map lights' irradiance at the
+model, with the original's model-light colour. A fixed brightness (#30) depended on each map's exposure and
+autoexposure (votowne +2 EV too dark, baltown 2 EV too bright).
 
+Measured with `anoxcheck.py --ab-original`, character region (centre bottom) minus whole frame, original
+gamma-corrected; negative = character brighter than in the original:
+
+| Map | `model_fill` | Character vs frame (EV) |
+| --- | --- | --- |
+| votowne | 1.5 (default) | -0.03 |
+| krapton | 1.5 | +0.31 |
+| comhills | 1.5 | -0.17 |
+| scommons | 1.5 | -0.30 |
+| hephaestus | 1.5 | -0.24 |
+| rowdys | 0.9 | -0.24 |
+| baltown | 0 | 0.00 |
+| greattree | 0.1 | -0.24 |
+| starport | 0.3 | -0.12 |
+| bricksb | 0.35 | -0.19 |
+
+The irradiance sum has no occlusion and does not include the Numos sky, so where the room or sky already
+lights the character (outdoor maps, lamps behind walls) it over-lights; those maps have their own value.
+The other ~69 maps use the default unmeasured. Not covered: the greattree view has a purple tint under Remix
+that the original does not have (unrelated to the fill light).
