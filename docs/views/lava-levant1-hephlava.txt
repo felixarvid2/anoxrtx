@@ -1,0 +1,6 @@
+levant1 proc_lava -1475.8 -1043.7 -640.0 38.7 -90.0
+levant1 proc_lavafloe 284.7 -325.0 42.1 14.4 180.0
+hephlava proc_lava 1808.6 -1929.1 -592.0 38.7 180.0
+levant1 proc_lava -1475.8 -783.7 -432.0 38.7 -90.0
+levant1 proc_lavafloe 542.2 -325.0 78.3 10.3 180.0
+hephlava proc_lava 2068.6 -1929.1 -384.0 38.7 180.0
