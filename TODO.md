@@ -39,7 +39,9 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [ ] Utomhusbaslinje: HD-himmel och Numos sol-/skuggriktning på avsedda kartor.
 - [ ] Vatten: genomskinlighet, stabil geometrihash och material i relevant vy.
 - [x] Lava: `proc_lava` fryses (256x256, hash 0x561447B2DFA181FD) och ersättningsmaterialet syns i levant2 (2026-10-18). Orsak: HD-paketets uppskalade palett (anoxgfx kräver 256 px bred) + QindieGL fyllde gammal D3D-textur. `proc_lavafloe` ej sedd i bild än.
-- [x] Figurer för mörka: fyllnadsljus per figur (`model_fill = 10`, QindieGL #30), i nivå med originalet i rowdys/museum/tenements (2026-10-18).
+- [x] Figurer för mörka: fyllnadsljus per figur relativt kartljusen (QindieGL #30/#32, `model_fill = 1.5` + egna värden
+  för 5 banor), 10 banor inom ±0,3 EV mot originalet (2026-10-19). Övriga ~69 banor omätta.
+- [ ] greattree: lila ton under Remix som originalet saknar.
 - [ ] Strid: dlights ritas nu (QindieGL #30 hashfix, verifierat med testljus via `anoxcheck.py --ab-dlight`,
   QindieGL #31): styrka 300 intill Boots i rowdys = tydligt, ej utbränt (+0,84 EV). Anachronox skapar dlights
   bara från entiteters ljusfält i skript/strid (inga mynningsflammor; 0 dlights i alla startvyer inkl. cine).
