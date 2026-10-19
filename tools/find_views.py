@@ -3,17 +3,21 @@
 
 usage: find_views.py MAP.bsp TEXTURE[,TEXTURE...] [--count N] [--distance D] [--name PREFIX]
        find_views.py MAP.bsp --light N [--distance D]          (view of map light N, index as in <map>.lights)
+       find_views.py MAP.bsp --spots N                          (N views from places the player or NPCs go)
 
 TEXTURE is a texture path as in the BSP (e.g. levant/proc_lava; substring match, case-insensitive). For the
 largest faces that use it (one per texture, up to --count) the view is placed --distance units (default 140)
 in front of the face along its normal, raised a little, looking at the face centre. Prints lines for
 tools/anoxcheck.py --views:   MAP NAME X Y Z PITCH YAW
 (QindieGL renders world views from rtx-remix/rigcam.txt "X Y Z PITCH YAW", Quake 2 angles: pitch > 0 = down.)
+--spots picks eye-height views at info_player_start and path_corner entities, spread over the map (each next spot
+the one farthest from those already picked), looking along the most open of 16 directions, slightly down; for
+measuring a map as a whole (e.g. exposure) where the start view is unusable.
 Camera positions are checked against the BSP tree: only empty leaves inside the map (cluster >= 0, no solid or
 liquid contents) are used,
 trying shorter distances and, for floors, oblique views from four sides.
 """
-import math, os, struct, sys
+import math, os, re, struct, sys
 
 
 def lumps(data):
@@ -94,6 +98,43 @@ def look(cam, target):
     return pitch, yaw
 
 
+def entities(path):
+    data = open(path, 'rb').read()
+    off, ln = lumps(data)[0]
+    text = data[off:off + ln].decode('latin-1')
+    return [dict(re.findall(r'"([^"]+)"\s+"([^"]*)"', block)) for block in re.findall(r'\{([^{}]*)\}', text)]
+
+
+def spots(path, count):
+    tree = Tree(path)
+    pts = []
+    for e in entities(path):
+        if e.get('classname') in ('info_player_start', 'path_corner') and 'origin' in e:
+            x, y, z = (float(v) for v in e['origin'].split()[:3])
+            for dz in (40.0, 24.0, 56.0):
+                if tree.empty((x, y, z + dz)):
+                    pts.append((x, y, z + dz)); break
+    picked = []
+    while pts and len(picked) < count:
+        best = max(pts, key=lambda p: min((math.dist(p, q) for q in picked), default=1e9))
+        pts.remove(best)
+        if picked and min(math.dist(best, q) for q in picked) < 256:
+            break
+        picked.append(best)
+    out = []
+    for cam in picked:
+        def reach(a):
+            far = 0
+            for d in range(32, 1025, 32):
+                if not tree.empty((cam[0] + math.cos(a) * d, cam[1] + math.sin(a) * d, cam[2])):
+                    break
+                far = d
+            return far
+        a = max((math.radians(k * 22.5) for k in range(16)), key=reach)
+        out.append((cam, 10.0, math.degrees(a)))
+    return out
+
+
 def main():
     args = sys.argv[1:]
     def opt(n, default):
@@ -101,7 +142,15 @@ def main():
             i = args.index(n); v = args[i + 1]; del args[i:i + 2]; return v
         return default
     count = int(opt('--count', '1')); dist = float(opt('--distance', '140')); prefix = opt('--name', '')
-    light = opt('--light', '')
+    light = opt('--light', ''); nspots = int(opt('--spots', '0'))
+    if nspots and args:
+        mp = os.path.splitext(os.path.basename(args[0]))[0].lower()
+        res = spots(args[0], nspots)
+        for i, (cam, p, yw) in enumerate(res):
+            print('%s %sspot%d %.1f %.1f %.1f %.1f %.1f' % (mp, prefix, i, cam[0], cam[1], cam[2], p, yw))
+        if not res:
+            sys.exit('%s: no player start or path_corner inside the map' % mp)
+        return
     if len(args) < 1 or (not light and len(args) < 2):
         print(__doc__); sys.exit(1)
     mp = os.path.splitext(os.path.basename(args[0]))[0].lower()

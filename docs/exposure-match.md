@@ -33,10 +33,21 @@ the seven above), measured at the global bias `-2.0` with `--settle 15`. Per-map
 Re-check of the five largest changes (after, EV): baltown +0.12, hephtower2 -0.21, mystech2 -0.22, whitendon -0.06,
 sexmach -1.04 at -5.3, so a second pass set it to -6.3 (-0.23).
 
-Not set (no usable comparison): ballotine, basement, braintrain, braintrain-b, commbase, commiteon,
-crevicelanding, fortress1, fortress2, hivebay, kraptonbay, labbuilding, mburger, servicetunnel, slevant (black
-frames, a scene still moving between the two shots, or a start view that differs between the runs), and
-baltownr (Remix start frame mostly black). These need a hand-picked view (`--views`) to measure.
+### Maps without a usable start view (2026-10-19)
+
+Sixteen maps had no usable start view. They were measured from rig-camera views spread over each map: up to
+three eye-height spots at `info_player_start` and `path_corner` entities (`tools/find_views.py MAP.bsp --spots 3`;
+the views are in `docs/views/exposure-spots.txt`), with the same gamma-corrected EV as above.
+
+| Map | Result |
+| --- | --- |
+| fortress2 | Remix 0.5 EV brighter in both runs (spot0 -0.53, start view -0.52): bias **-2.5**, after -0.19 |
+| fortress1, mburger | within ±0.4 EV per view, around 0 overall: global bias kept |
+| commbase, commiteon | +0.8 to +1.4 EV, but because the sky is different (Remix draws a dark night sky, the original a bright sky with sun): not exposure, left at global until the sky is fixed |
+| slevant | +2.4 EV, but because the original's orange haze over the lava is missing under Remix: not exposure (fog) |
+| crevicelanding, labbuilding, servicetunnel | Remix renders nothing when the rig starts the game with `+map` (bridge stall, see TODO); loaded from the menu they render. Not measured |
+| ballotine, basement, braintrain, braintrain-b, kraptonbay, baltownr | spots outside the playable map or black in one renderer: no usable view |
+| hivebay | start is a scene that draws no world (all views give the same black frame) |
 
 To match another map: run the `--ab-original` check for it, take the EV from the report (or the corrected value
 as above), set `rtx.tonemap.exposureBias` in its `[rtxconf.<map>]` section and check once more.

@@ -38,10 +38,18 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 
 - [ ] Utomhusbaslinje: HD-himmel och Numos sol-/skuggriktning på avsedda kartor.
 - [ ] Vatten: genomskinlighet, stabil geometrihash och material i relevant vy.
-- [x] Lava: `proc_lava` fryses (256x256, hash 0x561447B2DFA181FD) och ersättningsmaterialet syns i levant2 (2026-10-18). Orsak: HD-paketets uppskalade palett (anoxgfx kräver 256 px bred) + QindieGL fyllde gammal D3D-textur. `proc_lavafloe` ej sedd i bild än.
+- [x] Lava: `proc_lava` fryses (256x256, hash 0x561447B2DFA181FD) och ersättningsmaterialet syns i levant2 (2026-10-18). Orsak: HD-paketets uppskalade palett (anoxgfx kräver 256 px bred) + QindieGL fyllde gammal D3D-textur. `proc_lavafloe` ej sedd i bild än. levant1 och hephlava går inte att se med riggkameran (banstarten ritar ingen värld, även originalet svart, 2026-10-19); kräver en sparfil nära lavan.
 - [x] Figurer för mörka: fyllnadsljus per figur relativt kartljusen (QindieGL #30/#32, `model_fill = 1.5` + egna värden
   för 5 banor), 10 banor inom ±0,3 EV mot originalet (2026-10-19). Övriga ~69 banor omätta.
 - [ ] greattree: lila ton under Remix som originalet saknar.
+- [ ] Himmel: commbase och commiteon får mörk natthimmel under Remix där originalet har ljus himmel med sol
+  (+0,8–1,4 EV mörkare bild, 2026-10-19). slevant saknar originalets orange dis över lavan. Exponering inte satt för dessa.
+- [ ] **Bridge-stopp vid banladdning:** Remix-bryggan låser sig ibland när en bana laddas (servicetunnel och labbuilding
+  2 av ~7 laddningar från menyn, 2026-10-19): `Data Queue overwrite` i bridge32.log, servern svarar inte, bilden fryser på
+  laddskärmen. Med `+map` vid start alltid för crevicelanding/labbuilding/servicetunnel (handskakning för nya fönstret
+  tidsgränsas). Bisektion av servicetunnel.lights: ingen enskild rad; utan kartljus inga stopp i 1 försök. Större
+  server-köer (`serverCmdQueueSize`/`serverDataQueueSize = 1000`) laddade 3/3 men standard laddade också 1/1, så
+  inget bevisat. Nästa steg: fler upprepningar, eller skapa kartljus utspritt över flera bildrutor i QindieGL.
 - [ ] Strid: dlights ritas nu (QindieGL #30 hashfix, verifierat med testljus via `anoxcheck.py --ab-dlight`,
   QindieGL #31): styrka 300 intill Boots i rowdys = tydligt, ej utbränt (+0,84 EV). Anachronox skapar dlights
   bara från entiteters ljusfält i skript/strid (inga mynningsflammor; 0 dlights i alla startvyer inkl. cine).
