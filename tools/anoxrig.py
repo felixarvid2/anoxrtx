@@ -18,6 +18,7 @@ xkbcomp, xset, and enabled X autorepeat for console input.
   anoxrig.py hold SECS KEY...      focus game and hold keys for movement (e.g. hold 2 w)
   anoxrig.py list-saves            list local PROFILE/SLOT selectors and saved maps
   anoxrig.py load-save SAVE [SECS] restore PROFILE/SLOT through the game console
+  anoxrig.py console TEXT...       open the console, send one line (e.g. "map servicetunnel"), close it
   anoxrig.py wait-bright [SECS]    wait until the window is not black (menu/level visible)
   anoxrig.py log                   show the interesting Remix / QindieGL log lines
 """
@@ -606,6 +607,27 @@ def cmd_load_save(selector, timeout='120'):
         finally:
             d.close()
     print(f"loaded {info['save']} map={info['map']} viewpos=({' '.join(pose.groups()[:3])}) yaw={pose[4]} sha256={info['sha256']}")
+
+
+def cmd_console(*words):
+    """One console line, e.g. a map load from the menu (the path a player takes; +map at launch can stall
+    the Remix bridge on some maps). Closes the console again if the command left it open."""
+    d = display.Display()
+    try:
+        focus_game(d)
+        for attempt in range(4):   # the intro or a loading screen can still be up
+            try:
+                ensure_console(d); break
+            except RuntimeError:
+                if attempt == 3:
+                    raise
+                time.sleep(10)
+        console_line(d, ' '.join(words))
+        time.sleep(2)
+        if is_console(grab(d)):
+            cmd_key(os.environ.get('ANOX_CONSOLE_KEY', 'kc49'))
+    finally:
+        d.close()
 
 
 def cmd_wait_bright(secs='90'):
