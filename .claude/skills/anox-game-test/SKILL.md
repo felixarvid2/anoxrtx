@@ -21,16 +21,20 @@ Never edit Steam's `localconfig.vdf` or start Xwayland by hand.
    grep -aE "MapLights|DLights|ProcTex|RTX.conf|Remix API" "$QLOG" | tail -20   # -a: binary bytes in the log
    echo "remix crash: $(grep -c 'err:   The RTX' "$LOGS/bridge32.log")"
    ```
-   Other rig commands: `load-save SLOT`, `to-rowdys`, `timeline PFX T...`, `hold SECS KEY`, `key`, `chord`,
+   Other rig commands: `console TEXT` (one console line from the menu, e.g. `console map servicetunnel`;
+   retries while the intro is still up), `load-save SLOT`, `to-rowdys`, `timeline PFX T...`, `hold SECS KEY`, `key`, `chord`,
    `sendkey` (reaches Remix), `move`, `click`, `log`, `list-saves`. Saved test views: `docs/test-locations.md`.
 3. Run it in the background (a full run takes 2–6 min):
    `tools/rigsession.sh [--map NAME] /path/to/test.sh > log 2>&1`
-   `--map NAME` starts straight into a map (`+map`); some maps (whitecaves-*) need a save instead.
+   `--map NAME` starts straight into a map (`+map`); some maps (whitecaves-*) need a save instead, and
+   crevicelanding/labbuilding/servicetunnel stall the Remix bridge with `+map` (black frame): start without
+   `--map` and use `$RIG console map NAME`.
 4. Check the log ends with `rigsession: restored` (no WARNING), then look at the screenshots. Compare views
    with `tools/anoxcapture.py` / `tools/anoxcompare.py` (docs/screenshot-regression.md) when a baseline exists.
 
 ## Evidence to report
 Map/save, runtime (stock Remix 1.5.2 or Remix Plus 1.5.1), changed settings, screenshot paths, the relevant
 QindieGL.log lines, and whether Remix crashed. A rig "timeout" alone does not prove a crash; a crash shows as
-"The RTX Remix Runtime has encountered an unexpected issue" in `bridge32.log`. Known problems and fixes:
+"The RTX Remix Runtime has encountered an unexpected issue" in `bridge32.log`. A stall (not a crash) shows as `Data Queue overwrite` in `bridge32.log` without a following "resolved".
+For brightness comparisons with the original renderer use the `anox-ab-measure` skill. Known problems and fixes:
 docs/TROUBLESHOOTING.md.
