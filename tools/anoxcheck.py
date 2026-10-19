@@ -1,7 +1,7 @@
 #!/usr/bin/env -S sh -c 'exec "${ANOX_PY:-$HOME/.cache/anoxrtx/venv/bin/python}" "$0" "$@"'
 """Automatic in-game check of the Remix mod: run maps with a layer on and off, collect evidence, write a report.
 
-usage: anoxcheck.py OUTDIR MAP [MAP...] [--ab LAYER | --ab-cfg "CVAR LINE"] [--views FILE] [--wait S] [--settle S]
+usage: anoxcheck.py OUTDIR MAP [MAP...] [--ab LAYER | --ab-cfg "CVAR LINE" | --ab-dlight "X Y Z R G B INTENSITY"] [--views FILE] [--wait S] [--settle S]
        anoxcheck.py OUTDIR --report-only
 
 For every map (started with "+map MAP" through tools/rigsession.sh, which restores Steam afterwards):
@@ -14,6 +14,8 @@ with the per-pixel difference, mean brightness change and the share of changed p
 With --ab-original: "on" is RTX Remix, "off" the original rasterised look (Remix' d3d9.dll moved aside for the
 run, so QindieGL renders through Wine's D3D9 with the game's lightmaps; the rig camera still works). The report
 adds the exposure difference in EV (log2 of mean linear luminance, original / Remix) for matching brightness.
+With --ab-dlight: "on" adds that test dynamic light (rtx-remix/rigdlight.txt, QindieGL #31; several lights
+separated by ";"), "off" has none. Anachronox only creates dlights in scripted scenes and battles.
 With --ab-cfg "set r_novis 1": the A/B switch is that line appended to anoxdata/CONFIGS/Default.cfg (restored
 afterwards), e.g. to compare culling settings; the report adds frame times from QindieGL's "Perf:" log lines.
 With --views FILE (lines "MAP NAME X Y Z PITCH YAW", e.g. from tools/find_views.py) each listed view of a map is
@@ -230,8 +232,11 @@ def report(out, maps, label, views):
 
 class Switch:
     """A/B switch: a USD layer in mod.usda, or a line appended to Default.cfg. Always restored."""
-    def __init__(self, out, layer, cfg_line, original=False):
-        self.layer, self.cfg_line, self.original = layer, cfg_line, original
+    def __init__(self, out, layer, cfg_line, original=False, dlight=''):
+        self.layer, self.cfg_line, self.original, self.dlight = layer, cfg_line, original, dlight
+        if dlight:
+            self.path = GAME / 'rtx-remix' / 'rigdlight.txt'; self.label = 'test dlight ' + dlight
+            return
         self.path = MOD if layer else GAME / ('d3d9.dll' if original else 'anoxdata/CONFIGS/Default.cfg')
         if layer and '@./%s.usda@' % layer not in self.path.read_text():
             sys.exit('layer %s is not in %s' % (layer, self.path))
@@ -240,6 +245,10 @@ class Switch:
         self.label = layer or cfg_line or 'RTX Remix (off = original)'
 
     def set(self, on):
+        if self.dlight:
+            if on: self.path.write_text(self.dlight.replace(';', '\n') + '\n')
+            elif self.path.exists(): self.path.unlink()
+            return
         if self.original:
             if on: shutil.copy2(self.backup, self.path)
             elif self.path.exists(): self.path.unlink()
@@ -252,6 +261,8 @@ class Switch:
         self.path.write_text(s)
 
     def restore(self):
+        if self.dlight:
+            self.set(False); print('[anoxcheck] rigdlight.txt removed', flush=True); return
         shutil.copy2(self.backup, self.path)
         print('[anoxcheck] %s restored' % self.path.name, flush=True)
 
@@ -272,7 +283,7 @@ def main():
             i = args.index(n); v = args[i + 1]; del args[i:i + 2]; return v
         return default
     layer = opt('--ab', ''); cfg_line = opt('--ab-cfg', ''); views_file = opt('--views', '')
-    original = '--ab-original' in args
+    original = '--ab-original' in args; dlight = opt('--ab-dlight', '')
     args = [a for a in args if a != '--ab-original']
     wait = int(opt('--wait', '120')); settle = int(opt('--settle', '20'))
     report_only = '--report-only' in args
@@ -285,10 +296,10 @@ def main():
         sys.exit(0 if report(out, meta['maps'], meta['label'], meta['views']) else 1)
     maps = [m.lower() for m in args[1:]]
     views = read_views(views_file) if views_file else {}
-    label = layer or cfg_line or ('RTX Remix (off = original)' if original else '')
+    label = layer or cfg_line or ('test dlight ' + dlight if dlight else '') or ('RTX Remix (off = original)' if original else '')
     (out / 'meta.json').write_text(json.dumps({'maps': maps, 'label': label, 'views': views, 'started': time.ctime()}))
     if label:
-        sw = Switch(out, layer, cfg_line, original)
+        sw = Switch(out, layer, cfg_line, original, dlight)
         try:
             for tag, on in (('on', True), ('off', False)):
                 sw.set(on)

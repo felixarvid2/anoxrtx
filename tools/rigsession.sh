@@ -44,7 +44,7 @@ started_xw=""
 restore() {
     trap - EXIT INT TERM
     $RIG stop >/dev/null 2>&1
-    rm -f "$GAME/rtx-remix/rigcam.txt"
+    rm -f "$GAME/rtx-remix/rigcam.txt" "$GAME/rtx-remix/rigdlight.txt"
     steam_down
     sed -i 's|%command% +map [A-Za-z0-9_-]*|%command%|; s|"LaunchOptions"\t\t"DISPLAY=:7 |"LaunchOptions"\t\t"|' "$VDF"
     if [ -n "$started_xw" ]; then
