@@ -42,6 +42,9 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [x] Figurer för mörka: fyllnadsljus per figur relativt kartljusen (QindieGL #30/#32, `model_fill = 1.5` + egna värden
   för 5 banor), 10 banor inom ±0,3 EV mot originalet (2026-10-19). Övriga ~69 banor omätta.
 - [ ] greattree: lila ton under Remix som originalet saknar.
+- [ ] labbuilding (2026-10-21, exponering ej satt): fönster visar svart i stället för staden/himlen under Remix,
+  originalets turkosa ton i en korridor saknas, fyllnadsljuset bränner ut en figur i trappan (`model_fill` för högt).
+- [ ] crevicelanding: det landade skeppet (modell) är nästan oupplyst under Remix (+2 EV mörkare i vyn).
 - [ ] Himmel: commbase och commiteon får mörk natthimmel under Remix där originalet har ljus himmel med sol
   (+0,8–1,4 EV mörkare bild, 2026-10-19). slevant saknar originalets orange dis över lavan. Exponering inte satt för dessa.
 - [x] **Bridge-stopp vid banladdning (löst 2026-10-21):** Remix-bryggan låste sig när en bana laddades
