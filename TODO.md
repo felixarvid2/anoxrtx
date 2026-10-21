@@ -41,7 +41,7 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [x] Lava: `proc_lava` fryses (256x256, hash 0x561447B2DFA181FD) och ersättningsmaterialet syns i levant2 (2026-10-18). Orsak: HD-paketets uppskalade palett (anoxgfx kräver 256 px bred) + QindieGL fyllde gammal D3D-textur. `proc_lavafloe` ej sedd i bild än. levant1 och hephlava går inte att se med riggkameran (banstarten ritar ingen värld, även originalet svart, 2026-10-19); kräver en sparfil nära lavan.
 - [x] Figurer för mörka: fyllnadsljus per figur relativt kartljusen (QindieGL #30/#32, `model_fill = 1.5` + egna värden
   för 5 banor), 10 banor inom ±0,3 EV mot originalet (2026-10-19). Övriga ~69 banor omätta.
-- [ ] greattree: lila ton under Remix som originalet saknar.
+- [x] greattree/waukees: lila ton (2026-10-22) kom från den gulvita dimman som volymdimma; dimma av på båda.
 - [x] labbuilding (2026-10-21): fönstret visade grått i stället för staden: Remix gjorde kartans dimma till volymdimma
   som täckte himlen; `enableFogRemap = False` för banan. `model_fill = 0.6` (figur +0,17 EV), exponering global (median 0,0).
 - [ ] labbuilding: originalets dis över staden och turkosa ton i en korridor saknas under Remix; en lampa rakt ovanför
@@ -52,7 +52,10 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [x] Himmel commbase/commiteon (2026-10-21): skyboxen ritades men autoexponeringen anpassade sig till den soliga marken,
   så himlen blev 4–7 EV för mörk. `rtx.skyBrightness = 140`, bias -0,2 och dimma av (turkos dimma färgade marken).
   Bild median +0,03 EV, himmel +0,2–0,9 EV.
-- [ ] Andra utomhusbanor med sol och vanlig skybox (`skyMode = 0`) kan ha samma mörka himmel: kolla himmel-EV separat.
+- [x] Andra utomhusbanor med skybox (2026-10-22): uppåtvyer på 24 banor. whitendon hade samma mörka himmel
+  (`skyBrightness = 100`, bias -4,0, median -0,3 EV); waukees bias -0,4. Övriga utan himmelsfel.
+- [ ] fortressgrounds (helikopterplattan +2,9 EV mörkare) och hephaestus (vyer -0,6 till -2,5 EV ljusare) avviker
+  från startvyn; bara en vy var. Mät fler vyer innan bias ändras.
 - [ ] commbase: de lysande strålarna/kablarna (gröna/gula linjer) är mörka under Remix.
   (+0,8–1,4 EV mörkare bild, 2026-10-19). slevant saknar originalets orange dis över lavan. Exponering inte satt för dessa.
 - [x] **Bridge-stopp vid banladdning (löst 2026-10-21):** Remix-bryggan låste sig när en bana laddades
