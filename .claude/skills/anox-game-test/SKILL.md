@@ -26,15 +26,15 @@ Never edit Steam's `localconfig.vdf` or start Xwayland by hand.
    `sendkey` (reaches Remix), `move`, `click`, `log`, `list-saves`. Saved test views: `docs/test-locations.md`.
 3. Run it in the background (a full run takes 2–6 min):
    `tools/rigsession.sh [--map NAME] /path/to/test.sh > log 2>&1`
-   `--map NAME` starts straight into a map (`+map`); some maps (whitecaves-*) need a save instead, and
-   crevicelanding/labbuilding/servicetunnel stall the Remix bridge with `+map` (black frame): start without
-   `--map` and use `$RIG console map NAME`.
+   `--map NAME` starts straight into a map (`+map`); some maps (whitecaves-*) need a save instead. To load
+   from the menu like a player: start without `--map` and use `$RIG console map NAME`.
 4. Check the log ends with `rigsession: restored` (no WARNING), then look at the screenshots. Compare views
    with `tools/anoxcapture.py` / `tools/anoxcompare.py` (docs/screenshot-regression.md) when a baseline exists.
 
 ## Evidence to report
 Map/save, runtime (stock Remix 1.5.2 or Remix Plus 1.5.1), changed settings, screenshot paths, the relevant
 QindieGL.log lines, and whether Remix crashed. A rig "timeout" alone does not prove a crash; a crash shows as
-"The RTX Remix Runtime has encountered an unexpected issue" in `bridge32.log`. A stall (not a crash) shows as `Data Queue overwrite` in `bridge32.log` without a following "resolved".
+"The RTX Remix Runtime has encountered an unexpected issue" in `bridge32.log`. A stall (not a crash) shows as `Data Queue overwrite` in `bridge32.log` without a following "resolved"; that
+is the bridge deadlock fixed by `clientChannelMemSize = 201326592` in `.trex/bridge.conf`.
 For brightness comparisons with the original renderer use the `anox-ab-measure` skill. Known problems and fixes:
 docs/TROUBLESHOOTING.md.

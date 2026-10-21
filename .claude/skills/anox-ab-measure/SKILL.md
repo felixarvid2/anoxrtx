@@ -48,8 +48,8 @@ Decide the rule before you look at the data: median of the usable views, write a
 
 ## Known rig traps
 
-- `+map` at launch (what `anoxcheck` uses) stalls the Remix bridge on crevicelanding, labbuilding and
-  servicetunnel: black Remix frame, `Data Queue overwrite` in `*bridge32.log`, "handshake timeout" in the
-  Remix log. Load those from the menu instead: `$RIG start; sleep 20; $RIG console map NAME`.
-- Loading from the menu can also stall intermittently (2/~7 on servicetunnel/labbuilding). Before
-  attributing a fix, repeat the baseline too: a single passing run proves nothing.
+- A black Remix frame with `Data Queue overwrite` (no "resolved") in `*bridge32.log` is the bridge deadlock:
+  check `.trex/bridge.conf` has `clientChannelMemSize = 201326592` (192 MB; fixed 2026-10-21). To load a map
+  the way a player does: `$RIG start; sleep 20; $RIG console map NAME`.
+- Before attributing a fix to anything intermittent, repeat the baseline too (10 runs): a single passing run
+  proves nothing.
