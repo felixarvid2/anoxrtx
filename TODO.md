@@ -51,8 +51,10 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   geometri/texturer laddas, så kartljusen är inte orsaken (ett tidigare lyckat försök utan kartljus var slump;
   en gren som sprider ut ljusskapandet, QindieGL `feat/maplights-spread-create`, är inte skickad). Även
   labbuilding har stannat. Med `+map` vid start stannar crevicelanding/labbuilding/servicetunnel alltid.
-  Nästa steg: se vad bridge-servern gör när den hänger (trådstackar), och jämföra med ren Remix utan QindieGL-
-  tillägg (`mapLights` av, proctex av) för att se om det är QindieGL eller Remix/bryggan.
+  Utslagning (10 laddningar var, 2026-10-21, `[game.anox]` i QindieGL.ini): allt på 3/10, alla tillägg av
+  (remixapi, maplights, dlights, proctex, smoothnormals) **0/10**, bara API-delen av 5/10, bara proctex av 3/10,
+  bara smoothnormals av 4/10. Ingen enskild funktion är orsaken; troligen ett tidsberoende lopp som varje
+  tillägg kan utlösa. Nästa steg: trådstackar från bridge-servern (och spelet) medan den hänger.
 - [ ] Strid: dlights ritas nu (QindieGL #30 hashfix, verifierat med testljus via `anoxcheck.py --ab-dlight`,
   QindieGL #31): styrka 300 intill Boots i rowdys = tydligt, ej utbränt (+0,84 EV). Anachronox skapar dlights
   bara från entiteters ljusfält i skript/strid (inga mynningsflammor; 0 dlights i alla startvyer inkl. cine).
