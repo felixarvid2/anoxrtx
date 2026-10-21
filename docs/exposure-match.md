@@ -47,7 +47,7 @@ the views are in `docs/views/exposure-spots.txt`), with the same gamma-corrected
 | slevant | +2.4 EV, but because the original's orange haze over the lava is missing under Remix: not exposure (fog) |
 | crevicelanding | spots 0/3/4/5 +0.40/+0.96/+0.63/+0.64, median +0.6 (Remix darker): bias **-1.4**, after -0.19/+0.43/+0.13/+0.11 (median +0.12). spot1 left out: the landed ship model is nearly unlit under Remix (+2.0, model lighting, not exposure); spot2 looks into the void |
 | servicetunnel | start view -0.76 (spot0 -1.17 agrees but its shots differed): bias **-2.8**, after +0.04. The other five spots render no world in either renderer (far from the player start; the engine only draws what is visible from the player) |
-| labbuilding | spots 0/4/5 -0.73/+1.54/-0.39, too spread to set a value: Remix shows a brighter sky through the glass roof, the original has a teal tint in a corridor that Remix lacks, a window shows black instead of the city, and the fill light blows out a character on the stairs. Global bias kept |
+| labbuilding | start view -0.00 (after the fixes below), spots 0/2/4/5 -0.69/+1.28/+1.54/-0.40: median 0.0, global bias kept. Content differences, not exposure: the window showed opaque grey instead of the city because Remix turned the map fog into volumetric fog (fixed: `[rtxconf.labbuilding] rtx.volumetrics.enableFogRemap = False`); the original has haze over the city and a teal tint in a corridor that Remix lacks, and Remix shows a brighter sky through the glass roof |
 | ballotine, basement, braintrain, braintrain-b, kraptonbay, baltownr | spots outside the playable map or black in one renderer: no usable view |
 | hivebay | start is a scene that draws no world (all views give the same black frame) |
 
@@ -79,8 +79,11 @@ gamma-corrected; negative = character brighter than in the original:
 | greattree | 0.1 | -0.24 |
 | starport | 0.3 | -0.12 |
 | bricksb | 0.35 | -0.19 |
+| labbuilding | 0.6 | +0.17 (1.5: -0.54) |
 
 The irradiance sum has no occlusion and does not include the Numos sky, so where the room or sky already
-lights the character (outdoor maps, lamps behind walls) it over-lights; those maps have their own value.
+lights the character (outdoor maps, lamps behind walls) it over-lights; those maps have their own value. A lamp right above a character still over-lights it under path tracing
+(labbuilding stairs: -1.2 EV at `model_fill` 0.6, -1.7 at 1.5), because the original lights models only from the
+lightmap under them.
 The other ~69 maps use the default unmeasured. Not covered: the greattree view has a purple tint under Remix
 that the original does not have (unrelated to the fill light).
