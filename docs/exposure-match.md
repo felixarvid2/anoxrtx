@@ -43,7 +43,7 @@ the views are in `docs/views/exposure-spots.txt`), with the same gamma-corrected
 | --- | --- |
 | fortress2 | Remix 0.5 EV brighter in both runs (spot0 -0.53, start view -0.52): bias **-2.5**, after -0.19 |
 | fortress1, mburger | within ±0.4 EV per view, around 0 overall: global bias kept |
-| commbase, commiteon | +0.8 to +1.4 EV, but because the sky is different (Remix draws a dark night sky, the original a bright sky with sun): not exposure, left at global until the sky is fixed |
+| commbase, commiteon | +0.8 to +1.4 EV with a near-black sky. Not a night sky: the forest skybox is drawn, but autoexposure adapts to the sunlit ground so the skybox (fixed radiance) was 4.4–7.4 EV darker than in the original while the ground matched. Fixed 2026-10-21 with `rtx.skyBrightness = 140`, bias **-0.2**, and fog remap off (the teal fog `.196 .674 .811` tinted the ground once the sky lit it). After: frame +0.14/-0.07/-0.35/+0.35 (median +0.03), sky +0.24 to +0.85 |
 | slevant | +2.4 EV, but because the original's orange haze over the lava is missing under Remix: not exposure (fog) |
 | crevicelanding | spots 0/3/4/5 +0.40/+0.96/+0.63/+0.64, median +0.6 (Remix darker): bias **-1.4**, after -0.19/+0.43/+0.13/+0.11 (median +0.12). spot1 left out: the landed ship model is nearly unlit under Remix (+2.0, model lighting, not exposure); spot2 looks into the void |
 | servicetunnel | start view -0.76 (spot0 -1.17 agrees but its shots differed): bias **-2.8**, after +0.04. The other five spots render no world in either renderer (far from the player start; the engine only draws what is visible from the player) |
