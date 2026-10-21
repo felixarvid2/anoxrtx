@@ -29,6 +29,7 @@ items: QindieGL [linux/REMIX-NOTES.md](https://github.com/felixarvid2/QindieGL/b
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
+| Skybox far too dark on a sunlit outdoor map (looks like a night sky) while the ground matches the original | Autoexposure adapts to the bright path-traced ground; the skybox has a fixed radiance (commbase/commiteon: 4–7 EV too dark) | `[rtxconf.<map>] rtx.skyBrightness` (140 there), then re-match `exposureBias`; measure sky and ground regions separately |
 | Sky behind a window or opening is opaque grey (only distant emissive surfaces show through), while the original shows the skybox | The map's worldspawn `fog` is turned into Remix volumetric fog, which fills the view to the sky (labbuilding) | `[rtxconf.<map>] rtx.volumetrics.enableFogRemap = False` in `anox_customise.ini` |
 | Map lights missing | `remixapi`/`maplights` off, or no API | `[game.anox]` `remixapi = 1`, `maplights = 1`; `.trex/bridge.conf` `exposeRemixApi = True`; `QindieGL.log` "MapLights: loaded N lights" |
 | Lights dim right after loading a save, fine after a reload | Lights created before the game replaced its D3D device | Fixed in QindieGL #25 (lights rebuilt after device replacement); update QindieGL |

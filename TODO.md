@@ -49,8 +49,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [ ] Andra banor med `fog` i worldspawn och himmel bakom glas/öppningar kan ha samma gråa himmel under Remix
   (70 banor har fog; kolla vyer mot himlen).
 - [ ] crevicelanding: det landade skeppet (modell) är nästan oupplyst under Remix (+2 EV mörkare i vyn).
-- [ ] Himmel: commbase och commiteon får mörk natthimmel under Remix där originalet har ljus himmel med sol (inte dimman:
-  fortfarande svart med `enableFogRemap = False`, 2026-10-21)
+- [x] Himmel commbase/commiteon (2026-10-21): skyboxen ritades men autoexponeringen anpassade sig till den soliga marken,
+  så himlen blev 4–7 EV för mörk. `rtx.skyBrightness = 140`, bias -0,2 och dimma av (turkos dimma färgade marken).
+  Bild median +0,03 EV, himmel +0,2–0,9 EV.
+- [ ] Andra utomhusbanor med sol och vanlig skybox (`skyMode = 0`) kan ha samma mörka himmel: kolla himmel-EV separat.
+- [ ] commbase: de lysande strålarna/kablarna (gröna/gula linjer) är mörka under Remix.
   (+0,8–1,4 EV mörkare bild, 2026-10-19). slevant saknar originalets orange dis över lavan. Exponering inte satt för dessa.
 - [x] **Bridge-stopp vid banladdning (löst 2026-10-21):** Remix-bryggan låste sig när en bana laddades
   (`Data Queue overwrite` utan "resolved"): spelet väntade i `UnlockRect` på plats i dataringen medan servern,
