@@ -44,12 +44,15 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [ ] greattree: lila ton under Remix som originalet saknar.
 - [ ] Himmel: commbase och commiteon får mörk natthimmel under Remix där originalet har ljus himmel med sol
   (+0,8–1,4 EV mörkare bild, 2026-10-19). slevant saknar originalets orange dis över lavan. Exponering inte satt för dessa.
-- [ ] **Bridge-stopp vid banladdning:** Remix-bryggan låser sig ibland när en bana laddas (servicetunnel och labbuilding
-  2 av ~7 laddningar från menyn, 2026-10-19): `Data Queue overwrite` i bridge32.log, servern svarar inte, bilden fryser på
-  laddskärmen. Med `+map` vid start alltid för crevicelanding/labbuilding/servicetunnel (handskakning för nya fönstret
-  tidsgränsas). Bisektion av servicetunnel.lights: ingen enskild rad; utan kartljus inga stopp i 1 försök. Större
-  server-köer (`serverCmdQueueSize`/`serverDataQueueSize = 1000`) laddade 3/3 men standard laddade också 1/1, så
-  inget bevisat. Nästa steg: fler upprepningar, eller skapa kartljus utspritt över flera bildrutor i QindieGL.
+- [ ] **Bridge-stopp vid banladdning:** Remix-bryggan låser sig ibland när en bana laddas: `Data Queue overwrite`
+  utan "resolved" i bridge32.log, servern svarar inte, bilden fryser på laddskärmen. **servicetunnel från menyn:
+  3 av 10 laddningar** (2026-10-21, `anoxrig.py console map servicetunnel`, oförändrad build). I alla tre kom
+  QindieGL aldrig till kartljusen (som läggs på 120 bildrutor efter banbytet): stoppet sker medan banans
+  geometri/texturer laddas, så kartljusen är inte orsaken (ett tidigare lyckat försök utan kartljus var slump;
+  en gren som sprider ut ljusskapandet, QindieGL `feat/maplights-spread-create`, är inte skickad). Även
+  labbuilding har stannat. Med `+map` vid start stannar crevicelanding/labbuilding/servicetunnel alltid.
+  Nästa steg: se vad bridge-servern gör när den hänger (trådstackar), och jämföra med ren Remix utan QindieGL-
+  tillägg (`mapLights` av, proctex av) för att se om det är QindieGL eller Remix/bryggan.
 - [ ] Strid: dlights ritas nu (QindieGL #30 hashfix, verifierat med testljus via `anoxcheck.py --ab-dlight`,
   QindieGL #31): styrka 300 intill Boots i rowdys = tydligt, ej utbränt (+0,84 EV). Anachronox skapar dlights
   bara från entiteters ljusfält i skript/strid (inga mynningsflammor; 0 dlights i alla startvyer inkl. cine).
