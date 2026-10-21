@@ -232,7 +232,9 @@ class Installer:
                     shutil.copyfileobj(s, d)
                 n += 1
         self.log('Remix %s: %d files unpacked' % ('Plus' if plus else 'stock', n))
-        open(conf, 'w').write('presentSemaphoreEnabled = False\nexposeRemixApi = True\n')
+        # 192 MB client channel: with the default 96 MB the bridge deadlocks on some map loads (servicetunnel
+        # 3-5 of 10 loads, 0 of 10 at 192 MB; docs/TROUBLESHOOTING.md)
+        open(conf, 'w').write('presentSemaphoreEnabled = False\nexposeRemixApi = True\nclientChannelMemSize = 201326592\n')
         if plus:
             self.remix_plus_settings()
 

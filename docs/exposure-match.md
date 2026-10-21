@@ -45,7 +45,7 @@ the views are in `docs/views/exposure-spots.txt`), with the same gamma-corrected
 | fortress1, mburger | within ±0.4 EV per view, around 0 overall: global bias kept |
 | commbase, commiteon | +0.8 to +1.4 EV, but because the sky is different (Remix draws a dark night sky, the original a bright sky with sun): not exposure, left at global until the sky is fixed |
 | slevant | +2.4 EV, but because the original's orange haze over the lava is missing under Remix: not exposure (fog) |
-| crevicelanding, labbuilding, servicetunnel | Remix renders nothing when the rig starts the game with `+map` (bridge stall, see TODO); loaded from the menu they render. Not measured |
+| crevicelanding, labbuilding, servicetunnel | Remix rendered nothing with `+map` (bridge deadlock, fixed by `clientChannelMemSize = 201326592`, see TROUBLESHOOTING). Not measured yet |
 | ballotine, basement, braintrain, braintrain-b, kraptonbay, baltownr | spots outside the playable map or black in one renderer: no usable view |
 | hivebay | start is a scene that draws no world (all views give the same black frame) |
 

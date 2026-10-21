@@ -139,7 +139,8 @@ anoxrtx tools (`tools/`): `install.sh`/`install.py` (whole setup from the user's
   Wine), `rtx.useNewGuiInputMethod = False` (white window under Wine), `rtx.integrateIndirectMode = 0`
   (NRC cannot start under Wine; without this line any runtime `SetConfigVariable` re-enables NRC and crashes
   Remix), `rtx.upscalerType = 1` + `rtx.qualityDLSS = 5` (DLAA; DLSS works under GE-Proton).
-- `.trex/bridge.conf`: `presentSemaphoreEnabled = False`, `exposeRemixApi = True`.
+- `.trex/bridge.conf`: `presentSemaphoreEnabled = False`, `exposeRemixApi = True`, `clientChannelMemSize = 201326592`
+  (192 MB; fixes the map-load bridge deadlock, see TROUBLESHOOTING).
 - Remix Plus first-start dialog blocks input and defaults crash/usage reports to NVIDIA to on. It is answered
   (data collection off, owner's choice) in `pfx/drive_c/users/steamuser/AppData/Local/NVIDIA/RTXRemix/user_settings/<xxh3(game root)>.conf`.
   Never use `rtx.automation.disableBlockingDialogBoxes`: it grants the consent.
