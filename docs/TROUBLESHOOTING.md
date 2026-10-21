@@ -29,6 +29,7 @@ items: QindieGL [linux/REMIX-NOTES.md](https://github.com/felixarvid2/QindieGL/b
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
+| Sky behind a window or opening is opaque grey (only distant emissive surfaces show through), while the original shows the skybox | The map's worldspawn `fog` is turned into Remix volumetric fog, which fills the view to the sky (labbuilding) | `[rtxconf.<map>] rtx.volumetrics.enableFogRemap = False` in `anox_customise.ini` |
 | Map lights missing | `remixapi`/`maplights` off, or no API | `[game.anox]` `remixapi = 1`, `maplights = 1`; `.trex/bridge.conf` `exposeRemixApi = True`; `QindieGL.log` "MapLights: loaded N lights" |
 | Lights dim right after loading a save, fine after a reload | Lights created before the game replaced its D3D device | Fixed in QindieGL #25 (lights rebuilt after device replacement); update QindieGL |
 | Scene far too dark or too bright | Light formula | Tune `scale`/`exponent`/`radius` in `[maplights.global]` or `[maplights.<map>]` while playing; per-light fixes in `<map>.override` (`tools/lights_near.py` finds indices) |
