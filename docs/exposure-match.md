@@ -33,7 +33,7 @@ the seven above), measured at the global bias `-2.0` with `--settle 15`. Per-map
 Re-check of the five largest changes (after, EV): baltown +0.12, hephtower2 -0.21, mystech2 -0.22, whitendon -0.06,
 sexmach -1.04 at -5.3, so a second pass set it to -6.3 (-0.23).
 
-### Maps without a usable start view (2026-10-19)
+### Maps without a usable start view (2026-10-19, last three 2026-10-21)
 
 Sixteen maps had no usable start view. They were measured from rig-camera views spread over each map: up to
 three eye-height spots at `info_player_start` and `path_corner` entities (`tools/find_views.py MAP.bsp --spots 3`;
@@ -45,7 +45,9 @@ the views are in `docs/views/exposure-spots.txt`), with the same gamma-corrected
 | fortress1, mburger | within ±0.4 EV per view, around 0 overall: global bias kept |
 | commbase, commiteon | +0.8 to +1.4 EV, but because the sky is different (Remix draws a dark night sky, the original a bright sky with sun): not exposure, left at global until the sky is fixed |
 | slevant | +2.4 EV, but because the original's orange haze over the lava is missing under Remix: not exposure (fog) |
-| crevicelanding, labbuilding, servicetunnel | Remix rendered nothing with `+map` (bridge deadlock, fixed by `clientChannelMemSize = 201326592`, see TROUBLESHOOTING). Not measured yet |
+| crevicelanding | spots 0/3/4/5 +0.40/+0.96/+0.63/+0.64, median +0.6 (Remix darker): bias **-1.4**, after -0.19/+0.43/+0.13/+0.11 (median +0.12). spot1 left out: the landed ship model is nearly unlit under Remix (+2.0, model lighting, not exposure); spot2 looks into the void |
+| servicetunnel | start view -0.76 (spot0 -1.17 agrees but its shots differed): bias **-2.8**, after +0.04. The other five spots render no world in either renderer (far from the player start; the engine only draws what is visible from the player) |
+| labbuilding | spots 0/4/5 -0.73/+1.54/-0.39, too spread to set a value: Remix shows a brighter sky through the glass roof, the original has a teal tint in a corridor that Remix lacks, a window shows black instead of the city, and the fill light blows out a character on the stairs. Global bias kept |
 | ballotine, basement, braintrain, braintrain-b, kraptonbay, baltownr | spots outside the playable map or black in one renderer: no usable view |
 | hivebay | start is a scene that draws no world (all views give the same black frame) |
 

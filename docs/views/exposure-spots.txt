@@ -42,3 +42,8 @@ slevant spot0 -864.0 -336.0 1936.0 10.0 0.0
 baltownr spot0 -304.0 2460.0 224.0 10.0 0.0
 baltownr spot1 284.0 -3904.0 1188.0 10.0 45.0
 baltownr spot2 -1046.0 1046.0 300.0 10.0 337.5
+crevicelanding spot3 -2146.0 3444.0 -3832.0 10.0 292.5
+crevicelanding spot4 1861.0 389.0 -3762.0 10.0 0.0
+crevicelanding spot5 -2193.0 2472.0 -3785.0 10.0 67.5
+labbuilding spot4 -1085.0 2930.0 344.0 10.0 90.0
+labbuilding spot5 -2034.0 1509.0 270.0 10.0 90.0
