@@ -9,6 +9,7 @@ items: QindieGL [linux/REMIX-NOTES.md](https://github.com/felixarvid2/QindieGL/b
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
+| Game freezes on the loading screen (or stays black with `+map`), `Data Queue overwrite condition triggered` without "resolved" in `bridge32.log` | Remix bridge deadlock: the client waits for room in the data ring while the server, idle, waits for the next command. The chance rises as the ring gets smaller (servicetunnel: 48 MB 10/10, 96 MB default 3–5/10, 192 MB 0/10 loads) | `clientChannelMemSize = 201326592` in `.trex/bridge.conf` (the installer writes it) |
 | Game hangs, `Still waiting on the Present semaphore` | DLSS frame generation under Wine | `rtx.dlfg.enable = False`, `rtx.dlfg.enablePresentMetering = False` in `rtx.conf`; `presentSemaphoreEnabled = False` in `.trex/bridge.conf` |
 | Window turns white after the first frame | Remix' new GUI input overlay window is drawn opaque under Wine/X11 | `rtx.useNewGuiInputMethod = False` |
 | Fullscreen image offset to the left | Wine's other-process window rendering in a changed display mode | QindieGL `BorderlessFullscreen = 1` (`[Settings]`) |

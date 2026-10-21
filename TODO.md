@@ -44,17 +44,12 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [ ] greattree: lila ton under Remix som originalet saknar.
 - [ ] Himmel: commbase och commiteon får mörk natthimmel under Remix där originalet har ljus himmel med sol
   (+0,8–1,4 EV mörkare bild, 2026-10-19). slevant saknar originalets orange dis över lavan. Exponering inte satt för dessa.
-- [ ] **Bridge-stopp vid banladdning:** Remix-bryggan låser sig ibland när en bana laddas: `Data Queue overwrite`
-  utan "resolved" i bridge32.log, servern svarar inte, bilden fryser på laddskärmen. **servicetunnel från menyn:
-  3 av 10 laddningar** (2026-10-21, `anoxrig.py console map servicetunnel`, oförändrad build). I alla tre kom
-  QindieGL aldrig till kartljusen (som läggs på 120 bildrutor efter banbytet): stoppet sker medan banans
-  geometri/texturer laddas, så kartljusen är inte orsaken (ett tidigare lyckat försök utan kartljus var slump;
-  en gren som sprider ut ljusskapandet, QindieGL `feat/maplights-spread-create`, är inte skickad). Även
-  labbuilding har stannat. Med `+map` vid start stannar crevicelanding/labbuilding/servicetunnel alltid.
-  Utslagning (10 laddningar var, 2026-10-21, `[game.anox]` i QindieGL.ini): allt på 3/10, alla tillägg av
-  (remixapi, maplights, dlights, proctex, smoothnormals) **0/10**, bara API-delen av 5/10, bara proctex av 3/10,
-  bara smoothnormals av 4/10. Ingen enskild funktion är orsaken; troligen ett tidsberoende lopp som varje
-  tillägg kan utlösa. Nästa steg: trådstackar från bridge-servern (och spelet) medan den hänger.
+- [x] **Bridge-stopp vid banladdning (löst 2026-10-21):** Remix-bryggan låste sig när en bana laddades
+  (`Data Queue overwrite` utan "resolved"): spelet väntade i `UnlockRect` på plats i dataringen medan servern,
+  sysslolös, väntade på nästa kommando (trådstackar via winedbg). Risken styrs av ringens storlek
+  `clientChannelMemSize`: servicetunnel 48 MB 10/10, 96 MB (standard) 3–5/10, **192 MB 0/10** laddningar;
+  `clientDataQueueSize` 30000 hjälpte inte (5/10). Med 192 MB laddar även crevicelanding/labbuilding/servicetunnel
+  med `+map` och fem stora banor från menyn. Installern skriver `clientChannelMemSize = 201326592`.
 - [ ] Strid: dlights ritas nu (QindieGL #30 hashfix, verifierat med testljus via `anoxcheck.py --ab-dlight`,
   QindieGL #31): styrka 300 intill Boots i rowdys = tydligt, ej utbränt (+0,84 EV). Anachronox skapar dlights
   bara från entiteters ljusfält i skript/strid (inga mynningsflammor; 0 dlights i alla startvyer inkl. cine).

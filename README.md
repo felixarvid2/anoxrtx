@@ -77,7 +77,8 @@ I raise roughness and metalicity of character materials to the max to mask the p
      the Remix server hangs inside Present under Wine.
    - `rtx.useNewGuiInputMethod = False`: Remix' new GUI input method puts an invisible (alpha 0) layered window
      over the game. Wine/X11 shows it as an opaque white window, so the game looks white after the first frame.
-   - Add `presentSemaphoreEnabled = False` to `.trex/bridge.conf`.
+   - Add `presentSemaphoreEnabled = False` to `.trex/bridge.conf`, and `clientChannelMemSize = 201326592`
+     (192 MB; with the default 96 MB the bridge can deadlock while a map loads).
    - Use a QindieGL `opengl32.dll` built for Linux/MinGW (https://github.com/felixarvid2/QindieGL, see `linux/`)
      or the official one, and launch with `WINEDLLOVERRIDES="opengl32=n,b;d3d9=n,b" %command%`.
 
