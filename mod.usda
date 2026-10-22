@@ -2430,6 +2430,48 @@ over "RootNode"
 
     over "Looks"
     {
+        # crevicelanding ship (ob_shuttlewhol6, shuttle1d): fullbright in the original, nearly unlit under Remix.
+        # Emission from its own HD texture (needs the models_hd layer); 0.5 matched the original (-0.24/-0.61 EV)
+        over "mat_99F228048B26E866"
+        {
+            over "Shader"
+            {
+                bool inputs:enable_emission = 1
+                asset inputs:emissive_mask_texture = @./hd/models_hd/99F228048B26E866.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:emissive_intensity = 0.5
+            }
+        }
+
+        # crevicelanding ship (ob_shuttlewhol6, shuttle2c): fullbright in the original, nearly unlit under Remix.
+        # Emission from its own HD texture (needs the models_hd layer); 0.5 matched the original (-0.24/-0.61 EV)
+        over "mat_0774E3B18888CDB9"
+        {
+            over "Shader"
+            {
+                bool inputs:enable_emission = 1
+                asset inputs:emissive_mask_texture = @./hd/models_hd/0774E3B18888CDB9.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:emissive_intensity = 0.5
+            }
+        }
+
+        # crevicelanding ship (ob_shuttlewhol6, shuttle-cap): fullbright in the original, nearly unlit under Remix.
+        # Emission from its own HD texture (needs the models_hd layer); 0.5 matched the original (-0.24/-0.61 EV)
+        over "mat_DDB1218DAC586246"
+        {
+            over "Shader"
+            {
+                bool inputs:enable_emission = 1
+                asset inputs:emissive_mask_texture = @./hd/models_hd/DDB1218DAC586246.dds@ (
+                    colorSpace = "auto"
+                )
+                float inputs:emissive_intensity = 0.5
+            }
+        }
+
         over "mat_CD535900024106AE"
         {
             over "Shader"
