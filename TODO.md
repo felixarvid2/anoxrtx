@@ -58,10 +58,21 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [ ] bricksd: neonskyltarna (FIGHTING/TRAINING/BOXING) är matta under Remix mot klart lysande i originalet;
   oförändrat med dimma av (emissivt material).
 - [ ] mmuseum: fönstren är vita under Remix, blå i originalet; oförändrat med dimma av.
-- [x] crevicelanding (2026-10-22): det landade skeppet (`ob_shuttlewhol6`) är fullbright i originalet (entity.dat
-  lighting = 1) och var nästan oupplyst under Remix. Emission från egen HD-textur, intensitet 0,5 (mod.usda):
-  vy 1 +2,0 → -0,24 EV, vy 4 -0,61. `rtx.worldSpaceUiTextures` gjorde skeppet platt och ~1 EV för ljust.
-- [ ] 705 entitetstyper i entity.dat har lighting = 1 (fullbright i originalet); fler kan vara oupplysta under Remix.
+- [x] crevicelanding (2026-10-22): det landade skeppet (`ob_shuttlewhol6`) var nästan oupplyst under Remix. Det har
+  entity.dat lighting = 1, dvs. renderfx 0x800 (`RF_DIRLIGHT`, modelljus som figurerna, inte fullbright) men får
+  inget fyllnadsljus (bara figurer nära kameran). Emission från egen textur, 0,5 (`maps/model_emission.tsv`,
+  emissive.usda): vy 1 +2,0 → -0,23 EV, vy 4 -0,63. `rtx.worldSpaceUiTextures` gjorde skeppet platt och ~1 EV för ljust.
+- [ ] Rekvisita med modelljus (`RF_DIRLIGHT`, entity.dat lighting 1, ej figurer): 54 placerade typer, 372 platser;
+  24 vyer från startens PVS (`find_views.py --entity`, 2026-10-22). Avvikande: starports bakgrundshus (ob_s_building-*)
+  nästan svarta, men bilden domineras av Numos-himlen som ersätter stadsskyboxen (+2,4 EV); emission 0,5 hjälpte
+  knappt och samma texturer finns på sunstrip (bias -4,3), så ingen intensitet satt. Skeppen i chamber/warshipbay och
+  sendernet ser ut som originalet.
+- [ ] `func_fog` (lokala färgade dimvolymer, 12 banor: onegate 13, fortress2 9, hephfactory 7, pay2pray/vendomart/bricksd
+  5, temple 4 …): i pay2pray ritas volymen runt bönekapseln som en svart låda under Remix (*25, `bricks/white`, flagga
+  0x40000000). Ta reda på hur motorn ritar volymen (texturerad eller otexturerad/blandad) innan fix. Troligen orsaken
+  till labbuildings saknade dis (en vit func_fog).
+- [ ] HD-modellpaketet saknar de 27 modelltexturerna med mellanslag i namnet (t.ex. `background/sml_wall2 dk.tga`);
+  nuvarande extrahering klarar dem, så ett nytt `models`-steg bör ta med dem.
 - [x] Himmel commbase/commiteon (2026-10-21): skyboxen ritades men autoexponeringen anpassade sig till den soliga marken,
   så himlen blev 4–7 EV för mörk. `rtx.skyBrightness = 140`, bias -0,2 och dimma av (turkos dimma färgade marken).
   Bild median +0,03 EV, himmel +0,2–0,9 EV.
