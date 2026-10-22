@@ -46,8 +46,14 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   som täckte himlen; `enableFogRemap = False` för banan. `model_fill = 0.6` (figur +0,17 EV), exponering global (median 0,0).
 - [ ] labbuilding: originalets dis över staden och turkosa ton i en korridor saknas under Remix; en lampa rakt ovanför
   en figur i trappan bränner ut den (-1,2 EV mot bilden), oberoende av `model_fill`.
-- [ ] Andra banor med `fog` i worldspawn och himmel bakom glas/öppningar kan ha samma gråa himmel under Remix
-  (70 banor har fog; kolla vyer mot himlen).
+- [x] Andra banor med `fog` och himmel bakom glas/öppningar (2026-10-22): vyer mot himlen (`find_views.py --sky`)
+  på 26 banor; 13 har himmel synlig från startens PVS. Bara tours hade dimma framför himlen (dimma av; bild
+  -1,72 → -1,59 EV). Övriga banor går inte att se mot himlen från banstarten (behöver sparfiler).
+- [ ] tours: stadssilhuetten i skyboxen (ACORP-tornet, neonskyltar) syns inte under Remix, himlen blir en jämn
+  turkos yta; `skyBrightness = 140` gör den bara vit och ljussätter hela gatan. Inte dimma.
+- [ ] bricksd: neonskyltarna (FIGHTING/TRAINING/BOXING) är matta under Remix mot klart lysande i originalet;
+  oförändrat med dimma av (emissivt material).
+- [ ] mmuseum: fönstren är vita under Remix, blå i originalet; oförändrat med dimma av.
 - [ ] crevicelanding: det landade skeppet (modell) är nästan oupplyst under Remix (+2 EV mörkare i vyn).
 - [x] Himmel commbase/commiteon (2026-10-21): skyboxen ritades men autoexponeringen anpassade sig till den soliga marken,
   så himlen blev 4–7 EV för mörk. `rtx.skyBrightness = 140`, bias -0,2 och dimma av (turkos dimma färgade marken).
