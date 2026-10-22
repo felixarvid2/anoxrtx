@@ -54,7 +54,10 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [ ] bricksd: neonskyltarna (FIGHTING/TRAINING/BOXING) är matta under Remix mot klart lysande i originalet;
   oförändrat med dimma av (emissivt material).
 - [ ] mmuseum: fönstren är vita under Remix, blå i originalet; oförändrat med dimma av.
-- [ ] crevicelanding: det landade skeppet (modell) är nästan oupplyst under Remix (+2 EV mörkare i vyn).
+- [x] crevicelanding (2026-10-22): det landade skeppet (`ob_shuttlewhol6`) är fullbright i originalet (entity.dat
+  lighting = 1) och var nästan oupplyst under Remix. Emission från egen HD-textur, intensitet 0,5 (mod.usda):
+  vy 1 +2,0 → -0,24 EV, vy 4 -0,61. `rtx.worldSpaceUiTextures` gjorde skeppet platt och ~1 EV för ljust.
+- [ ] 705 entitetstyper i entity.dat har lighting = 1 (fullbright i originalet); fler kan vara oupplysta under Remix.
 - [x] Himmel commbase/commiteon (2026-10-21): skyboxen ritades men autoexponeringen anpassade sig till den soliga marken,
   så himlen blev 4–7 EV för mörk. `rtx.skyBrightness = 140`, bias -0,2 och dimma av (turkos dimma färgade marken).
   Bild median +0,03 EV, himmel +0,2–0,9 EV.

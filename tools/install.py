@@ -435,8 +435,15 @@ class Installer:
             open(dst, 'w').write(s)
         self.log('mod.usda layers:', ', '.join(layers))
         if self.has_pack():
-            # mod.usda, liquids.usda and rtx.conf use the original texture hashes; move them to the pack's
-            files = [dst, os.path.join(self.game, 'rtx.conf')]
+            # mod.usda, liquids.usda and rtx.conf use the original texture hashes; move them to the pack's.
+            # Only once per file: the map has chains (one texture's new hash is another's old one), so a second
+            # pass would rewrite them again. rtx.conf is rehashed only while it is still the repo copy (config step).
+            files = [dst]
+            conf = os.path.join(self.game, 'rtx.conf')
+            if os.path.exists(conf) and open(conf, 'rb').read() == open(os.path.join(REPO, 'rtx.conf'), 'rb').read():
+                files.append(conf)
+            else:
+                self.log('rtx.conf: not the repo copy (already rehashed or edited), left as it is')
             if os.path.exists(os.path.join(self.mod, 'liquids.usda')):
                 files.append(os.path.join(self.mod, 'liquids.usda'))
             self.py('rehash_textures.py', 'apply', os.path.join(REPO, 'maps', 'chuncki_texmap.tsv'), *files)
