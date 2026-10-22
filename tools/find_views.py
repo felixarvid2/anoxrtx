@@ -4,6 +4,7 @@
 usage: find_views.py MAP.bsp TEXTURE[,TEXTURE...] [--count N] [--distance D] [--name PREFIX]
        find_views.py MAP.bsp --light N [--distance D]          (view of map light N, index as in <map>.lights)
        find_views.py MAP.bsp --spots N                          (N views from places the player or NPCs go)
+       find_views.py MAP.bsp --sky N [--distance D]             (N views towards the sky from places the player goes)
 
 TEXTURE is a texture path as in the BSP (e.g. levant/proc_lava; substring match, case-insensitive). For the
 largest faces that use it (one per texture, up to --count) the view is placed --distance units (default 140)
@@ -13,6 +14,10 @@ tools/anoxcheck.py --views:   MAP NAME X Y Z PITCH YAW
 --spots picks eye-height views at info_player_start and path_corner entities, spread over the map (each next spot
 the one farthest from those already picked), looking along the most open of 16 directions, slightly down; for
 measuring a map as a whole (e.g. exposure) where the start view is unusable.
+--sky starts from the same player/NPC spots (only those in the PVS of the info_player_start the game spawns at: the one
+without targetname, else the first; the engine draws nothing else) and looks (level or up to 30 degrees up) where the most traced rays
+end on a SURF_SKY face; the N spots with the most sky, at least 512 units apart. For checking that the skybox shows
+through windows and openings and is not hidden by fog.
 Camera positions are checked against the BSP tree: only empty leaves inside the map (cluster >= 0, no solid or
 liquid contents) are used,
 trying shorter distances and, for floors, oblique views from four sides.
@@ -24,7 +29,7 @@ def lumps(data):
     return [struct.unpack_from('<ii', data, 8 + 8 * i) for i in range(19)]
 
 
-def faces_with(path, wanted):
+def faces_with(path, wanted, flags=0, points=False):
     data = open(path, 'rb').read()
     L = lumps(data)
     def arr(i, size):
@@ -38,7 +43,10 @@ def faces_with(path, wanted):
     for i in range(fn):
         plane, side, first, num, ti = struct.unpack_from('<HHiHH', data, foff + i * 20)
         name = tex[ti]
-        if not any(w in name for w in wanted):
+        if flags:
+            if not struct.unpack_from('<i', data, toff + ti * 76 + 32)[0] & flags:
+                continue
+        elif not any(w in name for w in wanted):
             continue
         pts = []
         for k in range(num):
@@ -54,7 +62,7 @@ def faces_with(path, wanted):
             a = [pts[k][j] - pts[0][j] for j in range(3)]; b = [pts[k + 1][j] - pts[0][j] for j in range(3)]
             x = (a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0])
             area += 0.5 * math.sqrt(sum(v * v for v in x))
-        out.append((area, name, c, n))
+        out.append((area, name, c, n, pts) if points else (area, name, c, n))
     return out
 
 
@@ -63,6 +71,32 @@ class Tree:
     def __init__(self, path):
         d = open(path, 'rb').read(); L = lumps(d)
         self.d = d; self.poff = L[1][0]; self.noff = L[4][0]; self.loff = L[8][0]
+
+    def leaf(self, p):
+        """(contents, cluster) of the leaf containing p"""
+        n = 0
+        while n >= 0:
+            plane, c0, c1 = struct.unpack_from('<iii', self.d, self.noff + n * 28)
+            nx, ny, nz, dist = struct.unpack_from('<ffff', self.d, self.poff + plane * 20)
+            n = c0 if nx * p[0] + ny * p[1] + nz * p[2] - dist >= 0 else c1
+        return struct.unpack_from('<ih', self.d, self.loff + (-1 - n) * 28)
+
+    def pvs(self, cluster):
+        """set of clusters potentially visible from cluster (Quake 2 run-length coded vis lump)"""
+        voff = lumps(self.d)[3][0]
+        nclusters = struct.unpack_from('<i', self.d, voff)[0]
+        i = voff + struct.unpack_from('<i', self.d, voff + 4 + cluster * 8)[0]
+        out = set(); c = 0
+        while c < nclusters:
+            b = self.d[i]; i += 1
+            if b == 0:
+                c += 8 * self.d[i]; i += 1
+                continue
+            for k in range(8):
+                if b & (1 << k):
+                    out.add(c + k)
+            c += 8
+        return out
 
     def empty(self, p):
         n = 0
@@ -107,13 +141,25 @@ def entities(path):
 
 def spots(path, count):
     tree = Tree(path)
-    pts = []
+    pts = []; starts = []; first = None
     for e in entities(path):
         if e.get('classname') in ('info_player_start', 'path_corner') and 'origin' in e:
             x, y, z = (float(v) for v in e['origin'].split()[:3])
             for dz in (40.0, 24.0, 56.0):
                 if tree.empty((x, y, z + dz)):
-                    pts.append((x, y, z + dz)); break
+                    pts.append((x, y, z + dz))
+                    if e['classname'] == 'info_player_start':
+                        first = first or (x, y, z + dz)
+                        if 'targetname' not in e:
+                            starts.append((x, y, z + dz))
+                    break
+    starts = starts or ([first] if first else [])
+    # the engine only draws what the player (at the start) can see, so the camera and the sky must be in its PVS
+    vis = set().union(*(tree.pvs(tree.leaf(q)[1]) for q in starts)) if starts else None
+    if vis is not None:
+        pts = [q for q in pts if tree.leaf(q)[1] in vis]
+    # at the spawn the camera is inside the player model, which Remix renders as a black frame
+    pts = [q for q in pts if all(math.dist(q, s) > 96 for s in starts)]
     picked = []
     while pts and len(picked) < count:
         best = max(pts, key=lambda p: min((math.dist(p, q) for q in picked), default=1e9))
@@ -135,6 +181,68 @@ def spots(path, count):
     return out
 
 
+def sky_views(path, count):
+    """views from player/NPC spots towards the direction where the most traced rays end on a SURF_SKY face"""
+    tree = Tree(path)
+    sky = []
+    for area, name, c, n, pts in faces_with(path, [], flags=0x4, points=True):
+        lo = [min(q[j] for q in pts) - 12 for j in range(3)]; hi = [max(q[j] for q in pts) + 12 for j in range(3)]
+        sky.append((n, sum(n[j] * c[j] for j in range(3)), lo, hi))
+    def hits_sky(cam, pitch, yaw):
+        p, y = math.radians(pitch), math.radians(yaw)
+        d = (math.cos(p) * math.cos(y), math.cos(p) * math.sin(y), -math.sin(p))
+        last = cam
+        for t in range(16, 4097, 16):
+            q = [cam[j] + d[j] * t for j in range(3)]
+            if not tree.empty(q):
+                if vis is not None and tree.leaf(last)[1] not in vis:
+                    return False
+                return any(abs(sum(n[j] * q[j] for j in range(3)) - dist) < 12 and
+                           all(lo[j] <= q[j] <= hi[j] for j in range(3)) for n, dist, lo, hi in sky)
+            last = q
+        return False
+    pts = []; starts = []; first = None
+    for e in entities(path):
+        if e.get('classname') in ('info_player_start', 'path_corner') and 'origin' in e:
+            x, y, z = (float(v) for v in e['origin'].split()[:3])
+            for dz in (40.0, 24.0, 56.0):
+                if tree.empty((x, y, z + dz)):
+                    pts.append((x, y, z + dz))
+                    if e['classname'] == 'info_player_start':
+                        first = first or (x, y, z + dz)
+                        if 'targetname' not in e:
+                            starts.append((x, y, z + dz))
+                    break
+    starts = starts or ([first] if first else [])
+    # the engine only draws what the player (at the start) can see, so the camera and the sky must be in its PVS
+    vis = set().union(*(tree.pvs(tree.leaf(q)[1]) for q in starts)) if starts else None
+    if vis is not None:
+        pts = [q for q in pts if tree.leaf(q)[1] in vis]
+    # at the spawn the camera is inside the player model, which Remix renders as a black frame
+    pts = [q for q in pts if all(math.dist(q, s) > 96 for s in starts)]
+    spread = []
+    while pts and len(spread) < 64:
+        best = max(pts, key=lambda p: min((math.dist(p, q) for q in spread), default=1e9))
+        pts.remove(best)
+        if spread and min(math.dist(best, q) for q in spread) < 128:
+            break
+        spread.append(best)
+    pitches = (0.0, -15.0, -30.0)
+    scored = []
+    for cam in spread:
+        h = {(p, k): hits_sky(cam, p, k * 22.5) for p in pitches for k in range(16)}
+        def score(p, k):
+            return sum(h[(pp, (k + dk) % 16)] for pp in pitches if abs(pp - p) <= 15 for dk in (-1, 0, 1))
+        p, k = max(((p, k) for p in pitches for k in range(16)), key=lambda pk: score(*pk))
+        if score(p, k):
+            scored.append((score(p, k), cam, p, k * 22.5))
+    out = []
+    for s, cam, p, yw in sorted(scored, key=lambda r: -r[0]):
+        if len(out) < count and all(math.dist(cam, q) >= 512 for q, _, _ in out):
+            out.append((cam, p, yw if yw <= 180 else yw - 360))
+    return out
+
+
 def main():
     args = sys.argv[1:]
     def opt(n, default):
@@ -142,7 +250,15 @@ def main():
             i = args.index(n); v = args[i + 1]; del args[i:i + 2]; return v
         return default
     count = int(opt('--count', '1')); dist = float(opt('--distance', '140')); prefix = opt('--name', '')
-    light = opt('--light', ''); nspots = int(opt('--spots', '0'))
+    light = opt('--light', ''); nspots = int(opt('--spots', '0')); nsky = int(opt('--sky', '0'))
+    if nsky and args:
+        mp = os.path.splitext(os.path.basename(args[0]))[0].lower()
+        res = sky_views(args[0], nsky)
+        for i, (cam, p, yw) in enumerate(res):
+            print('%s %ssky%d %.1f %.1f %.1f %.1f %.1f' % (mp, prefix, i, cam[0], cam[1], cam[2], p, yw))
+        if not res:
+            sys.exit('%s: no sky visible from player start or path_corner' % mp)
+        return
     if nspots and args:
         mp = os.path.splitext(os.path.basename(args[0]))[0].lower()
         res = spots(args[0], nspots)
