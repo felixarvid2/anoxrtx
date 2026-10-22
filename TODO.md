@@ -56,7 +56,12 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   (`skyBrightness = 100`, bias -4,0, median -0,3 EV); waukees bias -0,4. Övriga utan himmelsfel.
 - [x] hephaestus/fortressgrounds (2026-10-22): hephaestus bias -2,0 (startvy +0,13, vyer median -0,7);
   fortressgrounds oförändrad (startvy -0,04, bara den vita helikopterplattan mörkare).
-- [ ] commbase: de lysande strålarna/kablarna (gröna/gula linjer) är mörka under Remix.
+- [ ] commbase: de gula laserstrålarna (från `ob_lasersentinel`) är mörka under Remix (2026-10-22 undersökt).
+  Spelet ritar dem otexturerade (GL_QUAD_STRIP, 24 hörn, blend SRC_ALPHA/ONE, färg ffcc00, kärna alfa 1 + halo 0,5).
+  De gröna linjerna (`ob_commlaser`, `objects/commlaser.tga`) ser redan ut som originalet. Provat utan resultat:
+  `enableEmissiveBlendEmissiveOverride` (även intensitet 100, även i rtx.conf), commlaser-hashen ur `beamTextures`,
+  emissivt material. QindieGL-grenen `wip/untextured-additive` ger dem en 4x4-textur i deras färg (hash
+  0xF9CE231054C9B9AC): inte längre svarta men bara svaga. Nästa steg: titta på instansen i Remix dev-menyn.
   (+0,8–1,4 EV mörkare bild, 2026-10-19). slevant saknar originalets orange dis över lavan. Exponering inte satt för dessa.
 - [x] **Bridge-stopp vid banladdning (löst 2026-10-21):** Remix-bryggan låste sig när en bana laddades
   (`Data Queue overwrite` utan "resolved"): spelet väntade i `UnlockRect` på plats i dataringen medan servern,
