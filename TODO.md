@@ -54,8 +54,8 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   Bild median +0,03 EV, himmel +0,2–0,9 EV.
 - [x] Andra utomhusbanor med skybox (2026-10-22): uppåtvyer på 24 banor. whitendon hade samma mörka himmel
   (`skyBrightness = 100`, bias -4,0, median -0,3 EV); waukees bias -0,4. Övriga utan himmelsfel.
-- [ ] fortressgrounds (helikopterplattan +2,9 EV mörkare) och hephaestus (vyer -0,6 till -2,5 EV ljusare) avviker
-  från startvyn; bara en vy var. Mät fler vyer innan bias ändras.
+- [x] hephaestus/fortressgrounds (2026-10-22): hephaestus bias -2,0 (startvy +0,13, vyer median -0,7);
+  fortressgrounds oförändrad (startvy -0,04, bara den vita helikopterplattan mörkare).
 - [ ] commbase: de lysande strålarna/kablarna (gröna/gula linjer) är mörka under Remix.
   (+0,8–1,4 EV mörkare bild, 2026-10-19). slevant saknar originalets orange dis över lavan. Exponering inte satt för dessa.
 - [x] **Bridge-stopp vid banladdning (löst 2026-10-21):** Remix-bryggan låste sig när en bana laddades
