@@ -40,7 +40,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [ ] Vatten: genomskinlighet, stabil geometrihash och material i relevant vy.
 - [x] Lava: `proc_lava` fryses (256x256, hash 0x561447B2DFA181FD) och ersättningsmaterialet syns i levant2 (2026-10-18). Orsak: HD-paketets uppskalade palett (anoxgfx kräver 256 px bred) + QindieGL fyllde gammal D3D-textur. `proc_lavafloe` ej sedd i bild än. levant1 och hephlava går inte att se med riggkameran (banstarten ritar ingen värld, även originalet svart, 2026-10-19); kräver en sparfil nära lavan.
 - [x] Figurer för mörka: fyllnadsljus per figur relativt kartljusen (QindieGL #30/#32, `model_fill = 1.5` + egna värden
-  för 5 banor), 10 banor inom ±0,3 EV mot originalet (2026-10-19). Övriga ~69 banor omätta.
+  för 5 banor), 10 banor inom ±0,3 EV mot originalet (2026-10-19). Övriga 69 banor mätta 2026-10-22: 60 användbara,
+  37 fick egna värden (0,1–6) i två varv; 49 av 60 nu inom ±0,35 EV.
+- [ ] Figurer för ljusa även vid `model_fill = 0.1` (rummets ljus räcker): tensil -0,9, bricksd -0,66, hephfactory
+  -0,58, sendormitory -0,56, waukees -0,5, franks -0,48, levant1 -0,44 EV. fortressgrounds/grumpos +0,6/+0,9 för
+  mörka och påverkas inte av fyllnadsljuset.
 - [x] greattree/waukees: lila ton (2026-10-22) kom från den gulvita dimman som volymdimma; dimma av på båda.
 - [x] labbuilding (2026-10-21): fönstret visade grått i stället för staden: Remix gjorde kartans dimma till volymdimma
   som täckte himlen; `enableFogRemap = False` för banan. `model_fill = 0.6` (figur +0,17 EV), exponering global (median 0,0).
