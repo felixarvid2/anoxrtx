@@ -90,5 +90,81 @@ The irradiance sum has no occlusion and does not include the Numos sky, so where
 lights the character (outdoor maps, lamps behind walls) it over-lights; those maps have their own value. A lamp right above a character still over-lights it under path tracing
 (labbuilding stairs: -1.2 EV at `model_fill` 0.6, -1.7 at 1.5), because the original lights models only from the
 lightmap under them.
-The other ~69 maps use the default unmeasured. Not covered: the greattree view has a purple tint under Remix
-that the original does not have (unrelated to the fill light).
+Not covered: the greattree view has a purple tint under Remix that the original does not have (unrelated to the
+fill light).
+
+### All other maps (2026-10-22)
+
+Start views of the 69 other maps with `--ab-original`, the same character box (centre bottom, x 0.40–0.62,
+y 0.50–1.0) checked by eye to contain Boots; 60 usable (commbase, fortress1/2, republic: black or loading;
+sewagic1a: no character; mystech1, sunstrip, whitendon, zordos: the camera differs between the renderers).
+Maps with |character vs frame| > 0.3 got `model_fill = 1.5 * 2^EV`, then a second pass from each map's measured
+response (EV per doubling of `model_fill`, 0.25–0.65; the fill is only part of the light on the character).
+Verified Remix-only against the same original shots. Borderline maps (|EV| <= 0.35) and slevant keep 1.5.
+
+| Map | `model_fill` | Character vs frame (EV) | Note |
+| --- | --- | --- | --- |
+| baltownr | 0.39 | -0.02 (1.5: -0.93) |  |
+| bricksc | 0.86 | -0.23 (1.5: -0.80) |  |
+| bricksc2 | 0.41 | -0.11 (1.5: -0.93) |  |
+| bricksd | 0.1 | -0.66 (1.5: -1.45) | room light alone over-lights it (fill at the 0.1 floor) |
+| chamber | 0.24 | -0.08 (1.5: -1.48) |  |
+| commiteon | 1.5 (default) | +0.17 |  |
+| crevice | 1.5 (default) | -0.26 |  |
+| crevicelanding | 0.57 | +0.03 (1.5: -0.65) |  |
+| doren | 1.5 (default) | +0.33 |  |
+| fortressgrounds | 1.5 (default) | +0.64 | fill does not move it (1.5→2.34: +0.64→+0.61); bright logo in the box |
+| franks | 0.1 | -0.48 (1.5: -1.65) | room light alone over-lights it (fill at the 0.1 floor) |
+| grumpos | 1.5 (default) | +0.88 | fill does not move it (1.5→2.76: +0.88→+0.86) |
+| hephfactory | 0.1 | -0.58 (1.5: -2.10) | room light alone over-lights it (fill at the 0.1 floor) |
+| hephlava | 1.5 (default) | -0.20 |  |
+| hephpipes | 0.58 | -0.06 (1.5: -0.75) |  |
+| hephpoor | 5.03 | +0.02 (1.5: +1.16) |  |
+| hephtower1 | 1.5 (default) | -0.01 |  |
+| hephtower2 | 1.11 | -0.25 (1.5: -0.44) |  |
+| hive | 0.27 | -0.25 (1.5: -0.59) |  |
+| hovel | 0.92 | -0.26 (1.5: -0.71) |  |
+| krap2 | 1.08 | -0.30 (1.5: -0.47) |  |
+| kraptonjail | 1.04 | -0.26 (1.5: -0.53) |  |
+| kraptonmaze | 1.5 (default) | -0.18 |  |
+| levant | 1.5 (default) | -0.12 |  |
+| levant1 | 0.1 | -0.44 (1.5: -1.92) | room light alone over-lights it (fill at the 0.1 floor) |
+| levant2 | 1.5 (default) | -0.10 |  |
+| limbus | 1.14 | -0.28 (1.5: -0.40) |  |
+| limbusdome | 0.25 | -0.09 (1.5: -1.25) |  |
+| mburger | 1.5 (default) | +0.08 |  |
+| mmuseum | 0.1 | +0.19 (1.5: -1.02) |  |
+| mugpath | 0.25 | -0.11 (1.5: -1.30) |  |
+| museum | 1.5 (default) | -0.18 |  |
+| museumnight | 1.5 (default) | -0.21 |  |
+| mystech2 | 1.5 (default) | -0.13 |  |
+| onegate | 4.07 | -0.04 (1.5: +0.75) |  |
+| onegatestn | 0.14 | -0.10 (1.5: -1.07) |  |
+| orange | 1.09 | -0.28 (1.5: -0.46) |  |
+| pay2pray | 0.14 | -0.35 (1.5: -1.04) |  |
+| pillars | 0.1 | +0.11 (1.5: -1.36) |  |
+| redlight | 1.5 (default) | +0.26 |  |
+| routubes1 | 1.5 (default) | -0.03 |  |
+| routubes2 | 4.34 | -0.04 (1.5: +0.54) | the fill spot shows on the tunnel wall behind the character |
+| scommonnight | 1.5 (default) | +0.10 |  |
+| senderss | 1.5 (default) | -0.05 |  |
+| sendormitory | 0.1 | -0.56 (1.5: -1.05) | room light alone over-lights it (fill at the 0.1 floor) |
+| servicetunnel | 1.5 (default) | -0.33 |  |
+| sexmach | 1.5 (default) | -0.14 |  |
+| slevant | 1.5 (default) | -0.60 | original orange haze missing (frame +1.36), not adjusted |
+| slounge | 1.5 (default) | +0.31 |  |
+| slutopia | 1.5 (default) | -0.04 |  |
+| temple | 0.13 | -0.18 (1.5: -1.03) |  |
+| tenements | 2.12 | +0.28 (1.5: +0.50) |  |
+| tensil | 0.1 | -0.90 (1.5: -1.96) | room light alone over-lights it (fill at the 0.1 floor) |
+| tours | 0.61 | -0.02 (1.5: -0.67) |  |
+| tours2 | 6 | +0.07 (1.5: +1.15) |  |
+| tubbys | 0.4 | -0.38 (1.5: -1.21) | green tube light on the coat; 0.22 gave a noisy +0.85 |
+| vendomart | 5.68 | +0.07 (1.5: +0.96) |  |
+| warshipbay | 1.5 (default) | -0.30 |  |
+| waukees | 0.1 | -0.50 (1.5: -1.58) | room light alone over-lights it (fill at the 0.1 floor) |
+| whacks | 1.5 (default) | +0.31 |  |
+
+Seven maps stay 0.4–0.9 EV too bright at the lowest value (0.1): there the path-traced room light alone lights the
+character more than the original's lightmap sample; less fill cannot fix that. fortressgrounds and grumpos do not
+respond to the fill at all (+0.6/+0.9 too dark at any value).
