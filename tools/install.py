@@ -359,10 +359,14 @@ class Installer:
                 '--liq-hd', os.path.join(self.work, 'liquids_x4'))
 
     def step_emissive(self):
+        if not self.maps():
+            self.log('emissive: no extracted maps in the work directory (run the extract step), skipped'); return
         self.backup(os.path.join(self.mod, 'emissive.usda'))
         classes = os.path.join(self.work, 'jev_classes.json')
         extra = ['--classes', classes] if self.has_pack() and os.path.exists(classes) else []
-        self.py('emissive_layer.py', self.mod, self.game, *self.maps(), *(['--pack'] if self.has_pack() else []), *extra)
+        models = ['--models', os.path.join(REPO, 'maps', 'model_emission.tsv')]
+        self.py('emissive_layer.py', self.mod, self.game, *self.maps(), *(['--pack'] if self.has_pack() else []), *extra,
+                *models)
 
     def step_pbr(self):
         if not self.has_pack():

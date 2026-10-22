@@ -5,6 +5,7 @@ usage: find_views.py MAP.bsp TEXTURE[,TEXTURE...] [--count N] [--distance D] [--
        find_views.py MAP.bsp --light N [--distance D]          (view of map light N, index as in <map>.lights)
        find_views.py MAP.bsp --spots N                          (N views from places the player or NPCs go)
        find_views.py MAP.bsp --sky N [--distance D]             (N views towards the sky from places the player goes)
+       find_views.py MAP.bsp --entity CLASS[,CLASS...] [--count N] [--distance D]   (views of placed entities)
 
 TEXTURE is a texture path as in the BSP (e.g. levant/proc_lava; substring match, case-insensitive). For the
 largest faces that use it (one per texture, up to --count) the view is placed --distance units (default 140)
@@ -13,11 +14,14 @@ tools/anoxcheck.py --views:   MAP NAME X Y Z PITCH YAW
 (QindieGL renders world views from rtx-remix/rigcam.txt "X Y Z PITCH YAW", Quake 2 angles: pitch > 0 = down.)
 --spots picks eye-height views at info_player_start and path_corner entities, spread over the map (each next spot
 the one farthest from those already picked), looking along the most open of 16 directions, slightly down; for
-measuring a map as a whole (e.g. exposure) where the start view is unusable.
+measuring a map as a whole (e.g. exposure) where the start view is unusable. Only spots in the PVS of the
+spawn point are used (see --sky), and none within 96 units of it (the camera would be inside the player model).
 --sky starts from the same player/NPC spots (only those in the PVS of the info_player_start the game spawns at: the one
 without targetname, else the first; the engine draws nothing else) and looks (level or up to 30 degrees up) where the most traced rays
 end on a SURF_SKY face; the N spots with the most sky, at least 512 units apart. For checking that the skybox shows
 through windows and openings and is not hidden by fog.
+--entity looks at placed entities of the given classnames (e.g. models from entity.dat) from eye height around them,
+--distance away (shorter or longer if blocked), only inside the spawn's PVS; up to --count, 256 units apart.
 Camera positions are checked against the BSP tree: only empty leaves inside the map (cluster >= 0, no solid or
 liquid contents) are used,
 trying shorter distances and, for floors, oblique views from four sides.
@@ -141,21 +145,14 @@ def entities(path):
 
 def spots(path, count):
     tree = Tree(path)
-    pts = []; starts = []; first = None
+    pts = []
     for e in entities(path):
         if e.get('classname') in ('info_player_start', 'path_corner') and 'origin' in e:
             x, y, z = (float(v) for v in e['origin'].split()[:3])
             for dz in (40.0, 24.0, 56.0):
                 if tree.empty((x, y, z + dz)):
-                    pts.append((x, y, z + dz))
-                    if e['classname'] == 'info_player_start':
-                        first = first or (x, y, z + dz)
-                        if 'targetname' not in e:
-                            starts.append((x, y, z + dz))
-                    break
-    starts = starts or ([first] if first else [])
-    # the engine only draws what the player (at the start) can see, so the camera and the sky must be in its PVS
-    vis = set().union(*(tree.pvs(tree.leaf(q)[1]) for q in starts)) if starts else None
+                    pts.append((x, y, z + dz)); break
+    starts, vis = spawn_vis(path, tree)
     if vis is not None:
         pts = [q for q in pts if tree.leaf(q)[1] in vis]
     # at the spawn the camera is inside the player model, which Remix renders as a black frame
@@ -181,6 +178,52 @@ def spots(path, count):
     return out
 
 
+def spawn_vis(path, tree):
+    """(spawn points, clusters in their PVS or None): the info_player_start the game uses (the one without
+    targetname, else the first). The engine only draws what the player can see from there."""
+    starts = []; first = None
+    for e in entities(path):
+        if e.get('classname') == 'info_player_start' and 'origin' in e:
+            x, y, z = (float(v) for v in e['origin'].split()[:3])
+            for dz in (40.0, 24.0, 56.0):
+                if tree.empty((x, y, z + dz)):
+                    first = first or (x, y, z + dz)
+                    if 'targetname' not in e:
+                        starts.append((x, y, z + dz))
+                    break
+    starts = starts or ([first] if first else [])
+    return starts, (set().union(*(tree.pvs(tree.leaf(q)[1]) for q in starts)) if starts else None)
+
+
+def entity_views(path, classes, count, dist):
+    """views of placed entities (classname match) inside the spawn's PVS, from eye height around each one"""
+    tree = Tree(path)
+    starts, vis = spawn_vis(path, tree)
+    out = []
+    for e in entities(path):
+        c = e.get('classname', '').lower()
+        if c not in classes or 'origin' not in e or len(out) >= count:
+            continue
+        o = tuple(float(v) for v in e['origin'].split()[:3])
+        if any(math.dist(o, q) < 256 for _, q, _ in out):
+            continue
+        target = (o[0], o[1], o[2] + 24)
+        for dd in (dist, dist * 0.7, dist * 1.5, dist * 0.45):
+            for ang in range(0, 360, 45):
+                a = math.radians(ang)
+                cam = (o[0] + math.cos(a) * dd, o[1] + math.sin(a) * dd, o[2] + 48)
+                if not tree.empty(cam) or not tree.clear(cam, target):
+                    continue
+                if vis is not None and tree.leaf(cam)[1] not in vis:
+                    continue
+                if any(math.dist(cam, q) < 96 for q in starts):
+                    continue
+                out.append((c, o, cam)); break
+            if out and out[-1][1] == o:
+                break
+    return [(c, cam) + look(cam, (o[0], o[1], o[2] + 24)) for c, o, cam in out]
+
+
 def sky_views(path, count):
     """views from player/NPC spots towards the direction where the most traced rays end on a SURF_SKY face"""
     tree = Tree(path)
@@ -201,21 +244,14 @@ def sky_views(path, count):
                            all(lo[j] <= q[j] <= hi[j] for j in range(3)) for n, dist, lo, hi in sky)
             last = q
         return False
-    pts = []; starts = []; first = None
+    pts = []
     for e in entities(path):
         if e.get('classname') in ('info_player_start', 'path_corner') and 'origin' in e:
             x, y, z = (float(v) for v in e['origin'].split()[:3])
             for dz in (40.0, 24.0, 56.0):
                 if tree.empty((x, y, z + dz)):
-                    pts.append((x, y, z + dz))
-                    if e['classname'] == 'info_player_start':
-                        first = first or (x, y, z + dz)
-                        if 'targetname' not in e:
-                            starts.append((x, y, z + dz))
-                    break
-    starts = starts or ([first] if first else [])
-    # the engine only draws what the player (at the start) can see, so the camera and the sky must be in its PVS
-    vis = set().union(*(tree.pvs(tree.leaf(q)[1]) for q in starts)) if starts else None
+                    pts.append((x, y, z + dz)); break
+    starts, vis = spawn_vis(path, tree)
     if vis is not None:
         pts = [q for q in pts if tree.leaf(q)[1] in vis]
     # at the spawn the camera is inside the player model, which Remix renders as a black frame
@@ -251,6 +287,15 @@ def main():
         return default
     count = int(opt('--count', '1')); dist = float(opt('--distance', '140')); prefix = opt('--name', '')
     light = opt('--light', ''); nspots = int(opt('--spots', '0')); nsky = int(opt('--sky', '0'))
+    ents = opt('--entity', '')
+    if ents and args:
+        mp = os.path.splitext(os.path.basename(args[0]))[0].lower()
+        res = entity_views(args[0], set(ents.lower().split(',')), count, float(opt('--distance', '0') or 0) or dist)
+        for i, (c, cam, p, yw) in enumerate(res):
+            print('%s %s%s_%d %.1f %.1f %.1f %.1f %.1f' % (mp, prefix, c, i, cam[0], cam[1], cam[2], p, yw))
+        if not res:
+            sys.exit('%s: no view of %s inside the spawn PVS' % (mp, ents))
+        return
     if nsky and args:
         mp = os.path.splitext(os.path.basename(args[0]))[0].lower()
         res = sky_views(args[0], nsky)
