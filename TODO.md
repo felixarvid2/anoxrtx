@@ -53,6 +53,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [x] Andra banor med `fog` och himmel bakom glas/öppningar (2026-10-22): vyer mot himlen (`find_views.py --sky`)
   på 26 banor; 13 har himmel synlig från startens PVS. Bara tours hade dimma framför himlen (dimma av; bild
   -1,72 → -1,59 EV). Övriga banor går inte att se mot himlen från banstarten (behöver sparfiler).
+- [x] Graphical Enhancements 0.3 (ModDB) installerat 2026-10-23 (`install.py --ge ZIP`): 1573 lösa modell- och
+  himmelstexturer; dess `textures/` hoppas över (Chuncki täcker dem). Nya hashar läggs till bredvid de gamla
+  (`rehash_textures.py add`, `maps/ge_texmap.tsv`): himmelslistan, dekaler, skeppets emission, materialöverskrivningar
+  och FLUX-affischerna; GE:s uppskalning vinner över `models_hd`/`hd_sky`. Kontroll: crevicelanding -0,24/-0,60 EV
+  (före -0,23/-0,63), sendormitory -0,08, tours himmel ritas som himmel (bild -0,48 EV, före -1,59).
 - [ ] tours: stadssilhuetten i skyboxen (ACORP-tornet, neonskyltar) syns inte under Remix, himlen blir en jämn
   turkos yta; `skyBrightness = 140` gör den bara vit och ljussätter hela gatan. Inte dimma.
 - [ ] bricksd: neonskyltarna (FIGHTING/TRAINING/BOXING) är matta under Remix mot klart lysande i originalet;

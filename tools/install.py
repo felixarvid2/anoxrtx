@@ -9,6 +9,8 @@ Steps (default: all, in this order; each can be rerun on its own):
   remix     RTX Remix runtime (stock 1.5.2 or Remix Plus 1.5.1) + .trex/bridge.conf
   config    rtx.conf, anox_customise.ini, culling lines in anoxdata/CONFIGS/Default.cfg
   textures  Chuncki's 4x level texture pack (--chuncki ZIP; skipped when not given and not installed)
+  ge        Graphical Enhancements 0.3 (--ge ZIP): upscaled model and sky textures, loose in anoxdata/models and
+            anoxdata/graphics; its textures/ folder is left out (Chuncki's pack covers the level textures)
   extract   maps, sky, liquid and model images from the game archives (into the work directory)
   lights    map light files (rtx-remix/maplights/*.lights; *.override files are kept)
   sky       HD skyboxes (Real-ESRGAN x4) -> hd_sky.usda
@@ -17,7 +19,7 @@ Steps (default: all, in this order; each can be rerun on its own):
   pbr       normal maps, roughness, glass for the level textures -> pbr.usda (needs the texture pack)
   proctex   lava material for QindieGL's frozen procedural textures -> proctex.usda (needs the texture pack)
   models    HD model textures (Real-ESRGAN x4; posters redrawn with FLUX if --flux) -> models_hd.usda
-  mod       mod.usda with the layers above, all hashes moved to the texture pack's
+  mod       mod.usda with the layers above, all hashes moved to the texture pack's (and GE's, added)
   steam     Steam launch options and GE-Proton for the game (shuts Steam down; only with --steam)
 
 Options:
@@ -30,6 +32,7 @@ Options:
   --data-collection no|yes Remix Plus: answer its first-start dialog about crash/usage reports to NVIDIA
                       (default no; the dialog is then not shown)
   --chuncki ZIP       Chuncki's texture pack zip (download it yourself from ModDB)
+  --ge ZIP            GraphicalEnhancements0.3.zip (ModDB, anachronox-graphical-enhancements)
   --flux              redraw the posters with FLUX.1 via a running ComfyUI (127.0.0.1:8188)
   --steam             also run the steam step
   --dry-run           print what would be done
@@ -41,7 +44,7 @@ import datetime, glob, importlib.util, io, os, re, shutil, subprocess, sys, time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
-STEPS = ['qindiegl', 'remix', 'config', 'textures', 'extract', 'lights', 'sky', 'liquids', 'emissive', 'pbr',
+STEPS = ['qindiegl', 'remix', 'config', 'textures', 'ge', 'extract', 'lights', 'sky', 'liquids', 'emissive', 'pbr',
          'proctex', 'models', 'mod', 'steam']
 APPID = '242940'
 QINDIEGL_GIT = 'https://github.com/felixarvid2/QindieGL.git'
@@ -151,6 +154,9 @@ class Installer:
     def has_pack(self):
         return os.path.isdir(os.path.join(self.game, 'anoxdata', 'textures')) and \
             not os.path.exists(os.path.join(self.game, 'anoxdata', 'TEXTURES.dat'))
+
+    def ge_manifest(self):
+        return os.path.join(self.game, 'anoxdata', 'graphical_enhancements_manifest.txt')
 
     def textures_dat(self):
         d = os.path.join(self.game, 'anoxdata', 'TEXTURES.dat')
@@ -295,6 +301,31 @@ class Installer:
             os.rename(dat, dat + '.orig')
         self.log('texture pack installed (%d files); TEXTURES.dat renamed to TEXTURES.dat.orig'
                  % sum(len(f) for _, _, f in os.walk(tdir)))
+
+    def step_ge(self):
+        z = self.a['ge']
+        if not z:
+            self.log('Graphical Enhancements: %s' % ('installed' if os.path.exists(self.ge_manifest())
+                                                     else 'not given (--ge ZIP), skipped'))
+            return
+        self.log('installing Graphical Enhancements from', z)
+        if self.a['dry_run']:
+            return
+        done = []
+        with zipfile.ZipFile(z) as zf:
+            for name in zf.namelist():
+                m = re.search(r'(anoxdata/(?:models|graphics)/.*)$', name)
+                if not m or name.endswith('/') or name.lower().endswith('.zip') or '..' in name:
+                    continue
+                dst = os.path.join(self.game, m.group(1))
+                self.backup(dst)
+                os.makedirs(os.path.dirname(dst), exist_ok=True)
+                with zf.open(name) as s, open(dst, 'wb') as d:
+                    shutil.copyfileobj(s, d)
+                done.append(m.group(1))
+        # the files to delete to remove it again (they hide the copies in MODELS.dat / GRAPHICS.dat)
+        open(self.ge_manifest(), 'w').write('\n'.join(sorted(done)) + '\n')
+        self.log('Graphical Enhancements installed (%d files, list in %s)' % (len(done), self.ge_manifest()))
 
     def step_extract(self):
         adat = os.path.join(HERE, 'adat.py')
@@ -451,6 +482,17 @@ class Installer:
             if os.path.exists(os.path.join(self.mod, 'liquids.usda')):
                 files.append(os.path.join(self.mod, 'liquids.usda'))
             self.py('rehash_textures.py', 'apply', os.path.join(REPO, 'maps', 'chuncki_texmap.tsv'), *files)
+        if os.path.exists(self.ge_manifest()):
+            # GE's loose model/sky textures replace the archive ones the layers are made from. Add their hashes
+            # (old ones kept, so it is safe to repeat) to the lists and material overrides, but not to the HD
+            # layers: there GE's own upscale wins. The FLUX posters keep ours.
+            ge = os.path.join(REPO, 'maps', 'ge_texmap.tsv')
+            files = [os.path.join(self.game, 'rtx.conf')] + [
+                os.path.join(self.mod, f + '.usda') for f in ('mod', 'liquids', 'emissive', 'emissive_jev', 'pbr')]
+            self.py('rehash_textures.py', 'add', ge, *[f for f in files if os.path.exists(f)])
+            hd = os.path.join(self.mod, 'models_hd.usda')
+            if os.path.exists(hd):
+                self.py('rehash_textures.py', 'add', ge, hd, '--only', os.path.join(REPO, 'maps', 'posters_flux.tsv'))
 
     def step_steam(self):
         if not self.a['steam']:
@@ -504,7 +546,7 @@ def main():
     args = sys.argv[1:]
     a = {'game': None, 'work': os.path.expanduser('~/.cache/anoxrtx'), 'qindiegl': None,
          'llvm_mingw': os.environ.get('LLVM_MINGW', os.path.expanduser('~/.local/llvm-mingw')), 'remix': 'stock',
-         'data_collection': 'no', 'chuncki': None, 'flux': False, 'steam': False, 'dry_run': False}
+         'data_collection': 'no', 'chuncki': None, 'ge': None, 'flux': False, 'steam': False, 'dry_run': False}
     steps = []
     i = 0
     while i < len(args):
