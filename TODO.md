@@ -60,8 +60,10 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   (före -0,23/-0,63), sendormitory -0,08, tours himmel ritas som himmel (bild -0,48 EV, före -1,59).
 - [ ] tours: stadssilhuetten i skyboxen (ACORP-tornet, neonskyltar) syns inte under Remix, himlen blir en jämn
   turkos yta; `skyBrightness = 140` gör den bara vit och ljussätter hela gatan. Inte dimma.
-- [ ] bricksd: neonskyltarna (FIGHTING/TRAINING/BOXING) är matta under Remix mot klart lysande i originalet;
-  oförändrat med dimma av (emissivt material).
+- [x] bricksd (2026-10-23): neonskyltarna (FIGHTING/TRAINING/BOXING) är modeller (`ob_whacksign1-5`, entity.dat
+  lighting 0) som i originalet lyser av sin egen ljusa textur; under Remix +3,2 EV för mörka. Emission 1 från egen
+  textur (`maps/model_emission.tsv`): skyltarna -0,2 EV (2: -0,65 och urblekta). Väggen runt dem blir ljusare
+  (-1,0 EV mot -0,57), banans exponering kan behöva justeras.
 - [ ] mmuseum: fönstren är vita under Remix, blå i originalet; oförändrat med dimma av.
 - [x] crevicelanding (2026-10-22): det landade skeppet (`ob_shuttlewhol6`) var nästan oupplyst under Remix. Det har
   entity.dat lighting = 1, dvs. renderfx 0x800 (`RF_DIRLIGHT`, modelljus som figurerna, inte fullbright) men får

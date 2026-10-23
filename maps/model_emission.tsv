@@ -1,6 +1,13 @@
 # Model textures that emit light (tools/emissive_layer.py --models): PATH in MODELS.dat, intensity, note.
 # Props the original lights with the model light (entity.dat lighting 1, RF_DIRLIGHT) but that get no fill light
 # (QindieGL lights characters only near the camera) come out nearly black under path tracing.
+# Neon signs drawn as plain models (entity.dat lighting 0) glow in the original from their bright texture alone
+# and stay dull under path tracing.
 objects/shuttle1d.tga	0.5	crevicelanding ship (ob_shuttlewhol6)
 objects/shuttle2c.tga	0.5	crevicelanding ship
 objects/shuttle-cap.tga	0.5	crevicelanding ship
+objects/whacksign1.tga	1	bricksd neon signs (ob_whacksign*)
+objects/whacksign2.tga	1	bricksd neon signs (ob_whacksign*)
+objects/whacksign3.tga	1	bricksd neon signs (ob_whacksign*)
+objects/whacksign4.tga	1	bricksd neon signs (ob_whacksign*)
+objects/whacksign5.tga	1	bricksd neon signs (ob_whacksign*)
