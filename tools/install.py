@@ -54,7 +54,7 @@ ESRGAN_URL = ('https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0
               'realesrgan-ncnn-vulkan-20220424-ubuntu.zip')
 ANOX_OPTIONS = [('remixapi', '1'), ('maplights', '1'), ('maplights_scale', '100'), ('dlights', '1'),
                 ('proctex', '1'), ('smoothnormals', '1'), ('enable_camera_detection', '1'),
-                ('camera_detection_mode', '1')]
+                ('camera_detection_mode', '1'), ('untexturedadditive', '1')]
 CULL_LINES = ['set r_nocull 1', 'set gl_cull 0', 'set gl_cleartoblack 1']
 LAUNCH = ('__NV_PRIME_RENDER_OFFLOAD=1 __VK_LAYER_NV_optimus=NVIDIA_only __GLX_VENDOR_LIBRARY_NAME=nvidia '
           'VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/nvidia_icd.json DXVK_LOG_LEVEL=info '
