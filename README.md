@@ -155,14 +155,19 @@ I raise roughness and metalicity of character materials to the max to mask the p
 11. Graphical Enhancements 0.3 (optional, ModDB `anachronox-graphical-enhancements`; installer: `--ge ZIP`):
    upscaled model and sky textures as loose files in `anoxdata/models` and `anoxdata/graphics`, which the game
    loads instead of the MODELS.dat / GRAPHICS.dat copies, plus an `entity.dat` that makes four billboards
-   `charfly` instead of `noclip`. Its `textures/` folder (12 level textures, `textureinfo.dat` identical to the
-   game's) is left out; Chuncki's pack covers those. The loose textures have new Remix hashes:
+   `charfly` instead of `noclip`. Its 12 level textures (`bricks/01comp`, `02comp`, the `sexmachine` bottles and
+   glasses, all `#alphatest`) are the originals at the original size with a solid alpha instead of the grey one, so
+   the game no longer cuts holes into them. Chuncki's 4x images keep the grey alpha; `tools/merge_alpha.py
+   anoxdata/textures <GE>/anoxdata/textures anoxdata/graphical_enhancements_texmap.tsv` gives them GE's alpha
+   (scaled up, originals kept as `*.orig`), and `rehash_textures.py add` with that map moves the overrides along
+   (`textureinfo.dat` is identical to the game's and not needed). The loose textures have new Remix hashes:
    `tools/rehash_textures.py add maps/ge_texmap.tsv rtx.conf rtx-remix/mods/anoxrt/{mod,pbr,emissive}.usda`
    adds them next to the old ones (sky list, decals, the ship's emission, material overrides; some originals are
    identical and map to several GE files, which `add` all keeps), and
    `... add maps/ge_texmap.tsv rtx-remix/mods/anoxrt/models_hd.usda --only maps/posters_flux.tsv` keeps the
    FLUX posters. `models_hd.usda` / `hd_sky.usda` are otherwise not rehashed, so GE's own upscales show where it
-   has one. To remove it, delete the files listed in `anoxdata/graphical_enhancements_manifest.txt`.
+   has one. To remove it, delete the files listed in `anoxdata/graphical_enhancements_manifest.txt` and rename
+   the `anoxdata/textures/**/*.png.orig` files back.
 
 ## Test rig (Linux)
 

@@ -58,6 +58,9 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   (`rehash_textures.py add`, `maps/ge_texmap.tsv`): himmelslistan, dekaler, skeppets emission, materialöverskrivningar
   och FLUX-affischerna; GE:s uppskalning vinner över `models_hd`/`hd_sky`. Kontroll: crevicelanding -0,24/-0,60 EV
   (före -0,23/-0,63), sendormitory -0,08, tours himmel ritas som himmel (bild -0,48 EV, före -1,59).
+  GE:s 12 bantexturer (`bricks/01comp`, `02comp`, sexmachine-flaskor/glas, `#alphatest`) är originalen med solid
+  alfa i stället för grå; `merge_alpha.py` ger Chunckis 4x-bilder den alfan. sexmach-hyllan: ingen synlig skillnad
+  under Remix (skillnad inom brus). Graffitit (grumpos/tours/tenements) inte sett: vyerna hamnade utanför PVS.
 - [ ] tours: stadssilhuetten i skyboxen (ACORP-tornet, neonskyltar) syns inte under Remix, himlen blir en jämn
   turkos yta; `skyBrightness = 140` gör den bara vit och ljussätter hela gatan. Inte dimma.
 - [x] bricksd (2026-10-23): neonskyltarna (FIGHTING/TRAINING/BOXING) är modeller (`ob_whacksign1-5`, entity.dat
