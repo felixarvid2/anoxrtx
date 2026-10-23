@@ -40,7 +40,8 @@ This builds everything from your own game files: QindieGL (cloned and built with
 (`--remix stock`, default, or `--remix plus`), configs, map lights, HD skies/liquids/model textures (Real-ESRGAN,
 downloaded), emissive and PBR materials, the lava material and mod.usda, and sets the Steam launch options
 (`--steam`; select GE-Proton for the game yourself). Chuncki's pack has to be downloaded from ModDB first; without
-it the level textures stay original and the PBR/lava layers are skipped. Steps can be run on their own, e.g.
+it the level textures stay original and the PBR/lava layers are skipped. `--ge GraphicalEnhancements0.3.zip` also
+installs that mod's model and sky textures (step 11 below). Steps can be run on their own, e.g.
 `tools/install.sh lights mod`; `--help` lists them. Replaced files go to `<game>/anoxrtx-backup/`.
 `tools/toggle.sh off|on` switches between RTX Remix and the plain game. Needs: python3 (venv), git, cmake, a
 Vulkan-capable NVIDIA GPU; the first full run takes a while (texture upscaling).
@@ -150,6 +151,18 @@ I raise roughness and metalicity of character materials to the max to mask the p
    Tiny posters/signs (32x64) come out smeared from ESRGAN; redraw them with FLUX.1 img2img in a local
    ComfyUI before building the layer: `tools/flux_refine.py maps/posters_flux.tsv <upscaled dir> <flux dir>`
    (denoise 0.65, ~2 min per texture on an 8 GB GPU), then copy the results over the upscaled images.
+
+11. Graphical Enhancements 0.3 (optional, ModDB `anachronox-graphical-enhancements`; installer: `--ge ZIP`):
+   upscaled model and sky textures as loose files in `anoxdata/models` and `anoxdata/graphics`, which the game
+   loads instead of the MODELS.dat / GRAPHICS.dat copies, plus an `entity.dat` that makes four billboards
+   `charfly` instead of `noclip`. Its `textures/` folder (12 level textures, `textureinfo.dat` identical to the
+   game's) is left out; Chuncki's pack covers those. The loose textures have new Remix hashes:
+   `tools/rehash_textures.py add maps/ge_texmap.tsv rtx.conf rtx-remix/mods/anoxrt/{mod,pbr,emissive}.usda`
+   adds them next to the old ones (sky list, decals, the ship's emission, material overrides; some originals are
+   identical and map to several GE files, which `add` all keeps), and
+   `... add maps/ge_texmap.tsv rtx-remix/mods/anoxrt/models_hd.usda --only maps/posters_flux.tsv` keeps the
+   FLUX posters. `models_hd.usda` / `hd_sky.usda` are otherwise not rehashed, so GE's own upscales show where it
+   has one. To remove it, delete the files listed in `anoxdata/graphical_enhancements_manifest.txt`.
 
 ## Test rig (Linux)
 
