@@ -20,7 +20,8 @@ spawn point are used (see --sky), and none within 96 units of it (the camera wou
 without targetname, else the first; the engine draws nothing else) and looks (level or up to 30 degrees up) where the most traced rays
 end on a SURF_SKY face; the N spots with the most sky, at least 512 units apart. For checking that the skybox shows
 through windows and openings and is not hidden by fog.
---entity looks at placed entities of the given classnames (e.g. models from entity.dat) from eye height around them,
+--entity looks at placed entities of the given classnames (e.g. models from entity.dat, or brush entities such as
+func_fog at the middle of their box) from eye height around them,
 --distance away (shorter or longer if blocked), only inside the spawn's PVS; up to --count, 256 units apart.
 Camera positions are checked against the BSP tree: only empty leaves inside the map (cluster >= 0, no solid or
 liquid contents) are used,
@@ -199,12 +200,22 @@ def entity_views(path, classes, count, dist):
     """views of placed entities (classname match) inside the spawn's PVS, from eye height around each one"""
     tree = Tree(path)
     starts, vis = spawn_vis(path, tree)
+    d = open(path, 'rb').read(); moff, mlen = lumps(d)[13]
+    def centre(e):
+        # point entities have an origin; brush entities ("model" "*N") use the middle of their bounding box
+        if 'origin' in e:
+            return tuple(float(v) for v in e['origin'].split()[:3])
+        m = e.get('model', '')
+        if m.startswith('*') and 0 < int(m[1:]) < mlen // 48:
+            b = struct.unpack_from('<6f', d, moff + int(m[1:]) * 48)
+            return tuple((b[j] + b[j + 3]) / 2 for j in range(3))
+        return None
     out = []
     for e in entities(path):
         c = e.get('classname', '').lower()
-        if c not in classes or 'origin' not in e or len(out) >= count:
+        o = centre(e) if c in classes else None
+        if o is None or len(out) >= count:
             continue
-        o = tuple(float(v) for v in e['origin'].split()[:3])
         if any(math.dist(o, q) < 256 for _, q, _ in out):
             continue
         target = (o[0], o[1], o[2] + 24)
