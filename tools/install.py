@@ -10,7 +10,7 @@ Steps (default: all, in this order; each can be rerun on its own):
   config    rtx.conf, anox_customise.ini, culling lines in anoxdata/CONFIGS/Default.cfg
   textures  Chuncki's 4x level texture pack (--chuncki ZIP; skipped when not given and not installed)
   ge        Graphical Enhancements 0.3 (--ge ZIP): upscaled model and sky textures, loose in anoxdata/models and
-            anoxdata/graphics; its textures/ folder is left out (Chuncki's pack covers the level textures)
+            anoxdata/graphics; its 12 level textures only fix the alpha, which goes into Chuncki's pack (merge_alpha.py)
   extract   maps, sky, liquid and model images from the game archives (into the work directory)
   lights    map light files (rtx-remix/maplights/*.lights; *.override files are kept)
   sky       HD skyboxes (Real-ESRGAN x4) -> hd_sky.usda
@@ -157,6 +157,9 @@ class Installer:
 
     def ge_manifest(self):
         return os.path.join(self.game, 'anoxdata', 'graphical_enhancements_manifest.txt')
+
+    def ge_texmap(self):
+        return os.path.join(self.game, 'anoxdata', 'graphical_enhancements_texmap.tsv')
 
     def textures_dat(self):
         d = os.path.join(self.game, 'anoxdata', 'TEXTURES.dat')
@@ -326,6 +329,19 @@ class Installer:
         # the files to delete to remove it again (they hide the copies in MODELS.dat / GRAPHICS.dat)
         open(self.ge_manifest(), 'w').write('\n'.join(sorted(done)) + '\n')
         self.log('Graphical Enhancements installed (%d files, list in %s)' % (len(done), self.ge_manifest()))
+        # Its level textures are the originals with a solid alpha (bottles, graffiti: #alphatest), not upscales:
+        # give Chuncki's 4x images that alpha instead of replacing them (originals kept as *.orig).
+        if self.has_pack():
+            fix = os.path.join(self.work, 'ge_textures')
+            with zipfile.ZipFile(z) as zf:
+                for name in zf.namelist():
+                    m = re.search(r'anoxdata/textures/(.*\.(?:tga|png))$', name, re.I)
+                    if m and '..' not in name:
+                        dst = os.path.join(fix, m.group(1))
+                        os.makedirs(os.path.dirname(dst), exist_ok=True)
+                        with zf.open(name) as s, open(dst, 'wb') as d:
+                            shutil.copyfileobj(s, d)
+            self.py('merge_alpha.py', os.path.join(self.game, 'anoxdata', 'textures'), fix, self.ge_texmap())
 
     def step_extract(self):
         adat = os.path.join(HERE, 'adat.py')
@@ -490,6 +506,8 @@ class Installer:
             files = [os.path.join(self.game, 'rtx.conf')] + [
                 os.path.join(self.mod, f + '.usda') for f in ('mod', 'liquids', 'emissive', 'emissive_jev', 'pbr')]
             self.py('rehash_textures.py', 'add', ge, *[f for f in files if os.path.exists(f)])
+            if os.path.exists(self.ge_texmap()):
+                self.py('rehash_textures.py', 'add', self.ge_texmap(), *[f for f in files if os.path.exists(f)])
             hd = os.path.join(self.mod, 'models_hd.usda')
             if os.path.exists(hd):
                 self.py('rehash_textures.py', 'add', ge, hd, '--only', os.path.join(REPO, 'maps', 'posters_flux.tsv'))
