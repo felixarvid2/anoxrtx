@@ -67,7 +67,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   lighting 0) som i originalet lyser av sin egen ljusa textur; under Remix +3,2 EV för mörka. Emission 1 från egen
   textur (`maps/model_emission.tsv`): skyltarna -0,2 EV (2: -0,65 och urblekta). Väggen runt dem blir ljusare
   (-1,0 EV mot -0,57), banans exponering kan behöva justeras.
-- [ ] mmuseum: fönstren är vita under Remix, blå i originalet; oförändrat med dimma av.
+- [x] mmuseum (2026-10-23): de vita "fönstren" är ljuspaneler med `bricks/color10` (enfärgad blå 52,67,111,
+  ljusvärde 2500 -> emission 15, utbränt vitt). Intensitet 1 (`maps/emissive_intensity.tsv`): blå, i balans med
+  resten av bilden (-0,11 EV relativt). Banan saknar `sky`-nyckel (30 banor gör det); dess himmelsytor ritas med
+  en kvarlämnad textur, men de syns inte här (en `sky = NAMN` per bana via R_SetSky i QindieGL provades och togs bort).
+- [ ] mmuseum: takvyn (sky1) är 2,3 EV för ljus mot originalet; exponeringen (-1,1) är satt på startvyn.
 - [x] crevicelanding (2026-10-22): det landade skeppet (`ob_shuttlewhol6`) var nästan oupplyst under Remix. Det har
   entity.dat lighting = 1, dvs. renderfx 0x800 (`RF_DIRLIGHT`, modelljus som figurerna, inte fullbright) men får
   inget fyllnadsljus (bara figurer nära kameran). Emission från egen textur, 0,5 (`maps/model_emission.tsv`,

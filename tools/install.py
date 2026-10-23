@@ -411,7 +411,8 @@ class Installer:
         self.backup(os.path.join(self.mod, 'emissive.usda'))
         classes = os.path.join(self.work, 'jev_classes.json')
         extra = ['--classes', classes] if self.has_pack() and os.path.exists(classes) else []
-        models = ['--models', os.path.join(REPO, 'maps', 'model_emission.tsv')]
+        models = ['--models', os.path.join(REPO, 'maps', 'model_emission.tsv'),
+                  '--intensity', os.path.join(REPO, 'maps', 'emissive_intensity.tsv')]
         self.py('emissive_layer.py', self.mod, self.game, *self.maps(), *(['--pack'] if self.has_pack() else []), *extra,
                 *models)
 
