@@ -2,10 +2,13 @@
 """Make light-emitting map surfaces (Quake 2 SURF_LIGHT texinfo) emissive Remix materials.
 
 usage: emissive_layer.py MODDIR GAMEDIR MAP.bsp... [--pack] [--classes CLASSES.json [--glow-min 0.7]] [--models TSV]
+                         [--intensity TSV]
 
 Collects every texture used with SURF_LIGHT (0x1) in the given maps and its highest light value, and writes
 MODDIR/emissive.usda (+ MODDIR/hd/emissive/*.dds): enable_emission, emissive_mask_texture = the texture,
 emissive_intensity = clamp(value / 100, 1, 15).
+--intensity TSV (maps/emissive_intensity.tsv): "TEXTURE<TAB>INTENSITY<TAB>note" sets a light texture's intensity
+instead, e.g. flat coloured panels with a high light value that the formula blows out to white.
 Texture source / hash: with --pack the loose files in GAMEDIR/anoxdata/textures (e.g. Chuncki's 4x pack),
 otherwise GAMEDIR/anoxdata/TEXTURES.dat (or TEXTURES.dat.orig). Add @./emissive.usda@ to mod.usda's subLayers.
 Material overrides in mod.usda itself are stronger than this layer, so hand-made materials win.
@@ -37,12 +40,19 @@ def main():
             i = argv.index(n); v = argv[i + 1]; del argv[i:i + 2]; return v
         return default
     classes = opt('--classes', ''); glow_min = float(opt('--glow-min', '0.7')); models = opt('--models', '')
+    fixed = opt('--intensity', '')
     args = [a for a in argv if not a.startswith('--')]
     pack = '--pack' in argv
     if len(args) < 3:
         print(__doc__); sys.exit(1)
     moddir, gamedir, maps = args[0], args[1], args[2:]
     want = {}
+    override = {}
+    if fixed:
+        for line in open(fixed):
+            t = line.rstrip('\n').split('\t')
+            if t[0] and not t[0].startswith('#') and len(t) >= 2:
+                override[t[0].lower()] = float(t[1])
     for m in maps:
         _, _, tex = bspinfo.load(m)
         for name, flags, value in tex:
@@ -88,8 +98,8 @@ def main():
         dds = os.path.join(tmp, k.replace('/', '__') + '.dds')
         layers.dds(png, dds); os.remove(png)
         rel = os.path.relpath(dds, moddir).replace(os.sep, '/')
-        inten = min(15.0, max(1.0, value / 100.0))
-        out += ['        # %s (light %d)' % (k, value), '        over "mat_%016X"' % h, '        {',
+        inten = override.get(k, min(15.0, max(1.0, value / 100.0)))
+        out += ['        # %s (light %d%s)' % (k, value, ', intensity set' if k in override else ''), '        over "mat_%016X"' % h, '        {',
                 '            over "Shader"', '            {',
                 '                bool inputs:enable_emission = 1',
                 '                asset inputs:emissive_mask_texture = @./%s@ (' % rel,
