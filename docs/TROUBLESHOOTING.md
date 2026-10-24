@@ -55,3 +55,4 @@ items: QindieGL [linux/REMIX-NOTES.md](https://github.com/felixarvid2/QindieGL/b
 | Jobs killed for low memory, ComfyUI slow | Game (~5 GB bridge) and ComfyUI/FLUX on 14 GB RAM / 8 GB GPU | Do not run them together; stop ComfyUI before game tests |
 | Typed console text corrupted (Swedish symbols) | Keyboard layout mapping | Fixed in anoxrtx #27 (physical US key positions); see [console-input-check.md](console-input-check.md) |
 | `+map <name>` hangs on "One moment" (e.g. whitecaves-b) | Map needs a scripted entry | Use a save from [test-locations.md](test-locations.md) instead |
+| After `anoxrig.py console map NAME` from inside another map: PAUSE screen, no world drawn, shots unusable | The game pauses while the console is up during the load and stays paused | After the load, `anoxrig.py console pause` (Escape opens the main menu; the console key only reopens the console) |

@@ -71,7 +71,8 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   ljusvärde 2500 -> emission 15, utbränt vitt). Intensitet 1 (`maps/emissive_intensity.tsv`): blå, i balans med
   resten av bilden (-0,11 EV relativt). Banan saknar `sky`-nyckel (30 banor gör det); dess himmelsytor ritas med
   en kvarlämnad textur, men de syns inte här (en `sky = NAMN` per bana via R_SetSky i QindieGL provades och togs bort).
-- [ ] mmuseum: takvyn (sky1) är 2,3 EV för ljus mot originalet; exponeringen (-1,1) är satt på startvyn.
+- [x] mmuseum (2026-10-24): exponeringen -1,1 -> -1,5 efter fem vyer till (median -0,34 -> 0,00 EV,
+  docs/exposure-match.md). Takvyn (sky1) är kvar -2,1 EV: en taklampas hotspot, ljussättning och inte exponering.
 - [x] crevicelanding (2026-10-22): det landade skeppet (`ob_shuttlewhol6`) var nästan oupplyst under Remix. Det har
   entity.dat lighting = 1, dvs. renderfx 0x800 (`RF_DIRLIGHT`, modelljus som figurerna, inte fullbright) men får
   inget fyllnadsljus (bara figurer nära kameran). Emission från egen textur, 0,5 (`maps/model_emission.tsv`,
