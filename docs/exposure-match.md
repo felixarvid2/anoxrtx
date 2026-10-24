@@ -176,3 +176,12 @@ and two views towards the ceiling), measured against the original at -1.1: start
 spot1 +0.09, spot2 -0.35 (median -0.34). At **-1.5**: start +0.19, sky0 0.00, spot0 -0.72, spot1 +0.47, spot2
 +0.01 (median 0.00). sky1 (-2.36 → -2.06) looks at a ceiling lamp whose hotspot is brighter under path tracing;
 that is a local lighting difference, not exposure. The character fill row for mmuseum above was measured at -1.1.
+
+## bricksd views (2026-10-24)
+
+bricksd had no per-map bias (global -2.0; its start view was +0.15 in the all-maps pass, before the neon signs
+got emission). Views in the start's PVS against the original at -2.0: sky0 (the neon signs) -0.32, spot0 -0.40,
+spot3 -0.54. At **-2.4**: -0.06, -0.09, -0.21. The start view gets 0.54 EV darker (Remix shot vs Remix shot;
+the original start shot failed), so it is probably about +0.6 now; it is mostly Boots' coat. Not exposure:
+spot2 (+2.2) looks at a tall cyan energy column (spiral) that the original draws brightly and Remix draws as dark
+spiral trunks. spot1 and spot4 were rejected: the original renderer shot the previous view (camera not moved yet).
