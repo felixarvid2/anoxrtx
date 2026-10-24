@@ -98,8 +98,13 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [x] func_fog-skenet i pay2pray (2026-10-24): QindieGL #34 ger den färgade texturen texturkoordinater; utan dem
   behandlade Remix ritanropen som otexturerade och emissive blend override verkade inte. `[rtxconf.pay2pray]`
   override på, intensitet 8: bönekapseln lyser blått som i originalet (kapselvy +2,10 → +1,75 EV, resten är väggarna).
-- [ ] func_fog på övriga banor (labbuildings dis över staden, onegate, hephfactory …) syns inte från startvyerna;
-  behöver vyer/sparfiler, sedan override per bana.
+- [x] func_fog på övriga banor (2026-10-24): vyer nås med `set debug 1;goto X Y Z` (gamex86, flyttar spelaren så att
+  dimman hamnar i PVS) och rigcam. Override intensitet 8 på onegate, temple, vendomart, fortressgrounds, hephfactory,
+  20 på hive: skenet syns (onegate fog0 +4,34 → +0,83 EV; hive röda dis saknades, 8 ger +1,92, 20 ger +0,95). QindieGL #35: färgcachen
+  (16 färger, aldrig tömd) fylldes av labbuildings slumpfärgseffekt och gjorde senare banors dimlådor svarta igen.
+- [ ] func_fog kvar: fortress2 (override ger vita ljusschakt, originalvyn gick inte att ta), labbuilding (ingen
+  skillnad), hephfactory fog1-vyn (Remix-bilden grå med override, oklart om rigg eller fel), hephfactory/
+  fortressgrounds fortfarande ~2,5–3 EV mörkare och orange i stället för gul (20 ändrar inget).
 - [ ] HD-modellpaketet saknar de 27 modelltexturerna med mellanslag i namnet (t.ex. `background/sml_wall2 dk.tga`);
   nuvarande extrahering klarar dem, så ett nytt `models`-steg bör ta med dem.
 - [x] Himmel commbase/commiteon (2026-10-21): skyboxen ritades men autoexponeringen anpassade sig till den soliga marken,
