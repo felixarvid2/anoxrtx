@@ -65,6 +65,15 @@ unused slot, list the saves, and verify a restore. Record the selector, map,
 fingerprint, reported position/yaw, runtime, geometry, and the feature visible
 from that saved view. Keep the save and screenshots outside tracked files.
 
+## Views outside the spawn PVS (no save needed)
+
+The engine only draws what the player's PVS shows, so a free camera (`rigcam.txt`) far from the spawn sees nothing.
+Move the player there first: `$RIG console "set debug 1;goto X Y Z"` (gamex86 debug command; put the point ~110 units
+behind the camera), then write `rigcam.txt` and shoot. `map NAME$spot` does not work (`$` is a console macro) and
+`gamemap` hangs on the loading plaque. After console commands the game is sometimes left paused; compare the screen
+centre against a pause-plaque crop and send `console pause` only when it matches. Shots taken right after a map load
+or an unpause can be flat grey or show the console; shoot twice and discard those.
+
 ## Automated capture and comparison
 
 `tools/anoxcapture.py` now loads a verified saved view and records frames,
