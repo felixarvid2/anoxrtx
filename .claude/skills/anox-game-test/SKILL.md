@@ -24,6 +24,9 @@ Never edit Steam's `localconfig.vdf` or start Xwayland by hand.
    Other rig commands: `console TEXT` (one console line from the menu, e.g. `console map servicetunnel`;
    retries while the intro is still up), `load-save SLOT`, `to-rowdys`, `timeline PFX T...`, `hold SECS KEY`, `key`, `chord`,
    `sendkey` (reaches Remix), `move`, `click`, `log`, `list-saves`. Saved test views: `docs/test-locations.md`.
+   Changing map from inside a map (`console map NAME` after `--map OTHER`, e.g. to arrive from a neighbouring map)
+   leaves the game on a PAUSE screen with no world drawn; after the load send `$RIG console pause` (Escape opens
+   the main menu instead).
 3. Run it in the background (a full run takes 2–6 min):
    `tools/rigsession.sh [--map NAME] /path/to/test.sh > log 2>&1`
    `--map NAME` starts straight into a map (`+map`); some maps (whitecaves-*) need a save instead. To load

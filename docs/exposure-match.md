@@ -168,3 +168,11 @@ Verified Remix-only against the same original shots. Borderline maps (|EV| <= 0.
 Seven maps stay 0.4–0.9 EV too bright at the lowest value (0.1): there the path-traced room light alone lights the
 character more than the original's lightmap sample; less fill cannot fix that. fortressgrounds and grumpos do not
 respond to the fill at all (+0.6/+0.9 too dark at any value).
+
+## mmuseum views (2026-10-24)
+
+The bias -1.1 was set on the start view only. Five more views in the start's PVS (`find_views.py`, three spots
+and two views towards the ceiling), measured against the original at -1.1: start -0.20, sky0 -0.33, spot0 -1.06,
+spot1 +0.09, spot2 -0.35 (median -0.34). At **-1.5**: start +0.19, sky0 0.00, spot0 -0.72, spot1 +0.47, spot2
++0.01 (median 0.00). sky1 (-2.36 → -2.06) looks at a ceiling lamp whose hotspot is brighter under path tracing;
+that is a local lighting difference, not exposure. The character fill row for mmuseum above was measured at -1.1.
