@@ -8,7 +8,8 @@
 #   RIG   - command prefix for tools/anoxrig.py ("$RIG start", "$RIG shot name", ...)
 #   GAME  - game folder        LOGS - $GAME/rtx-remix/logs       QLOG - $GAME/QindieGL.log
 # On exit (also on failure or Ctrl+C): stops the game, shuts Steam down, removes DISPLAY=:7 and +map from the
-# launch options, kills the :7 Xwayland it started, restarts Steam on the desktop (unless --keep-steam-off).
+# launch options, kills the :7 Xwayland it started, deletes Steam's leaked /dev/shm segments that no process maps,
+# restarts Steam on the desktop (unless --keep-steam-off).
 # Prints "rigsession: restored" at the end; check that line in logs.
 set -u
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -39,6 +40,13 @@ steam_down() {   # only when running: "steam -shutdown" on a stopped Steam start
     steam -shutdown >/dev/null 2>&1 </dev/null
     for _ in $(seq 1 30); do pgrep -x steam >/dev/null || return 0; sleep 2; done
 }
+shm_clean() {    # every Steam restart leaks its 25 MB /dev/shm segments; once tmpfs is full the game never starts
+    local used f
+    used=$( { cat /proc/[0-9]*/maps 2>/dev/null; ls -l /proc/[0-9]*/fd 2>/dev/null; } | grep -o '/dev/shm/[^ ]*' | sort -u)
+    for f in /dev/shm/u$(id -u)-Shm_*; do
+        [ -e "$f" ] && ! grep -qxF "$f" <<< "$used" && rm -f -- "$f"
+    done
+}
 started_xw=""
 
 restore() {
@@ -46,6 +54,7 @@ restore() {
     $RIG stop >/dev/null 2>&1
     rm -f "$GAME/rtx-remix/rigcam.txt" "$GAME/rtx-remix/rigdlight.txt"
     steam_down
+    shm_clean
     sed -i 's|%command% +map [A-Za-z0-9_-]*|%command%|; s|"LaunchOptions"\t\t"DISPLAY=:7 |"LaunchOptions"\t\t"|' "$VDF"
     if [ -n "$started_xw" ]; then
         kill "$started_xw" 2>/dev/null

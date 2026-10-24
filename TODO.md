@@ -67,6 +67,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   lighting 0) som i originalet lyser av sin egen ljusa textur; under Remix +3,2 EV för mörka. Emission 1 från egen
   textur (`maps/model_emission.tsv`): skyltarna -0,2 EV (2: -0,65 och urblekta). Väggen runt dem blir ljusare
   (-1,0 EV mot -0,57), banans exponering kan behöva justeras.
+- [x] bricksd exponering (2026-10-24): bias -2,0 -> -2,4 (tre vyer -0,32..-0,54 -> -0,06..-0,21 EV,
+  docs/exposure-match.md).
+- [ ] bricksd: den höga cyanfärgade energipelaren (spiral) i schaktet syns starkt i originalet men ritas som mörka
+  spiralstammar under Remix (vy `bricksd spot2 300 -1776 107 10 67.5`, +2,2 EV). Källan är inte hittad (ingen
+  entity.dat-flagga; ob_chat1 med `chat1.tga` står där, rgb 0.1).
 - [x] mmuseum (2026-10-23): de vita "fönstren" är ljuspaneler med `bricks/color10` (enfärgad blå 52,67,111,
   ljusvärde 2500 -> emission 15, utbränt vitt). Intensitet 1 (`maps/emissive_intensity.tsv`): blå, i balans med
   resten av bilden (-0,11 EV relativt). Banan saknar `sky`-nyckel (30 banor gör det); dess himmelsytor ritas med

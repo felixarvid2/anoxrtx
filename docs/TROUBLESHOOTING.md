@@ -50,6 +50,7 @@ items: QindieGL [linux/REMIX-NOTES.md](https://github.com/felixarvid2/QindieGL/b
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
+| `start timeout after 180s: no game window on :7` on every run, anox.log not updated, Steam log shows `Fontconfig error: ... out of memory` | `/dev/shm` full: each Steam restart leaves its 25 MB `u1000-Shm_*` segments (409 files, 7.2 GB after a day of tests) | `rigsession.sh` now deletes the segments no process maps; by hand: `du -sh /dev/shm`, remove only unmapped `u$UID-Shm_*` files |
 | Steam ignores edited launch options | Steam rewrites `localconfig.vdf` while running | `steam -shutdown` before editing; restore afterwards |
 | A background job or the shell disappears | `pkill -f` pattern matched the running command | Use `[x]` bracket patterns or checked PIDs |
 | Jobs killed for low memory, ComfyUI slow | Game (~5 GB bridge) and ComfyUI/FLUX on 14 GB RAM / 8 GB GPU | Do not run them together; stop ComfyUI before game tests |
