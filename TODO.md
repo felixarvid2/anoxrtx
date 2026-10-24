@@ -95,8 +95,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   lådan, blend SRC_ALPHA/ONE, ingen djupskrivning), samma sort som commbase-strålarna; Remix gjorde dem svarta.
   QindieGL #33 `untexturedadditive = 1` (på för Anachronox): lådan runt bönekapseln i pay2pray blir genomskinlig och
   kapseln syns, temples svarta paneler försvinner. Originalets blå sken saknas fortfarande.
-- [ ] func_fog: volymerna lyser inte (originalet: blått sken runt bönekapseln). Övriga banors volymer syns inte från
-  startvyerna (labbuildings dis över staden, onegate, hephfactory …); behöver vyer/sparfiler.
+- [x] func_fog-skenet i pay2pray (2026-10-24): QindieGL #34 ger den färgade texturen texturkoordinater; utan dem
+  behandlade Remix ritanropen som otexturerade och emissive blend override verkade inte. `[rtxconf.pay2pray]`
+  override på, intensitet 8: bönekapseln lyser blått som i originalet (kapselvy +2,10 → +1,75 EV, resten är väggarna).
+- [ ] func_fog på övriga banor (labbuildings dis över staden, onegate, hephfactory …) syns inte från startvyerna;
+  behöver vyer/sparfiler, sedan override per bana.
 - [ ] HD-modellpaketet saknar de 27 modelltexturerna med mellanslag i namnet (t.ex. `background/sml_wall2 dk.tga`);
   nuvarande extrahering klarar dem, så ett nytt `models`-steg bör ta med dem.
 - [x] Himmel commbase/commiteon (2026-10-21): skyboxen ritades men autoexponeringen anpassade sig till den soliga marken,
@@ -106,12 +109,10 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   (`skyBrightness = 100`, bias -4,0, median -0,3 EV); waukees bias -0,4. Övriga utan himmelsfel.
 - [x] hephaestus/fortressgrounds (2026-10-22): hephaestus bias -2,0 (startvy +0,13, vyer median -0,7);
   fortressgrounds oförändrad (startvy -0,04, bara den vita helikopterplattan mörkare).
-- [ ] commbase: de gula laserstrålarna (från `ob_lasersentinel`) är mörka under Remix (2026-10-22 undersökt).
-  Spelet ritar dem otexturerade (GL_QUAD_STRIP, 24 hörn, blend SRC_ALPHA/ONE, färg ffcc00, kärna alfa 1 + halo 0,5).
-  De gröna linjerna (`ob_commlaser`, `objects/commlaser.tga`) ser redan ut som originalet. Provat utan resultat:
-  `enableEmissiveBlendEmissiveOverride` (även intensitet 100, även i rtx.conf), commlaser-hashen ur `beamTextures`,
-  emissivt material. QindieGL #33 `untexturedadditive` (på sedan 2026-10-23) ger dem en 4x4-textur i deras färg
-  (hash 0xF9CE231054C9B9AC): inte längre svarta men bara svaga. Nästa steg: titta på instansen i Remix dev-menyn.
+- [x] commbase: de gula laserstrålarna (från `ob_lasersentinel`, otexturerade GL_QUAD_STRIP, blend SRC_ALPHA/ONE,
+  färg ffcc00) var mörka/grå under Remix. Löst 2026-10-24: QindieGL #34 (texturkoordinater för den färgade texturen)
+  plus `[rtxconf.commbase]` override på, intensitet 150 (solbelyst bana, låg exponering; 4 gav inget, 40 orange och
+  svagt). Strålarna gula som i originalet, något mer orange; bildens EV oförändrad (+0,14).
   (+0,8–1,4 EV mörkare bild, 2026-10-19). slevant saknar originalets orange dis över lavan. Exponering inte satt för dessa.
 - [x] **Bridge-stopp vid banladdning (löst 2026-10-21):** Remix-bryggan låste sig när en bana laddades
   (`Data Queue overwrite` utan "resolved"): spelet väntade i `UnlockRect` på plats i dataringen medan servern,
