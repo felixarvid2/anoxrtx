@@ -185,3 +185,9 @@ spot3 -0.54. At **-2.4**: -0.06, -0.09, -0.21. The start view gets 0.54 EV darke
 the original start shot failed), so it is probably about +0.6 now; it is mostly Boots' coat. Not exposure:
 spot2 (+2.2) looks at a tall cyan energy column (spiral) that the original draws brightly and Remix draws as dark
 spiral trunks. spot1 and spot4 were rejected: the original renderer shot the previous view (camera not moved yet).
+
+bricksd spot2 (the energy column in the shaft): the column is several additive (SRC_ALPHA, ONE) effect meshes that
+Remix draws almost invisibly faint (+2.6 EV). `[rtxconf.bricksd] rtx.enableEmissiveBlendEmissiveOverride = True`
+with `rtx.emissiveBlendOverrideEmissiveIntensity = 2.5` makes them glow (+0.13; 10 was -0.42 and white); sky0,
+spot0 and spot3 stay at -0.06, +0.13, -0.21. Found with the game's `gl_log 1` (ref_gl logs every GL call to
+`anoxdata/gl.log`) and a QindieGL debug log of additive draws with their Remix hashes.
