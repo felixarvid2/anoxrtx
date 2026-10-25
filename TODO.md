@@ -107,9 +107,10 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   inget). hephfactory fog1-vyn är ogiltig, inte ett override-fel: gl_log (2026-10-25) visar att ref_gl inte ritar
   någon värld där, bara R_PolyBlend-kvadraten (svart, alfa 1, 10 enheter framför kameran); kameran står i ett blad
   med innehåll 0x8010000 som dimvolymens. Originalet blir svart, Remix ljussätter kvadraten till jämnt brungrå.
-- [ ] R_PolyBlend-kvadraten (helskärmsfärg från `v_blend`) är 3D-geometri framför kameran, så Remix ljussätter den
-  i stället för att färga bilden; kolla om skadeblinkar/undervattensfärg/fade-ut ser fel ut och om QindieGL bör
-  rita den som 2D-överlägg.
+- [x] R_PolyBlend (helskärmsfärg: skadeblink, undervatten, `setblend`-fades, intoningen vid varje banstart),
+  2026-10-25: Remix ritade kvadraten framför kameran som en grå ogenomskinlig skiva oavsett färg/alfa. QindieGL #36
+  `polyblendoverlay = 1` ritar den som UI-överlägg med en egen 2×2 vit textur, hash `0x722A202F07A4B313` i
+  `rtx.uiTextures`. temple med setblend röd/svart/vit: samma ton som originalet.
 - [ ] HD-modellpaketet saknar de 27 modelltexturerna med mellanslag i namnet (t.ex. `background/sml_wall2 dk.tga`);
   nuvarande extrahering klarar dem, så ett nytt `models`-steg bör ta med dem.
 - [x] Himmel commbase/commiteon (2026-10-21): skyboxen ritades men autoexponeringen anpassade sig till den soliga marken,
