@@ -119,8 +119,9 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   2026-10-25: Remix ritade kvadraten framför kameran som en grå ogenomskinlig skiva oavsett färg/alfa. QindieGL #36
   `polyblendoverlay = 1` ritar den som UI-överlägg med en egen 2×2 vit textur, hash `0x722A202F07A4B313` i
   `rtx.uiTextures`. temple med setblend röd/svart/vit: samma ton som originalet.
-- [ ] HD-modellpaketet saknar de 27 modelltexturerna med mellanslag i namnet (t.ex. `background/sml_wall2 dk.tga`);
-  nuvarande extrahering klarar dem, så ett nytt `models`-steg bör ta med dem.
+- [x] Modelltexturerna med mellanslag i namnet (2026-10-25, 28 st. i MODELS.dat): 26 finns redan som 4x-versioner från
+  Graphical Enhancements 0.3 (lösa filer i `anoxdata/models`, spelet laddar dem), så de är HD utan models_hd.usda.
+  De två utan (`objects/banners copy.tga`, `banners copy1.tga`) används inte av någon md2 eller entity.dat.
 - [x] Himmel commbase/commiteon (2026-10-21): skyboxen ritades men autoexponeringen anpassade sig till den soliga marken,
   så himlen blev 4–7 EV för mörk. `rtx.skyBrightness = 140`, bias -0,2 och dimma av (turkos dimma färgade marken).
   Bild median +0,03 EV, himmel +0,2–0,9 EV.
