@@ -133,12 +133,15 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   jämnade ut. På avstånd (find_views --entity func_fog 450) ser fortressgrounds turkosa låda ut som originalet vid 8
   (30 bleker den); hephfactorys pelare ändras inte med intensiteten (+2,67/+2,52 EV). Originalets gula ton är
   additiv blandning som klipps per kanal (0,7 0,4 0 staplas mot gulvitt); Remix klipper inte, pelaren förblir orange.
-- [ ] hephfactory: vid den orangea dimvolymen *63 (kamera -142 2449 -160, yaw 45) visar originalet scenen, Remix en
+- [x] hephfactory: vid den orangea dimvolymen *63 (kamera -142 2449 -160, yaw 45) visar originalet scenen, Remix en
   jämn grå bild (även med polyblend-fixen). gl_log under Remix vid 20 2612 -160: ingen värld ritad, bara en svart
   polyblend-kvadrat. Inte återskapat efter ny banladdning + direkt goto (-185 2407 -176): världen ritas, scenen syns
   (2026-10-25). De gråa bilderna kom när spelaren flyttats in i/förbi dimvolymer med goto (spelarens punkt i ett
   blad med dimvolymens innehåll 0x8010000); troligen motorns läge "spelaren i dimma", inte Remix. Kolla i vanligt
   spel om man kan gå in i *63 (94×71×94 vid golvet) och vad som syns då.
+  Kontrollerat 2026-10-25: *63 är mynningen till en låg gång norrut (golv -255, tak -161, väggar x 129/223), samma
+  golv som rummet söderut. Spelaren gick in från goto 176 2620 -230 med `w` genom dimman till gångens slut och
+  tillbaka med `s`: Remix och originalet visar scenen i alla bilder, ingen grå bild. Inget att åtgärda.
 - [x] R_PolyBlend (helskärmsfärg: skadeblink, undervatten, `setblend`-fades, intoningen vid varje banstart),
   2026-10-25: Remix ritade kvadraten framför kameran som en grå ogenomskinlig skiva oavsett färg/alfa. QindieGL #36
   `polyblendoverlay = 1` ritar den som UI-överlägg med en egen 2×2 vit textur, hash `0x722A202F07A4B313` i
