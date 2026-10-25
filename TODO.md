@@ -59,8 +59,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   0,62 0,80 0,59 / 200 bredvid vita 85), men ×2/×4 via `labbuilding.override` (`N scale S`) flyttar grönandelen bara
   0,347 → 0,355: de lysande takpanelerna dominerar. ×16 ger 0,37–0,38 utan att bilden blir ljusare (×32 0,38–0,39):
   `maps/overrides/labbuilding.override` (34 rader `N scale 16`), installeras av `lights`-steget om ingen egen finns.
-- [ ] labbuilding: en lampa rakt ovanför en figur i trappan bränner ut den (-1,2 EV mot bilden), oberoende av
-  `model_fill`.
+- [x] labbuilding: en lampa rakt ovanför en figur i trappan bränner ut den (-1,2 EV mot bilden), oberoende av
+  `model_fill` (2026-10-25). Figuren är spelaren vid `info_player_start` (-2034 1697 296), lampan är ljus 191
+  (66 enheter ovanför). Med nuvarande installation (QindieGL #36, polyblend-overlay) är figuren inte utbränd.
+  `191 scale 0.5`/`0.25` ändrar bilden knappt (0,1–0,25 EV); skenet kommer från lampans emissiva textur, inte
+  ljuset. Ingen override behövs. Lampans glas är ljusare än originalets (känd begränsning, emissiv).
 - [x] Andra banor med `fog` och himmel bakom glas/öppningar (2026-10-22): vyer mot himlen (`find_views.py --sky`)
   på 26 banor; 13 har himmel synlig från startens PVS. Bara tours hade dimma framför himlen (dimma av; bild
   -1,72 → -1,59 EV). Övriga banor går inte att se mot himlen från banstarten (behöver sparfiler).
