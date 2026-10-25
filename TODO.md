@@ -76,7 +76,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   758 735 946): skyboxen `blue3` med staden, det gröna skenet och ACORP-tornet syns under Remix som i originalet.
   Troligen löst av 5640072 (HD-paketets nya himmelshashar i `rtx.skyBoxTextures`); de nuvarande filernas hashar
   finns där, `hd_sky.usda` matchar bara de gamla.
-- [ ] tours: ACORP-tornets fönsterljus och himlen ovanför är svagare/blekare under Remix än i originalet.
+- [x] tours: DETTACORP-tornets fönsterljus (2026-10-25) är modeller (`ob_newbuild4`, texturer `objects/newbuild4`/`newbuild4a`,
+  ritade som vanliga modeller) och lyste inte under Remix. `maps/model_emission.tsv`: fönsterremsorna 0,5, skylten 1.
+  Fönstren och DETTACORP-skylten lyser som i originalet; bilden blir 0,2 EV ljusare än förut (sky0 -0,48 → -0,70).
+  1 på fönstren lyste upp trumman bredvid vit. SENETECH/DETTATECH-skyltar, ljusrör, `glowindow1` och `newbuild7`
+  provades också (bilden -1,0 EV, trumman vit) och togs bort.
 - [x] bricksd (2026-10-23): neonskyltarna (FIGHTING/TRAINING/BOXING) är modeller (`ob_whacksign1-5`, entity.dat
   lighting 0) som i originalet lyser av sin egen ljusa textur; under Remix +3,2 EV för mörka. Emission 1 från egen
   textur (`maps/model_emission.tsv`): skyltarna -0,2 EV (2: -0,65 och urblekta). Väggen runt dem blir ljusare

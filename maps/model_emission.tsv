@@ -11,3 +11,5 @@ objects/whacksign2.tga	1	bricksd neon signs (ob_whacksign*)
 objects/whacksign3.tga	1	bricksd neon signs (ob_whacksign*)
 objects/whacksign4.tga	1	bricksd neon signs (ob_whacksign*)
 objects/whacksign5.tga	1	bricksd neon signs (ob_whacksign*)
+objects/newbuild4.tga	0.5	tours DETTACORP tower window lights (ob_newbuild4/6); 1 lit the drum next to it pale
+objects/newbuild4a.tga	1	tours DETTACORP sign (ob_newbuild4)
