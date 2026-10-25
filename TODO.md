@@ -49,6 +49,12 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   använder inte hörnfärgen: `rtx.ignoreAllVertexColorBakedLighting = True` ändrar inte figuren (tensil 0,218 →
   0,219, waukees -3 %), och ett test-QindieGL som skalade glColor4fv med 1/0,5/0,25/0 gav samma bild. Att dämpa
   figurerna per bana via hörnfärgen går alltså inte; kvar är albedo per textur (gäller alla banor) eller Remix API.
+  Albedo per bana provat 2026-10-25 (QindieGL-grenen `model-albedo`, ej sammanslagen): figuren känns igen på
+  glMultMatrixf vars translation = entitetens origin, och ritas från en mörkare kopia av texturen (HD-blocken
+  följde med via ett genererat lager). tensil: albedo 0,54 gav bara ~8 % mörkare rock, albedo 0,1 en färglös grå
+  figur. Orsak: ~60 % av figurens ljus under Remix är den spekulära loben (dielektrisk, F0 0,04) på de mörka
+  texturerna, som originalet saknar; varken albedo, legacy-grovhet 1, dimma av eller fyllnadsljus 0 tar bort den.
+  Kvar som väg: en lägre spekulär nivå per material, som Remix inte har för opaka ytor.
 - [x] greattree/waukees: lila ton (2026-10-22) kom från den gulvita dimman som volymdimma; dimma av på båda.
 - [x] labbuilding (2026-10-21): fönstret visade grått i stället för staden: Remix gjorde kartans dimma till volymdimma
   som täckte himlen; `enableFogRemap = False` för banan. `model_fill = 0.6` (figur +0,17 EV), exponering global (median 0,0).
