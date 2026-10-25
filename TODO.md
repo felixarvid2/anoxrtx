@@ -125,7 +125,10 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   (16 färger, aldrig tömd) fylldes av labbuildings slumpfärgseffekt och gjorde senare banors dimlådor svarta igen.
 - [x] fortress2 func_fog (2026-10-25): originalvyerna gick att ta (fortress2 laddad som första bana); originalet har
   vita genomskinliga ljusschakt vid robotarna (func_fog 1 1 1), Remix utan override inga, override 8 ger dem. På.
-- [ ] func_fog kvar: labbuilding (ingen skillnad med override).
+- [x] func_fog labbuilding (2026-10-25): enda volymen (*74, vit, 48×48×36 vid -2728 3288 426) är projektorkäglan över
+  hologrambordet (kamera -2508 3288 474 pitch 6,2 yaw 180, goto -2398 3288 458). Originalet visar ett ljust dis i käglan. Under Remix
+  syns den knappt; override 20/40 gör den svagt synlig men bleker hologramemblemet (brunt i originalet) till vitrött,
+  eftersom emblemet också ritas additivt. Övriga vyer oförändrade. Override av: emblemet väger tyngre än diset.
 - [x] hephfactory/fortressgrounds "2,5–3 EV för mörka" (2026-10-25): vyerna fylldes av dimman, så autoexponeringen
   jämnade ut. På avstånd (find_views --entity func_fog 450) ser fortressgrounds turkosa låda ut som originalet vid 8
   (30 bleker den); hephfactorys pelare ändras inte med intensiteten (+2,67/+2,52 EV). Originalets gula ton är
