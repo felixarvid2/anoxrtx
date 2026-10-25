@@ -66,8 +66,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   GE:s 12 bantexturer (`bricks/01comp`, `02comp`, sexmachine-flaskor/glas, `#alphatest`) är originalen med solid
   alfa i stället för grå; `merge_alpha.py` ger Chunckis 4x-bilder den alfan. sexmach-hyllan: ingen synlig skillnad
   under Remix (skillnad inom brus). Graffitit (grumpos/tours/tenements) inte sett: vyerna hamnade utanför PVS.
-- [ ] tours: stadssilhuetten i skyboxen (ACORP-tornet, neonskyltar) syns inte under Remix, himlen blir en jämn
-  turkos yta; `skyBrightness = 140` gör den bara vit och ljussätter hela gatan. Inte dimma.
+- [x] tours: stadssilhuetten i skyboxen (2026-10-25, ny A/B mot originalet: sky0 och fyra vyer 40° uppåt från
+  758 735 946): skyboxen `blue3` med staden, det gröna skenet och ACORP-tornet syns under Remix som i originalet.
+  Troligen löst av 5640072 (HD-paketets nya himmelshashar i `rtx.skyBoxTextures`); de nuvarande filernas hashar
+  finns där, `hd_sky.usda` matchar bara de gamla.
+- [ ] tours: ACORP-tornets fönsterljus och himlen ovanför är svagare/blekare under Remix än i originalet.
 - [x] bricksd (2026-10-23): neonskyltarna (FIGHTING/TRAINING/BOXING) är modeller (`ob_whacksign1-5`, entity.dat
   lighting 0) som i originalet lyser av sin egen ljusa textur; under Remix +3,2 EV för mörka. Emission 1 från egen
   textur (`maps/model_emission.tsv`): skyltarna -0,2 EV (2: -0,65 och urblekta). Väggen runt dem blir ljusare
