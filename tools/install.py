@@ -12,7 +12,7 @@ Steps (default: all, in this order; each can be rerun on its own):
   ge        Graphical Enhancements 0.3 (--ge ZIP): upscaled model and sky textures, loose in anoxdata/models and
             anoxdata/graphics; its 12 level textures only fix the alpha, which goes into Chuncki's pack (merge_alpha.py)
   extract   maps, sky, liquid and model images from the game archives (into the work directory)
-  lights    map light files (rtx-remix/maplights/*.lights; *.override files are kept)
+  lights    map light files (rtx-remix/maplights/*.lights) + maps/overrides/*.override where none exists yet
   sky       HD skyboxes (Real-ESRGAN x4) -> hd_sky.usda
   liquids   HD liquids with water/lava/slime materials -> liquids.usda
   emissive  light-emitting surfaces -> emissive.usda
@@ -379,6 +379,13 @@ class Installer:
         self.backup(out)
         # --events: styles 1..63 and START_OFF lights for QindieGL's game-driven light styles (QindieGL #27+)
         self.py('bsp2lights.py', '--events', out, *self.maps())
+        # light fixes per map (maps/overrides/<map>.override); an existing file is the user's and is kept
+        for src in sorted(glob.glob(os.path.join(REPO, 'maps', 'overrides', '*.override'))):
+            dst = os.path.join(out, os.path.basename(src))
+            if not os.path.exists(dst):
+                self.put(src, dst)
+            elif open(src, 'rb').read() != open(dst, 'rb').read():
+                self.log('kept', os.path.relpath(dst, self.game), '(differs from', os.path.relpath(src, REPO) + ')')
 
     def step_sky(self):
         from PIL import Image
