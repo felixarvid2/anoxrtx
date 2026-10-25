@@ -122,11 +122,14 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   (16 färger, aldrig tömd) fylldes av labbuildings slumpfärgseffekt och gjorde senare banors dimlådor svarta igen.
 - [x] fortress2 func_fog (2026-10-25): originalvyerna gick att ta (fortress2 laddad som första bana); originalet har
   vita genomskinliga ljusschakt vid robotarna (func_fog 1 1 1), Remix utan override inga, override 8 ger dem. På.
-- [ ] func_fog kvar: labbuilding (ingen
-  skillnad), hephfactory/fortressgrounds fortfarande ~2,5–3 EV mörkare och orange i stället för gul (20 ändrar
-  inget). hephfactory fog1-vyn är ogiltig, inte ett override-fel: gl_log (2026-10-25) visar att ref_gl inte ritar
-  någon värld där, bara R_PolyBlend-kvadraten (svart, alfa 1, 10 enheter framför kameran); kameran står i ett blad
-  med innehåll 0x8010000 som dimvolymens. Originalet blir svart, Remix ljussätter kvadraten till jämnt brungrå.
+- [ ] func_fog kvar: labbuilding (ingen skillnad med override).
+- [x] hephfactory/fortressgrounds "2,5–3 EV för mörka" (2026-10-25): vyerna fylldes av dimman, så autoexponeringen
+  jämnade ut. På avstånd (find_views --entity func_fog 450) ser fortressgrounds turkosa låda ut som originalet vid 8
+  (30 bleker den); hephfactorys pelare ändras inte med intensiteten (+2,67/+2,52 EV). Originalets gula ton är
+  additiv blandning som klipps per kanal (0,7 0,4 0 staplas mot gulvitt); Remix klipper inte, pelaren förblir orange.
+- [ ] hephfactory: vid den orangea dimvolymen *63 (kamera -142 2449 -160, yaw 45) visar originalet scenen, Remix en
+  jämn grå bild (även med polyblend-fixen). gl_log under Remix vid 20 2612 -160: ingen värld ritad, bara en svart
+  polyblend-kvadrat; varför motorn slutar rita där under Remix är okänt.
 - [x] R_PolyBlend (helskärmsfärg: skadeblink, undervatten, `setblend`-fades, intoningen vid varje banstart),
   2026-10-25: Remix ritade kvadraten framför kameran som en grå ogenomskinlig skiva oavsett färg/alfa. QindieGL #36
   `polyblendoverlay = 1` ritar den som UI-överlägg med en egen 2×2 vit textur, hash `0x722A202F07A4B313` i
