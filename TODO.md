@@ -48,8 +48,13 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [x] greattree/waukees: lila ton (2026-10-22) kom från den gulvita dimman som volymdimma; dimma av på båda.
 - [x] labbuilding (2026-10-21): fönstret visade grått i stället för staden: Remix gjorde kartans dimma till volymdimma
   som täckte himlen; `enableFogRemap = False` för banan. `model_fill = 0.6` (figur +0,17 EV), exponering global (median 0,0).
-- [ ] labbuilding: originalets dis över staden och turkosa ton i en korridor saknas under Remix; en lampa rakt ovanför
-  en figur i trappan bränner ut den (-1,2 EV mot bilden), oberoende av `model_fill`.
+- [x] labbuilding: diset över staden (2026-10-25) är inte dimma (himlen ritas utan GL-dimma, enligt gl_log) utan
+  fönsterglaset `sunder/sun_glass3` (ljus blåvit, SURF_TRANS33, 33 % över staden). pbr_layer.py gjorde det till klart
+  AperturePBR_Translucent-glas: diset borta och rummet speglades i rutan. Nu `HAZE_GLASS`, inget material: diset och
+  strimmorna syns, inga speglingar; rutan är något gråare än originalet (opacity_constant 0,2/0,33 och emission
+  provade: ingen skillnad resp. mjölkvit ruta). Dimma-remap av ger svart himmel, inte dis.
+- [ ] labbuilding: turkos ton i en korridor saknas under Remix; en lampa rakt ovanför en figur i trappan bränner ut
+  den (-1,2 EV mot bilden), oberoende av `model_fill`.
 - [x] Andra banor med `fog` och himmel bakom glas/öppningar (2026-10-22): vyer mot himlen (`find_views.py --sky`)
   på 26 banor; 13 har himmel synlig från startens PVS. Bara tours hade dimma framför himlen (dimma av; bild
   -1,72 → -1,59 EV). Övriga banor går inte att se mot himlen från banstarten (behöver sparfiler).
