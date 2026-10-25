@@ -103,8 +103,13 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   20 på hive: skenet syns (onegate fog0 +4,34 → +0,83 EV; hive röda dis saknades, 8 ger +1,92, 20 ger +0,95). QindieGL #35: färgcachen
   (16 färger, aldrig tömd) fylldes av labbuildings slumpfärgseffekt och gjorde senare banors dimlådor svarta igen.
 - [ ] func_fog kvar: fortress2 (override ger vita ljusschakt, originalvyn gick inte att ta), labbuilding (ingen
-  skillnad), hephfactory fog1-vyn (Remix-bilden grå med override, oklart om rigg eller fel), hephfactory/
-  fortressgrounds fortfarande ~2,5–3 EV mörkare och orange i stället för gul (20 ändrar inget).
+  skillnad), hephfactory/fortressgrounds fortfarande ~2,5–3 EV mörkare och orange i stället för gul (20 ändrar
+  inget). hephfactory fog1-vyn är ogiltig, inte ett override-fel: gl_log (2026-10-25) visar att ref_gl inte ritar
+  någon värld där, bara R_PolyBlend-kvadraten (svart, alfa 1, 10 enheter framför kameran); kameran står i ett blad
+  med innehåll 0x8010000 som dimvolymens. Originalet blir svart, Remix ljussätter kvadraten till jämnt brungrå.
+- [ ] R_PolyBlend-kvadraten (helskärmsfärg från `v_blend`) är 3D-geometri framför kameran, så Remix ljussätter den
+  i stället för att färga bilden; kolla om skadeblinkar/undervattensfärg/fade-ut ser fel ut och om QindieGL bör
+  rita den som 2D-överlägg.
 - [ ] HD-modellpaketet saknar de 27 modelltexturerna med mellanslag i namnet (t.ex. `background/sml_wall2 dk.tga`);
   nuvarande extrahering klarar dem, så ett nytt `models`-steg bör ta med dem.
 - [x] Himmel commbase/commiteon (2026-10-21): skyboxen ritades men autoexponeringen anpassade sig till den soliga marken,
