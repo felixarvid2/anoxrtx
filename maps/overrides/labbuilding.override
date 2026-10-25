@@ -1,0 +1,37 @@
+# labbuilding: the 34 green corridor lights (0.62 0.80 0.59, light 200) x16. The original lightmap tints the corridors
+# green-teal; under Remix the emissive ceiling panels outweigh these lights (green share of linear light 0.35 vs
+# 0.36-0.40 in the original; x16 gives 0.37-0.38). Indices as in labbuilding.lights (tools/lights_near.py).
+1 scale 16
+51 scale 16
+52 scale 16
+53 scale 16
+54 scale 16
+55 scale 16
+56 scale 16
+65 scale 16
+66 scale 16
+70 scale 16
+81 scale 16
+83 scale 16
+85 scale 16
+87 scale 16
+89 scale 16
+91 scale 16
+93 scale 16
+95 scale 16
+101 scale 16
+102 scale 16
+103 scale 16
+111 scale 16
+117 scale 16
+118 scale 16
+120 scale 16
+124 scale 16
+128 scale 16
+130 scale 16
+132 scale 16
+134 scale 16
+136 scale 16
+138 scale 16
+179 scale 16
+183 scale 16

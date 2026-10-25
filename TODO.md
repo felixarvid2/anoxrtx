@@ -53,12 +53,12 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   AperturePBR_Translucent-glas: diset borta och rummet speglades i rutan. Nu `HAZE_GLASS`, inget material: diset och
   strimmorna syns, inga speglingar; rutan är något gråare än originalet (opacity_constant 0,2/0,33 och emission
   provade: ingen skillnad resp. mjölkvit ruta). Dimma-remap av ger svart himmel, inte dis.
-- [ ] labbuilding: grönturkos ton i korridorerna saknas under Remix (2026-10-25, goto-vyer spot4/8/9: grönandel av
+- [x] labbuilding: grönturkos ton i korridorerna saknades under Remix (2026-10-25, goto-vyer spot4/8/9: grönandel av
   linjärt ljus 0,36–0,40 i originalet, 0,35 under Remix). Inte dimma (enda func_fog är liten och vit) och inte
   textur (originalrenderaren använder samma HD-texturer). Ljusfärgerna går rätt in i `.lights` (34 gröna lampor
   0,62 0,80 0,59 / 200 bredvid vita 85), men ×2/×4 via `labbuilding.override` (`N scale S`) flyttar grönandelen bara
-  0,347 → 0,355: de gröna lamporna sitter skymda, ljuset domineras av de lysande takpanelerna. Nästa idé: ge
-  korridorens takpaneler (emissive.usda) en grönare ton, eller låta map-ljusens färg följa originalets ljuskarta.
+  0,347 → 0,355: de lysande takpanelerna dominerar. ×16 ger 0,37–0,38 utan att bilden blir ljusare (×32 0,38–0,39):
+  `maps/overrides/labbuilding.override` (34 rader `N scale 16`), installeras av `lights`-steget om ingen egen finns.
 - [ ] labbuilding: en lampa rakt ovanför en figur i trappan bränner ut den (-1,2 EV mot bilden), oberoende av
   `model_fill`.
 - [x] Andra banor med `fog` och himmel bakom glas/öppningar (2026-10-22): vyer mot himlen (`find_views.py --sky`)
