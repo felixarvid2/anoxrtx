@@ -13,8 +13,8 @@ For every texture the maps use (BSP texinfo) that exists in the loose texture pa
   (clamped 0.05..1), metallic = Jev's metal probability when it is at least 0.5, otherwise 0; textures missing
   from the file fall back to the keywords;
 - glass: SURF_TRANS33/66 textures named glass/win/clear become thin-walled AperturePBR_Translucent with
-  the texture as transmittance.
-Sky (SURF_SKY) and liquid (SURF_WARP) surfaces are skipped; liquids.usda handles those.
+  the texture as transmittance (not HAZE_GLASS: haze sheets keep Remix' blended look).
+Sky (SURF_SKY) and liquid (SURF_WARP) surfaces are skipped (liquids.usda handles those), and so are HAZE_GLASS.
 Writes MODDIR/pbr.usda and MODDIR/hd/pbr/. Add @./pbr.usda@ to mod.usda's subLayers; overrides in mod.usda,
 emissive.usda and liquids.usda keep their own values where they set the same inputs.
 Needs: pillow, numpy, xxhash.
@@ -44,6 +44,9 @@ CLASSES = [
 ]
 DEFAULT = (0.7, 0.0)
 GLASS_WORDS = ('glass', 'win', 'clear')
+# translucent haze sheets, not clear glass: the original blends their light texture at 33 % over the view (the haze
+# over the city in labbuilding); as clear AperturePBR_Translucent glass the haze is gone and the room reflects in it
+HAZE_GLASS = ('sunder/sun_glass3',)
 
 
 def classify(name):
@@ -108,7 +111,7 @@ def main():
     out = layers.header(); done = set(); n = nglass = nskip = njev = 0
     for k in sorted(flags):
         f = flags[k]
-        if (only and k not in only) or f & (SURF_SKY | SURF_WARP) or k not in files:
+        if (only and k not in only) or f & (SURF_SKY | SURF_WARP) or k not in files or k in HAZE_GLASS:
             nskip += 1; continue
         try:
             h, _ = rh.remix_hash(files[k])
