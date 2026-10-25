@@ -45,6 +45,10 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [ ] Figurer för ljusa även vid `model_fill = 0.1` (rummets ljus räcker): tensil -0,9, bricksd -0,66, hephfactory
   -0,58, sendormitory -0,56, waukees -0,5, franks -0,48, levant1 -0,44 EV. fortressgrounds/grumpos +0,6/+0,9 för
   mörka och påverkas inte av fyllnadsljuset.
+  Provat 2026-10-25: modellerna ritas med glColor4fv per hörn (Quake 2-skuggningen) och GL_MODULATE, men Remix
+  använder inte hörnfärgen: `rtx.ignoreAllVertexColorBakedLighting = True` ändrar inte figuren (tensil 0,218 →
+  0,219, waukees -3 %), och ett test-QindieGL som skalade glColor4fv med 1/0,5/0,25/0 gav samma bild. Att dämpa
+  figurerna per bana via hörnfärgen går alltså inte; kvar är albedo per textur (gäller alla banor) eller Remix API.
 - [x] greattree/waukees: lila ton (2026-10-22) kom från den gulvita dimman som volymdimma; dimma av på båda.
 - [x] labbuilding (2026-10-21): fönstret visade grått i stället för staden: Remix gjorde kartans dimma till volymdimma
   som täckte himlen; `enableFogRemap = False` för banan. `model_fill = 0.6` (figur +0,17 EV), exponering global (median 0,0).
