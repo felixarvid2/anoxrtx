@@ -120,7 +120,9 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   dimman hamnar i PVS) och rigcam. Override intensitet 8 på onegate, temple, vendomart, fortressgrounds, hephfactory,
   20 på hive: skenet syns (onegate fog0 +4,34 → +0,83 EV; hive röda dis saknades, 8 ger +1,92, 20 ger +0,95). QindieGL #35: färgcachen
   (16 färger, aldrig tömd) fylldes av labbuildings slumpfärgseffekt och gjorde senare banors dimlådor svarta igen.
-- [ ] func_fog kvar: fortress2 (override ger vita ljusschakt, originalvyn gick inte att ta), labbuilding (ingen
+- [x] fortress2 func_fog (2026-10-25): originalvyerna gick att ta (fortress2 laddad som första bana); originalet har
+  vita genomskinliga ljusschakt vid robotarna (func_fog 1 1 1), Remix utan override inga, override 8 ger dem. På.
+- [ ] func_fog kvar: labbuilding (ingen
   skillnad), hephfactory/fortressgrounds fortfarande ~2,5–3 EV mörkare och orange i stället för gul (20 ändrar
   inget). hephfactory fog1-vyn är ogiltig, inte ett override-fel: gl_log (2026-10-25) visar att ref_gl inte ritar
   någon värld där, bara R_PolyBlend-kvadraten (svart, alfa 1, 10 enheter framför kameran); kameran står i ett blad
