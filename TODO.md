@@ -54,7 +54,14 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   följde med via ett genererat lager). tensil: albedo 0,54 gav bara ~8 % mörkare rock, albedo 0,1 en färglös grå
   figur. Orsak: ~60 % av figurens ljus under Remix är den spekulära loben (dielektrisk, F0 0,04) på de mörka
   texturerna, som originalet saknar; varken albedo, legacy-grovhet 1, dimma av eller fyllnadsljus 0 tar bort den.
-  Kvar som väg: en lägre spekulär nivå per material, som Remix inte har för opaka ytor.
+  Lösning hittad 2026-10-25: Remix opaka F0 är `mix(0,04, albedo, metallic)` (dxvk-remix `calcBaseReflectivity`), så
+  metallic 1 + grovhet 1 ger F0 = albedo och ingen 0,04-lob; grov GGX ser nästan diffus ut. Figurtexturerna
+  sätts ihop under körning (newface: kropp + ögon/mun-bitar, hashen byts när figuren blinkar/pratar), så det görs
+  via legacy-standarden: `rtx.legacyMaterial.metallicConstant = 1`, `roughnessConstant = 1` (+ metallic 1/grovhet
+  1 i de mod.usda-block som gäller modelltexturer). tensil figur mot bild -0,78 → -0,02 EV, waukees -0,89 → -0,30,
+  bilden i övrigt +0,03/+0,18 EV; hår och rock får originalets färger. Kvar: gäller alla banor, så `model_fill`
+  måste kalibreras om på alla banor (övriga figurer blir mörkare), och legacy-världstexturer utan pbr-block blir
+  också grov metall. Diagnos: `rtx.compositePrimary{Direct,Indirect}Specular = False` gav samma figurer.
 - [x] greattree/waukees: lila ton (2026-10-22) kom från den gulvita dimman som volymdimma; dimma av på båda.
 - [x] labbuilding (2026-10-21): fönstret visade grått i stället för staden: Remix gjorde kartans dimma till volymdimma
   som täckte himlen; `enableFogRemap = False` för banan. `model_fill = 0.6` (figur +0,17 EV), exponering global (median 0,0).
