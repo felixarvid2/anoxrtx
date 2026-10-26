@@ -122,9 +122,10 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   inget fyllnadsljus (bara figurer nära kameran). Emission från egen textur, 0,5 (`maps/model_emission.tsv`,
   emissive.usda): vy 1 +2,0 → -0,23 EV, vy 4 -0,63. `rtx.worldSpaceUiTextures` gjorde skeppet platt och ~1 EV för ljust.
 - [ ] Rekvisita med modelljus (`RF_DIRLIGHT`, entity.dat lighting 1, ej figurer): 54 placerade typer, 372 platser;
-  24 vyer från startens PVS (`find_views.py --entity`, 2026-10-22). Avvikande: starports bakgrundshus (ob_s_building-*)
-  nästan svarta, men bilden domineras av Numos-himlen som ersätter stadsskyboxen (+2,4 EV); emission 0,5 hjälpte
-  knappt och samma texturer finns på sunstrip (bias -4,3), så ingen intensitet satt. Skeppen i chamber/warshipbay och
+  24 vyer från startens PVS (`find_views.py --entity`, 2026-10-22). starports bakgrundshus (ob_s_building-*) var
+  nästan svarta och Numos-himlen ersatte stadsskyboxen. Löst 2026-10-26: Numos av på starport (stadssiluetten
+  tillbaka) och emission 1 på husens 29 texturer (`maps/model_emission.tsv`, background/*): husen ljusa som i
+  originalet. Samma hus finns på sunstrip, labbuilding, servicetunnel, braintrain-b, cine1; startvyerna oförändrade. Skeppen i chamber/warshipbay och
   sendernet ser ut som originalet.
 - [x] `func_fog` (lokala färgade dimvolymer, 12 banor: onegate 13, fortress2 9, hephfactory 7, pay2pray/vendomart/bricksd
   5, temple 4 …), 2026-10-23: ref_gl ritar volymerna otexturerade (GL_POLYGON, färg per hörn med alfagradient genom

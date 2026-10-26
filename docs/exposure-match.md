@@ -224,3 +224,14 @@ Remix draws almost invisibly faint (+2.6 EV). `[rtxconf.bricksd] rtx.enableEmiss
 with `rtx.emissiveBlendOverrideEmissiveIntensity = 2.5` makes them glow (+0.13; 10 was -0.42 and white); sky0,
 spot0 and spot3 stay at -0.06, +0.13, -0.21. Found with the game's `gl_log 1` (ref_gl logs every GL call to
 `anoxdata/gl.log`) and a QindieGL debug log of additive draws with their Remix hashes.
+
+## starport sky and background buildings (2026-10-26)
+
+With the Numos sky (`rtx.skyMode = 1`) the city skyline in starport's skybox (blue spires, pink towers) was replaced
+by clouds and a grey horizon, and its sun, in the direction the views look, left the background buildings
+(`ob_s_building-*`, props lit by the model light in the original) as black silhouettes: building views +1.6 to
++2.0 EV against the original. Numos is now off on starport (start view +0.11 EV at bias -2.5, unchanged) and the
+buildings' 29 skins (`background/*.tga`) emit at intensity 1 (`maps/model_emission.tsv`), which makes them as light
+as in the original. Two of the four building views stay black under Remix for an unknown reason (camera at
+-1182 287 152 and -1076 1318 240).
+
