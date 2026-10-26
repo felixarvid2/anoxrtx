@@ -38,6 +38,14 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 
 - [ ] Utomhusbaslinje: HD-himmel och Numos sol-/skuggriktning på avsedda kartor.
 - [ ] Vatten: genomskinlighet, stabil geometrihash och material i relevant vy.
+  2026-10-26 (`find_views.py` vattentexturer, `--ab-original`): greattree-sjön (`waukees/h2002`, warp utan TRANS,
+  alltså opak i originalet) blev nästan svart med mörka fläckar som genomskinligt vatten; nu opak blank yta
+  (`WATER_OPAQUE` i make_layers.py, grovhet 0,1): ser ut som originalet (bild +2,5 → +1,0 EV). fortress1-poolen
+  (genomskinlig) ser bra ut. hovel `bricks2/brownwater` (TRANS33) är klarare än originalets bruna lager;
+  `transmittance_measurement_distance` 64 → 8 syntes inte, oförändrad. Kvar: limbus, senderss, tensil, sunstrip,
+  starport har vatten utanför startens PVS (rigkameran ser inget där, också med nya `find_views.py --pvs`), behöver
+  sparfiler. Geometrihashen: `geometryAssetHashRuleString` innehåller texcoords, som warp-ytor räknar om varje
+  bildruta; inget flimmer sett (settle 0,0–0,06), så ingen ändring.
 - [x] Lava: `proc_lava` fryses (256x256, hash 0x561447B2DFA181FD) och ersättningsmaterialet syns i levant2 (2026-10-18). Orsak: HD-paketets uppskalade palett (anoxgfx kräver 256 px bred) + QindieGL fyllde gammal D3D-textur. `proc_lavafloe` ej sedd i bild än. levant1 och hephlava går inte att se med riggkameran (banstarten ritar ingen värld, även originalet svart, 2026-10-19); kräver en sparfil nära lavan.
 - [x] Figurer för mörka: fyllnadsljus per figur relativt kartljusen (QindieGL #30/#32, `model_fill = 1.5` + egna värden
   för 5 banor), 10 banor inom ±0,3 EV mot originalet (2026-10-19). Övriga 69 banor mätta 2026-10-22: 60 användbara,
