@@ -49,7 +49,9 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   `roughnessConstant = 1` i `[rtxconf.<bana>]` för de sju banorna; nu -0,23 till +0,23 EV. Globalt metallic 1
   (planen från 2026-10-25) gjorde figurerna 0,8–1,5 EV för mörka på nästan alla 71 banor (den tidigare mätningen
   saknade sRGB/gamma-hanteringen i `ab_ev.py`), så det rullades inte ut. docs/exposure-match.md
-- [ ] fortressgrounds/grumpos: figurerna +0,6/+0,9 EV för mörka och påverkas inte av fyllnadsljuset.
+- [x] fortressgrounds/grumpos: figurerna +0,6/+0,9 EV för mörka. Fyllnadsljuset verkar, men bara ~0,2 EV per
+  fördubbling (ljusa ytor framför Boots, autoexponeringen tar tillbaka en del); `model_fill = 32` ger -0,35/+0,18
+  EV, fortressgrounds exponering -2,9 → -2,6 (2026-10-26).
 - [x] greattree/waukees: lila ton (2026-10-22) kom från den gulvita dimman som volymdimma; dimma av på båda.
 - [x] labbuilding (2026-10-21): fönstret visade grått i stället för staden: Remix gjorde kartans dimma till volymdimma
   som täckte himlen; `enableFogRemap = False` för banan. `model_fill = 0.6` (figur +0,17 EV), exponering global (median 0,0).
