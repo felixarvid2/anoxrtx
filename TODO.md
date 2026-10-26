@@ -37,6 +37,14 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 ## Befintligt som fortfarande behöver spelverifiering
 
 - [ ] Utomhusbaslinje: HD-himmel och Numos sol-/skuggriktning på avsedda kartor.
+  2026-10-26: Numos av på sunstrip, comhills, baltown (och starport): Numos tog bort sunstrips stadssiluett,
+  comhills soliga ökenhimmel och baltowns lila skymning (vyer mot horisonten +1,6 till +2,7 EV). Banornas sol
+  var avstängd (`sun_scale = 0`, Numos skulle ge solen); nu på igen. Solriktningen i .lights var omvänd (Remix
+  API:s distant light vill ha riktningen mot solen; bsp2lights.py rättad): comhills mark blå → solbelyst.
+  Exponering: sunstrip -4,3 → -2,4, comhills -2,4 → -1,8, baltown -0,5 → -1,8; startvyer -0,09/+0,16/-0,02,
+  baltown vyer -0,1. Kvar: comhills terräng mot horisonten +1,2 till +1,8 EV för mörk (originalets
+  `_sun_ambient 30` saknas; dimma av gjorde det sämre, skyBrightness 3 gav -0,4 EV); starports sol påverkar inte
+  bilden alls (oklart varför). baltownr har kvar Numos (ej bedömd: vyerna hamnade inomhus).
 - [ ] Vatten: genomskinlighet, stabil geometrihash och material i relevant vy.
   2026-10-26 (`find_views.py` vattentexturer, `--ab-original`): greattree-sjön (`waukees/h2002`, warp utan TRANS,
   alltså opak i originalet) blev nästan svart med mörka fläckar som genomskinligt vatten; nu opak blank yta

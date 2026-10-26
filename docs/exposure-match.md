@@ -235,3 +235,23 @@ buildings' 29 skins (`background/*.tga`) emit at intensity 1 (`maps/model_emissi
 as in the original. Two of the four building views stay black under Remix for an unknown reason (camera at
 -1182 287 152 and -1076 1318 240).
 
+## Numos off on sunstrip, comhills, baltown; map sun direction (2026-10-26)
+
+Four horizon views from each start (and the start views) against the original: the Numos sky replaced
+sunstrip's city skyline, comhills' sunny desert sky and baltown's purple dusk (views +1.6 to +2.7 EV darker), so
+Numos is off there as on starport; only baltownr keeps it. These maps had `sun_scale = 0` (Numos was to provide
+the sun), now the map sun is back. Its direction was inverted: `tools/bsp2lights.py` wrote the direction from the
+sun into the scene, but the Remix API distant light takes the direction towards the light (comhills: the
+ground went from fog-blue to sunlit). Exposure after the change, start view / horizon views:
+
+| Map | bias | start | horizon views |
+| --- | --- | --- | --- |
+| sunstrip | -4.3 → -2.4 | -0.09 | +1.20, -1.07, +0.28, -0.16 |
+| comhills | -2.4 → -1.8 | +0.16 | +1.82, +1.15, +1.76, +1.45 (distant terrain too dark) |
+| baltown | -0.5 → -1.8 | -0.02 | -0.10, -0.06, -0.06, -0.11 |
+| starport | -2.5 | +0.11 | (building views as above) |
+
+comhills' distant terrain stays dark: the original's ArghRad `_sun_ambient 30` (a constant term in the lightmaps)
+has no counterpart; fog remap off made it darker (+1.6..+2.8), `rtx.skyBrightness = 3` lighter (+0.9..+1.5,
+start -0.20), `sun_scale = 4` did not help.
+
