@@ -22,7 +22,10 @@ rh = importlib.util.module_from_spec(spec); spec.loader.exec_module(rh)
 
 # liquid classes (by looking at the textures); anything else is left alone
 WATER = {'limbus/water3b', 'limbus/water3b1', 'limbus/water3c', 'senderloung/water1', 'bricks2/brownwater',
-         'waukees/h2002', 'tensil/h2002_sm', 'tensil/poo', 'baseanox/sewagesolid'}
+         'tensil/h2002_sm', 'tensil/poo', 'baseanox/sewagesolid'}
+# water the maps draw opaque (warp without SURF_TRANS33/66): as translucent water the deep greattree lake turned
+# black; an opaque glossy surface looks like the original
+WATER_OPAQUE = {'waukees/h2002'}
 SLUDGE = {'ballotine/slime01a', 'bricks/shitplain2', 'bricks2/dpoo3', 'sexmachine/trash1',
           'warshipbay/plain3', 'krapton/p6'}
 LAVA = {'levant/lava': 12.0, 'levant/levant3a': 6.0}
@@ -118,9 +121,9 @@ def main():
                     '                    colorSpace = "auto"', '                )',
                     '                float inputs:transmittance_measurement_distance = 64',
                     '                bool inputs:thin_walled = 0']
-        elif key in SLUDGE:
+        elif key in SLUDGE or key in WATER_OPAQUE:
             body = ['                asset inputs:diffuse_texture = @./%s@ (' % tex, '                    colorSpace = "auto"',
-                    '                )', '                float inputs:reflection_roughness_constant = 0.15',
+                    '                )', '                float inputs:reflection_roughness_constant = %g' % (0.1 if key in WATER_OPAQUE else 0.15),
                     '                float inputs:metallic_constant = 0']
         elif key in LAVA or key in GLOW:
             inten = LAVA.get(key, GLOW.get(key))

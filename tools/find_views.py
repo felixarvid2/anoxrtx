@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Find camera views for the test rig from a map's BSP: look at the surfaces that use a texture.
 
-usage: find_views.py MAP.bsp TEXTURE[,TEXTURE...] [--count N] [--distance D] [--name PREFIX]
+usage: find_views.py MAP.bsp TEXTURE[,TEXTURE...] [--count N] [--distance D] [--name PREFIX] [--pvs]
        find_views.py MAP.bsp --light N [--distance D]          (view of map light N, index as in <map>.lights)
        find_views.py MAP.bsp --spots N                          (N views from places the player or NPCs go)
        find_views.py MAP.bsp --sky N [--distance D]             (N views towards the sky from places the player goes)
@@ -9,7 +9,8 @@ usage: find_views.py MAP.bsp TEXTURE[,TEXTURE...] [--count N] [--distance D] [--
 
 TEXTURE is a texture path as in the BSP (e.g. levant/proc_lava; substring match, case-insensitive). For the
 largest faces that use it (one per texture, up to --count) the view is placed --distance units (default 140)
-in front of the face along its normal, raised a little, looking at the face centre. Prints lines for
+in front of the face along its normal, raised a little, looking at the face centre. With --pvs only camera positions
+inside the spawn's PVS are used (outside it the original renderer draws nothing). Prints lines for
 tools/anoxcheck.py --views:   MAP NAME X Y Z PITCH YAW
 (QindieGL renders world views from rtx-remix/rigcam.txt "X Y Z PITCH YAW", Quake 2 angles: pitch > 0 = down.)
 --spots picks eye-height views at info_player_start and path_corner entities, spread over the map (each next spot
@@ -299,6 +300,9 @@ def main():
     count = int(opt('--count', '1')); dist = float(opt('--distance', '140')); prefix = opt('--name', '')
     light = opt('--light', ''); nspots = int(opt('--spots', '0')); nsky = int(opt('--sky', '0'))
     ents = opt('--entity', '')
+    in_pvs = '--pvs' in args
+    if in_pvs:
+        args.remove('--pvs')
     if ents and args:
         mp = os.path.splitext(os.path.basename(args[0]))[0].lower()
         res = entity_views(args[0], set(ents.lower().split(',')), count, float(opt('--distance', '0') or 0) or dist)
@@ -340,6 +344,7 @@ def main():
         return
     wanted = [w.lower() for w in args[1].split(',')]
     tree = Tree(args[0])
+    vis = spawn_vis(args[0], tree)[1] if in_pvs else None
     faces = {}
     for area, name, c, n in faces_with(args[0], wanted):
         if n[2] < -0.7:       # ceilings: looking up from below is rarely useful
@@ -352,7 +357,7 @@ def main():
         found = None
         for area, c, n in sorted(lst, key=lambda f: -f[0])[:12]:
             for cam in candidates(c, n, dist):
-                if tree.empty(cam) and tree.clear(cam, c):
+                if tree.empty(cam) and tree.clear(cam, c) and (vis is None or tree.leaf(cam)[1] in vis):
                     found = (cam, c); break
             if found:
                 break
