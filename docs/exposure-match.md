@@ -240,10 +240,11 @@ as in the original. Two of the four building views stay black under Remix for an
 Four horizon views from each start (and the start views) against the original: the Numos sky replaced
 sunstrip's city skyline, comhills' sunny desert sky and baltown's purple dusk (views +1.6 to +2.7 EV darker), so
 Numos is off there as on starport; only baltownr keeps it. These maps had `sun_scale = 0` (Numos was to provide
-the sun), now the map sun is back on, but it has no visible effect: comhills' horizon views are pixel-identical
-with `sun_scale` 0, 1 and 256 and with the direction inverted (an earlier reading that the direction was inverted
-came from animation noise in the start view and was reverted). QindieGL creates and draws the distant light
-without errors. Exposure after the change, start view / horizon views:
+the sun), now the map sun is back on. It was far too weak: Remix spreads a distant light's radiance over its
+disc (2 degrees), so `_sun_light / 200` gave almost no light; the global `sun_scale` is now 12. The direction in
+the .lights files (from the sun into the scene) is right; inverting it (#92, reverted in #93) lit the terrain from
+below, which is why sun x64/x256 tests made with it showed nothing. Exposure before the sun fix, start view /
+horizon views:
 
 | Map | bias | start | horizon views |
 | --- | --- | --- | --- |
@@ -252,7 +253,8 @@ without errors. Exposure after the change, start view / horizon views:
 | baltown | -0.5 → -1.8 | -0.02 | -0.10, -0.06, -0.06, -0.11 |
 | starport | -2.5 | +0.11 | (building views as above) |
 
-comhills' distant terrain stays dark because nothing lights it (no working sun; the original also has ArghRad's
-`_sun_ambient 30`): fog remap off made it darker, `rtx.skyBrightness` 3/6/12 mostly brightens the sky (terrain
-only ~0.3 EV).
+With `sun_scale = 12` comhills' terrain is sunlit as in the original. Its blue map fog tinted the sunlit ground
+blue (`enableFogColorRemap = False` there) and the skybox was ~3 EV too dark against it (`skyBrightness = 24`,
+bias -0.4): start view -0.23, horizon views +1.13, +0.40, +1.29, +0.55 (whole frame; terrain alone within
+about ±0.7). baltown: start -0.62, views -0.12..+0.16. sunstrip's and starport's views do not change with the sun.
 
