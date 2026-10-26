@@ -169,6 +169,36 @@ Seven maps stay 0.4–0.9 EV too bright at the lowest value (0.1): there the pat
 character more than the original's lightmap sample; less fill cannot fix that. fortressgrounds and grumpos do not
 respond to the fill at all (+0.6/+0.9 too dark at any value).
 
+### Over-lit characters: legacy metallic (2026-10-26)
+
+Remix shades textures without a replacement material (the characters: their skins are composed at runtime with
+the eye and mouth frames, so their hashes change) with `rtx.legacyMaterial` (metallic 0.1, roughness 0.7), i.e.
+a 0.04 dielectric specular lobe on top of the diffuse; the original shades models diffuse only. dxvk-remix
+uses F0 = mix(0.04, albedo, metallic) (`calcBaseReflectivity`), so a higher metallic with roughness 1 trades
+the grey sheen and part of the diffuse for a rough albedo-coloured lobe, which darkens characters.
+
+A global `metallicConstant = 1` / `roughnessConstant = 1` (all 71 measured maps, Remix-only against the saved
+original shots, measured as in `tools/ab_ev.py`) moved characters 0.8–1.5 EV darker on almost every map (median
+character vs frame about +1.0 EV, Boots near black); the fill light cannot make up for it (tensil: `model_fill`
+0.1 → 0.23 changed it by 0.1 EV). An earlier check (2026-10-25: tensil -0.78 → +0.02) had used luminance
+without the sRGB/gamma handling of `ab_ev.py`, which hid this. So it is set per map in `[rtxconf.<map>]`
+(default 0.1/0.7 in `[rtxconf.default]`) only on the seven maps above, at metallic 0.5, roughness 1, `model_fill`
+0.1:
+
+| Map | metallic 0.1 (before) | metallic 1 | metallic 0.5 |
+| --- | --- | --- | --- |
+| tensil | -0.90 | +0.59 | -0.23 |
+| bricksd | -0.66 | +0.17 | -0.09 |
+| hephfactory | -0.58 | +0.86 | +0.23 |
+| sendormitory | -0.56 | +0.09 | -0.01 |
+| waukees | -0.50 | +0.47 | +0.10 |
+| franks | -0.48 | +0.62 | +0.12 |
+| levant1 | -0.44 | +0.66 | +0.15 |
+
+(character vs frame, EV; whole frames at metallic 0.5: -0.21 to +0.33 EV.) World textures without a pbr block on these maps
+also get the rougher, slightly more metallic look (the franks door is a little glossier). Controls rowdys and
+baltownr with the default material: -0.08 and +0.07, as calibrated.
+
 ## mmuseum views (2026-10-24)
 
 The bias -1.1 was set on the start view only. Five more views in the start's PVS (`find_views.py`, three spots
