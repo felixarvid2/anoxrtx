@@ -42,26 +42,14 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [x] Figurer för mörka: fyllnadsljus per figur relativt kartljusen (QindieGL #30/#32, `model_fill = 1.5` + egna värden
   för 5 banor), 10 banor inom ±0,3 EV mot originalet (2026-10-19). Övriga 69 banor mätta 2026-10-22: 60 användbara,
   37 fick egna värden (0,1–6) i två varv; 49 av 60 nu inom ±0,35 EV.
-- [ ] Figurer för ljusa även vid `model_fill = 0.1` (rummets ljus räcker): tensil -0,9, bricksd -0,66, hephfactory
-  -0,58, sendormitory -0,56, waukees -0,5, franks -0,48, levant1 -0,44 EV. fortressgrounds/grumpos +0,6/+0,9 för
-  mörka och påverkas inte av fyllnadsljuset.
-  Provat 2026-10-25: modellerna ritas med glColor4fv per hörn (Quake 2-skuggningen) och GL_MODULATE, men Remix
-  använder inte hörnfärgen: `rtx.ignoreAllVertexColorBakedLighting = True` ändrar inte figuren (tensil 0,218 →
-  0,219, waukees -3 %), och ett test-QindieGL som skalade glColor4fv med 1/0,5/0,25/0 gav samma bild. Att dämpa
-  figurerna per bana via hörnfärgen går alltså inte; kvar är albedo per textur (gäller alla banor) eller Remix API.
-  Albedo per bana provat 2026-10-25 (QindieGL-grenen `model-albedo`, ej sammanslagen): figuren känns igen på
-  glMultMatrixf vars translation = entitetens origin, och ritas från en mörkare kopia av texturen (HD-blocken
-  följde med via ett genererat lager). tensil: albedo 0,54 gav bara ~8 % mörkare rock, albedo 0,1 en färglös grå
-  figur. Orsak: ~60 % av figurens ljus under Remix är den spekulära loben (dielektrisk, F0 0,04) på de mörka
-  texturerna, som originalet saknar; varken albedo, legacy-grovhet 1, dimma av eller fyllnadsljus 0 tar bort den.
-  Lösning hittad 2026-10-25: Remix opaka F0 är `mix(0,04, albedo, metallic)` (dxvk-remix `calcBaseReflectivity`), så
-  metallic 1 + grovhet 1 ger F0 = albedo och ingen 0,04-lob; grov GGX ser nästan diffus ut. Figurtexturerna
-  sätts ihop under körning (newface: kropp + ögon/mun-bitar, hashen byts när figuren blinkar/pratar), så det görs
-  via legacy-standarden: `rtx.legacyMaterial.metallicConstant = 1`, `roughnessConstant = 1` (+ metallic 1/grovhet
-  1 i de mod.usda-block som gäller modelltexturer). tensil figur mot bild -0,78 → -0,02 EV, waukees -0,89 → -0,30,
-  bilden i övrigt +0,03/+0,18 EV; hår och rock får originalets färger. Kvar: gäller alla banor, så `model_fill`
-  måste kalibreras om på alla banor (övriga figurer blir mörkare), och legacy-världstexturer utan pbr-block blir
-  också grov metall. Diagnos: `rtx.compositePrimary{Direct,Indirect}Specular = False` gav samma figurer.
+- [x] Figurer för ljusa även vid `model_fill = 0.1` (rummets ljus räcker): tensil -0,9, bricksd -0,66, hephfactory
+  -0,58, sendormitory -0,56, waukees -0,5, franks -0,48, levant1 -0,44 EV. Orsak: Remix dielektriska spekulära lob
+  (F0 0,04) på legacy-material, som originalets diffusa modellskuggning saknar (hörnfärg och albedo per bana
+  provade 2026-10-25 utan effekt). Löst 2026-10-26 per bana: `rtx.legacyMaterial.metallicConstant = 0.5`,
+  `roughnessConstant = 1` i `[rtxconf.<bana>]` för de sju banorna; nu -0,23 till +0,23 EV. Globalt metallic 1
+  (planen från 2026-10-25) gjorde figurerna 0,8–1,5 EV för mörka på nästan alla 71 banor (den tidigare mätningen
+  saknade sRGB/gamma-hanteringen i `ab_ev.py`), så det rullades inte ut. docs/exposure-match.md
+- [ ] fortressgrounds/grumpos: figurerna +0,6/+0,9 EV för mörka och påverkas inte av fyllnadsljuset.
 - [x] greattree/waukees: lila ton (2026-10-22) kom från den gulvita dimman som volymdimma; dimma av på båda.
 - [x] labbuilding (2026-10-21): fönstret visade grått i stället för staden: Remix gjorde kartans dimma till volymdimma
   som täckte himlen; `enableFogRemap = False` för banan. `model_fill = 0.6` (figur +0,17 EV), exponering global (median 0,0).
