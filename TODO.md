@@ -39,13 +39,15 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [ ] Utomhusbaslinje: HD-himmel och Numos sol-/skuggriktning på avsedda kartor.
   2026-10-26: Numos av på sunstrip, comhills, baltown (och starport): Numos tog bort sunstrips stadssiluett,
   comhills soliga ökenhimmel och baltowns lila skymning (vyer mot horisonten +1,6 till +2,7 EV). Banornas sol
-  var avstängd (`sun_scale = 0`, Numos skulle ge solen); nu på igen, men solen (Remix API distant light från
-  QindieGL) syns inte alls: comhills horisontvyer pixel-lika med sun_scale 0, 1 och 256 (även med omvänd
-  riktning; #92:s riktningsbyte var en felslutsats från brus och är återställt). Skapas utan fel (CreateLight
-  success, live_handles). Öppen fråga: QindieGL:s distant light eller Remix Plus 1.5.1.
+  var avstängd (`sun_scale = 0`, Numos skulle ge solen); nu på igen. Solen var ~60x för svag: Remix sprider en
+  distant lights strålning över solskivan (2°), så `_sun_light / 200` lyste knappt; global `sun_scale = 12`
+  (2026-10-26). Riktningen (från solen in i scenen) var rätt: #92:s riktningsbyte byggde på brus och återställdes
+  i #93, och de tester med sol x64/x256 som såg verkningslösa ut gjordes med omvänd riktning.
+  comhills: dimfärg av (blå dimma färgade den solbelysta marken blå), `skyBrightness = 24`, bias -0,4: startvy
+  -0,23, horisontvyer +0,4 till +1,3 (förr +1,2 till +1,8, svart terräng).
   Exponering: sunstrip -4,3 → -2,4, comhills -2,4 → -1,8, baltown -0,5 → -1,8; startvyer -0,09/+0,16/-0,02,
-  baltown vyer -0,1. Kvar: comhills terräng mot horisonten +1,2 till +1,8 EV för mörk (ingen sol; dimma av
-  gjorde det sämre, skyBrightness 3/6/12 ljusar mest himlen, terrängen bara ~0,3 EV). baltownr har kvar Numos (ej bedömd: vyerna hamnade inomhus).
+  baltown vyer -0,1 (med sol x12: startvy -0,62, vyer -0,12 till +0,16). sunstrips och starports vyer ändras inte
+  av solen (vyerna ligger i skugga/inomhus). baltownr har kvar Numos (ej bedömd: vyerna hamnade inomhus).
 - [ ] Vatten: genomskinlighet, stabil geometrihash och material i relevant vy.
   2026-10-26 (`find_views.py` vattentexturer, `--ab-original`): greattree-sjön (`waukees/h2002`, warp utan TRANS,
   alltså opak i originalet) blev nästan svart med mörka fläckar som genomskinligt vatten; nu opak blank yta
