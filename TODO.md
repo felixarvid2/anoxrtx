@@ -137,7 +137,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   nästan svarta och Numos-himlen ersatte stadsskyboxen. Löst 2026-10-26: Numos av på starport (stadssiluetten
   tillbaka) och emission 1 på husens 29 texturer (`maps/model_emission.tsv`, background/*): husen ljusa som i
   originalet. Samma hus finns på sunstrip, labbuilding, servicetunnel, braintrain-b, cine1; startvyerna oförändrade. Skeppen i chamber/warshipbay och
-  sendernet ser ut som originalet.
+  sendernet ser ut som originalet. Två starport-vyer (ob_s_building-3_0, -14b_3) var helt svarta, också himlen:
+  kameran står i luften inuti `ob_btrain` (skala 16,2, ~2700x830x650 enheter), som originalet inte ser inifrån
+  (baksidor bortplockade). Med tågets texturer i `rtx.ignoreTextures` syns staden (ljusstyrka 11-13 → 53),
+  2026-10-26. Ett testvalsfel, inte ett spelfel; `find_views.py` kollar bara BSP:n (ett modelltest provades
+  men frame 0-geometrin gav motsägande svar).
 - [x] `func_fog` (lokala färgade dimvolymer, 12 banor: onegate 13, fortress2 9, hephfactory 7, pay2pray/vendomart/bricksd
   5, temple 4 …), 2026-10-23: ref_gl ritar volymerna otexturerade (GL_POLYGON, färg per hörn med alfagradient genom
   lådan, blend SRC_ALPHA/ONE, ingen djupskrivning), samma sort som commbase-strålarna; Remix gjorde dem svarta.
