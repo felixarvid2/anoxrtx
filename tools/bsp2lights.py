@@ -26,8 +26,8 @@ Intensity (calibrated against the maps' baked lightmaps with tools/lightcal.py, 
 Only `light` entities are written; lights with spawnflags & 1 (START_OFF) are skipped, `style` 1..11
 (Quake 2 flicker/pulse styles) is written so QindieGL animates it. A `sun` line comes from worldspawn
 _sun_angle ("yaw pitch", pitch < 0 = sun above the horizon), _sun_color, _sun_light (ArghRad keys; the
-stronger of _sun and _sun2): direction = towards the sun (what the Remix API's distant light expects; the
-opposite left the ground unlit, comhills 2026-10-26), intensity = _sun_light / SUN_DIV.
+stronger of _sun and _sun2): direction = from the sun into the scene, intensity = _sun_light / SUN_DIV.
+(2026-10-26: under Remix Plus 1.5.1 the sun has no visible effect at all, see TODO.)
 Global brightness: maplights_scale in QindieGL.ini, or `scale` in anox_customise.ini.
 
 --events requires the paired event-lighting QindieGL wrapper. It preserves styles 1..63 and appends
@@ -154,7 +154,7 @@ def export_maps(paths, out, legacy=False, events=False):
             L, yaw, pitch, col = best
             p_, y_ = math.radians(pitch), math.radians(yaw)
             fwd = (math.cos(p_) * math.cos(y_), math.cos(p_) * math.sin(y_), -math.sin(p_))   # towards the sun
-            rows.append('sun %.4f %.4f %.4f %.4f %.4f %.4f %g %g' % (fwd[0], fwd[1], fwd[2], col[0], col[1], col[2],
+            rows.append('sun %.4f %.4f %.4f %.4f %.4f %.4f %g %g' % (-fwd[0], -fwd[1], -fwd[2], col[0], col[1], col[2],
                                                                   round(L / SUN_DIV, 3), SUN_ANGLE))
             suns += 1
         rows.extend(off_rows)
