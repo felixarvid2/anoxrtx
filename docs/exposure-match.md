@@ -113,9 +113,9 @@ Verified Remix-only against the same original shots. Borderline maps (|EV| <= 0.
 | crevice | 1.5 (default) | -0.26 |  |
 | crevicelanding | 0.57 | +0.03 (1.5: -0.65) |  |
 | doren | 1.5 (default) | +0.33 |  |
-| fortressgrounds | 1.5 (default) | +0.64 | fill does not move it (1.5→2.34: +0.64→+0.61); bright logo in the box |
+| fortressgrounds | 32 | -0.35 (1.5: +0.64; bias -2.9 → -2.6, frame +0.03) | weak fill response, see below |
 | franks | 0.1 | -0.48 (1.5: -1.65) | room light alone over-lights it (fill at the 0.1 floor) |
-| grumpos | 1.5 (default) | +0.88 | fill does not move it (1.5→2.76: +0.88→+0.86) |
+| grumpos | 32 | +0.18 (1.5: +0.88) | weak fill response, see below |
 | hephfactory | 0.1 | -0.58 (1.5: -2.10) | room light alone over-lights it (fill at the 0.1 floor) |
 | hephlava | 1.5 (default) | -0.20 |  |
 | hephpipes | 0.58 | -0.06 (1.5: -0.75) |  |
@@ -166,8 +166,11 @@ Verified Remix-only against the same original shots. Borderline maps (|EV| <= 0.
 | whacks | 1.5 (default) | +0.31 |  |
 
 Seven maps stay 0.4–0.9 EV too bright at the lowest value (0.1): there the path-traced room light alone lights the
-character more than the original's lightmap sample; less fill cannot fix that. fortressgrounds and grumpos do not
-respond to the fill at all (+0.6/+0.9 too dark at any value).
+character more than the original's lightmap sample; less fill cannot fix that. fortressgrounds and grumpos respond only weakly to the fill (about 0.2 EV per doubling;
+2026-10-26, Remix-only, character vs frame): fortressgrounds 0 / 1.5 / 8 / 32: +1.11 / +0.97 / +0.49 / -0.19,
+grumpos +0.87 / +0.84 / +0.68 / +0.17. Boots stands with his back to the camera in front of bright surfaces (the
+lit logo, ceiling lamps), autoexposure takes back part of the fill (fortressgrounds frame -0.23 → +0.31 at 32,
+so its bias went -2.9 → -2.6). Both now `model_fill = 32`.
 
 ### Over-lit characters: legacy metallic (2026-10-26)
 
