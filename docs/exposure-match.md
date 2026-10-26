@@ -240,9 +240,10 @@ as in the original. Two of the four building views stay black under Remix for an
 Four horizon views from each start (and the start views) against the original: the Numos sky replaced
 sunstrip's city skyline, comhills' sunny desert sky and baltown's purple dusk (views +1.6 to +2.7 EV darker), so
 Numos is off there as on starport; only baltownr keeps it. These maps had `sun_scale = 0` (Numos was to provide
-the sun), now the map sun is back. Its direction was inverted: `tools/bsp2lights.py` wrote the direction from the
-sun into the scene, but the Remix API distant light takes the direction towards the light (comhills: the
-ground went from fog-blue to sunlit). Exposure after the change, start view / horizon views:
+the sun), now the map sun is back on, but it has no visible effect: comhills' horizon views are pixel-identical
+with `sun_scale` 0, 1 and 256 and with the direction inverted (an earlier reading that the direction was inverted
+came from animation noise in the start view and was reverted). QindieGL creates and draws the distant light
+without errors. Exposure after the change, start view / horizon views:
 
 | Map | bias | start | horizon views |
 | --- | --- | --- | --- |
@@ -251,7 +252,7 @@ ground went from fog-blue to sunlit). Exposure after the change, start view / ho
 | baltown | -0.5 → -1.8 | -0.02 | -0.10, -0.06, -0.06, -0.11 |
 | starport | -2.5 | +0.11 | (building views as above) |
 
-comhills' distant terrain stays dark: the original's ArghRad `_sun_ambient 30` (a constant term in the lightmaps)
-has no counterpart; fog remap off made it darker (+1.6..+2.8), `rtx.skyBrightness = 3` lighter (+0.9..+1.5,
-start -0.20), `sun_scale = 4` did not help.
+comhills' distant terrain stays dark because nothing lights it (no working sun; the original also has ArghRad's
+`_sun_ambient 30`): fog remap off made it darker, `rtx.skyBrightness` 3/6/12 mostly brightens the sky (terrain
+only ~0.3 EV).
 
