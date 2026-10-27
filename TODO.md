@@ -25,6 +25,12 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   om ljusläckor eller saknade skuggor syns.
 - [ ] **5. Dynamisk emission:** synkronisera ett verifierat material med
   ljushändelser, utan kvarhängande tillstånd eller dubbel illumination.
+  Första version 2026-10-27 (QindieGL #37 `styledemission`, `tools/emissive_styles.py`, installsteget `estyles`):
+  lampytor vars ljuskarta har en ljusstil (dface styles, 118 ytor på 9 banor) ritas med en texturkopia som skiljer
+  sig i en byte per nivå (faktor 0, 1/3, 2/3), och `emissive_styles.usda` ger kopiorna dämpad emission. fortress1
+  (stil 11): taklamporna pulserar (takytan 45/41/39/43 över tio bilder, utan inställningen 44-45); spiralerna
+  (`bricks/light1a`, emission 5) syns knappt ändras. Kvar: tändning under spel, sparladdning och banbyte,
+  ytor på rörliga brush-entiteter (lokala koordinater, matchas inte).
 - [ ] **6. PBR-klassificering:** vidareutveckla befintliga namnregler med
   dataregler, undantag, BSP-flaggor och osäkerhetsrapport; kan gå parallellt.
 - [ ] **7. Ankarmeshar:** stabila författar-ID:n, per-karta-data, ersättnings-
@@ -48,6 +54,13 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   Exponering: sunstrip -4,3 → -2,4, comhills -2,4 → -1,8, baltown -0,5 → -1,8; startvyer -0,09/+0,16/-0,02,
   baltown vyer -0,1 (med sol x12: startvy -0,62, vyer -0,12 till +0,16). sunstrips och starports vyer ändras inte
   av solen (vyerna ligger i skugga/inomhus). baltownr har kvar Numos (ej bedömd: vyerna hamnade inomhus).
+- [ ] baltownr (2026-10-27): Numos på/av ger samma bild i alla fem vyer (EV skiljer högst 0,05), så Numos syns inte
+  där. Vyer rakt upp i startschaktet (344 -3850 1380, pitch -75) är nästan svarta under Remix med och utan Numos,
+  originalet visar molnig natthimmel med måne (`balsun`, finns i hd_sky.usda). Orsak okänd.
+- [x] fortress2 blå ton (2026-10-27): originalets cyanfärgade dörrparti (färg/luminans 0,82 1,05 1,02) motsvarar exakt
+  de närmaste lamporna (`_color` 0,79 1 1); Remix blandar in mer neutralt ljus (0,96 1,01 0,98). Panelernas emission
+  (`naude-blue-5`) 15/60/240 och de två vita lamporna släckta ändrade inget. Över 89 A/B-par är Remix inte
+  systematiskt varmare (blått, median +0,026); fortress2 (+0,08) ligger inom spridningen. Ingen ändring.
 - [ ] Vatten: genomskinlighet, stabil geometrihash och material i relevant vy.
   2026-10-26 (`find_views.py` vattentexturer, `--ab-original`): greattree-sjön (`waukees/h2002`, warp utan TRANS,
   alltså opak i originalet) blev nästan svart med mörka fläckar som genomskinligt vatten; nu opak blank yta

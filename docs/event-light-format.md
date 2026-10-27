@@ -52,3 +52,20 @@ python3 -m unittest discover -s tools -p test_bsp2lights.py
 
 These tests validate export and compatibility properties, not the renderer
 hook, in-game switch behavior, save restoration, or visual lighting.
+
+## Styled emission (`<map>.estyles`)
+
+`tools/emissive_styles.py` (installer step `estyles`) writes `rtx-remix/maplights/<map>.estyles` for QindieGL's
+`styledemission` and `emissive_styles.usda` for the mod:
+
+```
+# hash x y z style
+0xAC52D1DF17CABCA6 -920.0 -299.5 -276.0 11
+```
+
+One line per SURF_LIGHT face whose lightmap has a non-zero style (`dface_t.styles`, first one used): the
+texture's Remix hash as in `emissive.usda`, the face centre (average of its vertices) and the style. QindieGL
+matches a drawn polygon by hash and centre (within 2 units) and, for style factor level 0..2
+(`round(factor * 3)`), draws it with a copy of the texture whose mip-0 byte 0 is XORed with level + 1.
+`emissive_styles.usda` gives each copy's hash the texture's materials from the other layers with the emission
+scaled by level / 3 (off at 0). Faces of moving brush entities are drawn in local coordinates and do not match.
