@@ -19,6 +19,8 @@ Steps (default: all, in this order; each can be rerun on its own):
   pbr       normal maps, roughness, glass for the level textures -> pbr.usda (needs the texture pack)
   proctex   lava material for QindieGL's frozen procedural textures -> proctex.usda (needs the texture pack)
   models    HD model textures (Real-ESRGAN x4; posters redrawn with FLUX if --flux) -> models_hd.usda
+  estyles   light faces that follow light styles: rtx-remix/maplights/*.estyles + emissive_styles.usda (after the
+            other layers: it copies their materials)
   mod       mod.usda with the layers above, all hashes moved to the texture pack's (and GE's, added)
   steam     Steam launch options and GE-Proton for the game (shuts Steam down; only with --steam)
 
@@ -45,7 +47,7 @@ import datetime, glob, importlib.util, io, os, re, shutil, subprocess, sys, time
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 STEPS = ['qindiegl', 'remix', 'config', 'textures', 'ge', 'extract', 'lights', 'sky', 'liquids', 'emissive', 'pbr',
-         'proctex', 'models', 'mod', 'steam']
+         'proctex', 'models', 'estyles', 'mod', 'steam']
 APPID = '242940'
 QINDIEGL_GIT = 'https://github.com/felixarvid2/QindieGL.git'
 REMIX_URLS = {
@@ -58,7 +60,7 @@ ESRGAN_URL = ('https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0
 ANOX_OPTIONS = [('remixapi', '1'), ('maplights', '1'), ('maplights_scale', '100'), ('dlights', '1'),
                 ('proctex', '1'), ('smoothnormals', '1'), ('enable_camera_detection', '1'),
                 ('camera_detection_mode', '1'), ('untexturedadditive', '1'),
-                ('polyblendoverlay', '1')]
+                ('polyblendoverlay', '1'), ('styledemission', '1')]
 CULL_LINES = ['set r_nocull 1', 'set gl_cull 0', 'set gl_cleartoblack 1']
 LAUNCH = ('__NV_PRIME_RENDER_OFFLOAD=1 __VK_LAYER_NV_optimus=NVIDIA_only __GLX_VENDOR_LIBRARY_NAME=nvidia '
           'VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/nvidia_icd.json DXVK_LOG_LEVEL=info '
@@ -484,10 +486,18 @@ class Installer:
         self.backup(os.path.join(self.mod, 'models_hd.usda'))
         self.py('hd_layer.py', self.mod, 'models_hd', x4, alpha)
 
+    def step_estyles(self):
+        if not self.maps() or not os.path.exists(os.path.join(self.mod, 'emissive.usda')):
+            self.log('estyles: needs the extracted maps and emissive.usda (extract and emissive steps), skipped'); return
+        self.backup(os.path.join(self.mod, 'emissive_styles.usda'))
+        self.py('emissive_styles.py', self.mod, self.game, os.path.join(self.game, 'rtx-remix', 'maplights'),
+                *self.maps())
+
     def step_mod(self):
         dst = os.path.join(self.mod, 'mod.usda')
         self.put(os.path.join(REPO, 'mod.usda'), dst)
-        layers = [l for l in ('hd_sky', 'liquids', 'emissive', 'emissive_jev', 'models_hd', 'pbr', 'proctex')
+        layers = [l for l in ('hd_sky', 'liquids', 'emissive', 'emissive_styles', 'emissive_jev', 'models_hd', 'pbr',
+                              'proctex')
                   if os.path.exists(os.path.join(self.mod, l + '.usda'))]
         if not self.a['dry_run']:
             s = open(dst).read()
