@@ -57,7 +57,7 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   av solen (vyerna ligger i skugga/inomhus). baltownr har kvar Numos (ej bedömd: vyerna hamnade inomhus).
 - [x] baltownr Numos av (2026-10-27): på/av gav samma bild i alla fem vyer (EV skiljer högst 0,05), så Numos är
   nu av överallt och kartsolen på (`sun_scale = 0` borttagen).
-- [ ] baltownr startschaktet (2026-10-27): vyer rakt upp (344 -3850 1380, pitch -75) är 7 EV mörkare under Remix;
+- [x] baltownr startschaktet (2026-10-27): vyer rakt upp (344 -3850 1380, pitch -75) är 7 EV mörkare under Remix;
   originalet visar molnig natthimmel med måne (`balsun`) och solbelysta väggar. Förstärkt syns himmelsrutan som
   mörka radiella strimmor. Uteslutet: Numos, volymetrisk dimma (`enableFogRemap = False`), `skyBrightness = 8`,
   himmelstexturerna (alla sex balsun-hashar, original och GE, står i `rtx.skyBoxTextures`; HD-dds är hela) och
@@ -68,8 +68,12 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   månen och de solbelysta väggarna som i originalet. Samma fel som tåget på starport. Fungerade inte:
   `rtx.enableCulling = True` (per karta och i rtx.conf) och en QindieGL-test som vände cull-riktningen; Remix
   culling tar inte bort insidan åt något håll. Texturen kan inte döljas (25 kullar på baltownr delar den), och
-  meshhashen saknar positioner (`indices,texcoords,geometrydescriptor`), så alla kullar delar den också. Möjlig
-  väg: QindieGL hoppar över en modell när kameran är inne i dess skrov (behöver entitet och modell per draw).
+  meshhashen saknar positioner (`indices,texcoords,geometrydescriptor`), så alla kullar delar den också. Löst
+  med QindieGL #38 `skipenclosingmodels = 25` (installern sätter det): en modell med baksidesgallring ritas inte
+  när dess insida täcker minst 25 % av sfären runt kameran (vinkelsumma/winding number, behöver ingen entitet).
+  Kullen täcker 86 % rakt upp i schaktet och hoppas över: natthimlen och månen syns (+8,45 → +2,94 EV, resten är
+  exponeringen; väggar och golv är mörkare än originalet). Under kullens öppna botten (s0, z 404) är det 31 %
+  enligt capture-meshen; de vågräta s0/s1-vyerna är oförändrade. rowdys oförändrad, ingen Remix-krasch.
 - [x] baltownr exponering (2026-10-27): de nedre nivåerna var 1,5 EV för ljusa (median av 8 vyer); bias -3,8 och
   slemgolvet `ballotine/slime01a` intensitet 2 (docs/exposure-match.md), efter: median -0,07 EV (-1,7 till +1,3). Kvar: s1_1 längs slemkorridoren -1,7.
 - [x] fortress2 blå ton (2026-10-27): originalets cyanfärgade dörrparti (färg/luminans 0,82 1,05 1,02) motsvarar exakt
@@ -172,7 +176,9 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   exporterad till OBJ med entitetens origin, angle och skala; `offset` används inte): tåget står still (fem
   översiktsbilder i följd identiska) och renderingen stämmer med originalet och Remix. 3_0 ligger inuti skrovet;
   14b_3 ligger inom tågets låda men strax utanför frame 0-skrovet, ändå svart i Remix och utan tåg i originalet.
-  Ett automatiskt modelltest i find_views är därför inte pålitligt.
+  Ett automatiskt modelltest i find_views är därför inte pålitligt. Löst 2026-10-27 med QindieGL #38
+  `skipenclosingmodels`: tåget (582 trianglar) ritas inte i de två vyerna och staden syns (fortfarande +2,8 EV,
+  exponering).
 - [x] `func_fog` (lokala färgade dimvolymer, 12 banor: onegate 13, fortress2 9, hephfactory 7, pay2pray/vendomart/bricksd
   5, temple 4 …), 2026-10-23: ref_gl ritar volymerna otexturerade (GL_POLYGON, färg per hörn med alfagradient genom
   lådan, blend SRC_ALPHA/ONE, ingen djupskrivning), samma sort som commbase-strålarna; Remix gjorde dem svarta.

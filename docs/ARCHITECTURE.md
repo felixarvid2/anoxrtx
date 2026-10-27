@@ -20,7 +20,8 @@ anox.exe (32-bit, Quake 2 engine derivative)
 
 - **QindieGL** turns the game's GL calls into D3D9 fixed-function calls that Remix understands (camera
   detection, smooth normals, fog states). Anachronox-specific code lives behind `[game.anox]` options in
-  `QindieGL.ini`: `maplights`, `dlights`, `proctex`, `smoothnormals`, `remixapi`, `untexturedadditive`.
+  `QindieGL.ini`: `maplights`, `dlights`, `proctex`, `smoothnormals`, `remixapi`, `untexturedadditive`,
+  `polyblendoverlay`, `styledemission`, `skipenclosingmodels`.
   Main files: `code/rmx_maplights.cpp` (map/dynamic lights, per-map settings, reload), `code/rmx_gen.cpp`
   (Remix API init, `[rtxconf.*]` variables), `code/d3d_texture.cpp` (procedural texture freeze),
   `idtech3_mixup/hooking.cpp` (Detours hooks), `code/win_imgui.cpp` (overlay).
