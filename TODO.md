@@ -140,8 +140,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   sendernet ser ut som originalet. Två starport-vyer (ob_s_building-3_0, -14b_3) var helt svarta, också himlen:
   kameran står i luften inuti `ob_btrain` (skala 16,2, ~2700x830x650 enheter), som originalet inte ser inifrån
   (baksidor bortplockade). Med tågets texturer i `rtx.ignoreTextures` syns staden (ljusstyrka 11-13 → 53),
-  2026-10-26. Ett testvalsfel, inte ett spelfel; `find_views.py` kollar bara BSP:n (ett modelltest provades
-  men frame 0-geometrin gav motsägande svar).
+  2026-10-26. Ett testvalsfel, inte ett spelfel; `find_views.py` kollar bara BSP:n. 2026-10-27 i Blender (frame 0
+  exporterad till OBJ med entitetens origin, angle och skala; `offset` används inte): tåget står still (fem
+  översiktsbilder i följd identiska) och renderingen stämmer med originalet och Remix. 3_0 ligger inuti skrovet;
+  14b_3 ligger inom tågets låda men strax utanför frame 0-skrovet, ändå svart i Remix och utan tåg i originalet.
+  Ett automatiskt modelltest i find_views är därför inte pålitligt.
 - [x] `func_fog` (lokala färgade dimvolymer, 12 banor: onegate 13, fortress2 9, hephfactory 7, pay2pray/vendomart/bricksd
   5, temple 4 …), 2026-10-23: ref_gl ritar volymerna otexturerade (GL_POLYGON, färg per hörn med alfagradient genom
   lådan, blend SRC_ALPHA/ONE, ingen djupskrivning), samma sort som commbase-strålarna; Remix gjorde dem svarta.
