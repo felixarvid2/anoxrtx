@@ -68,4 +68,7 @@ texture's Remix hash as in `emissive.usda`, the face centre (average of its vert
 matches a drawn polygon by hash and centre (within 2 units) and, for style factor level 0..2
 (`round(factor * 3)`), draws it with a copy of the texture whose mip-0 byte 0 is XORed with level + 1.
 `emissive_styles.usda` gives each copy's hash the texture's materials from the other layers with the emission
-scaled by level / 3 (off at 0). Faces of moving brush entities are drawn in local coordinates and do not match.
+scaled by level / 3 (off at 0). Faces of brush entities (func_wall, func_door) match too, also while they move:
+the BSP stores their vertices in model coordinates, ref_gl places the model with the modelview matrix, and
+QindieGL compares the untransformed vertices. The log's "draws of a listed texture matched no face" (at map
+change) includes faces with the same texture but no style, e.g. fortress1's 32 unstyled `bricks/light1a` faces.
