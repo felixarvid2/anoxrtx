@@ -131,9 +131,9 @@ I raise roughness and metalicity of character materials to the max to mask the p
      `<prefix>/drive_c/users/steamuser/AppData/Local/NVIDIA/RTXRemix/user_settings/<xxh3 of "S:\steamapps\common\Anachronox">.conf`
      with `neverShowFirstUseGuide = True`, `allowCrashReporting = False`, `allowUsageTracking = False`.
      Do not use `rtx.automation.disableBlockingDialogBoxes`: it is for NVIDIA's CI and grants the consent.
-   - `anox_customise.ini` turns on the Numos sky (`rtx.skyMode = 1`) only on the maps with an ArghRad sun
-     (sunstrip, starport, comhills, baltown, baltownr), with the sun direction from the map and the map light
-     sun turned off there. Globally it would replace the space and city skies with a daytime sky.
+   - The Numos sky (`rtx.skyMode = 1`) is off on every map: on the maps with an ArghRad sun it replaced the
+     original skyboxes (sunstrip, starport, comhills, baltown) or made no visible difference (baltownr), so the
+     map light sun lights them instead. It can be turned on per map in `anox_customise.ini` (`[rtxconf.<map>]`).
    - For testing, Steam launch options `%command% +map <name>` start straight into a map.
 
 9. Lava (QindieGL `proctex = 1`; implemented, not yet seen in the game – see STATUS.md): the Levant lava is generated every frame, so Remix cannot replace it.

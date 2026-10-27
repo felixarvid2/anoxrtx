@@ -145,8 +145,8 @@ anoxrtx tools (`tools/`): `install.sh`/`install.py` (whole setup from the user's
   (data collection off, owner's choice) in `pfx/drive_c/users/steamuser/AppData/Local/NVIDIA/RTXRemix/user_settings/<xxh3(game root)>.conf`.
   Never use `rtx.automation.disableBlockingDialogBoxes`: it grants the consent.
 - Numos sky (`rtx.skyMode = 1`, Remix Plus) must stay per map: globally it replaces the space/city skies.
-  It is on for sunstrip, starport, comhills, baltown, baltownr (maps with an ArghRad sun), with the map light sun
-  off there.
+  It is now off everywhere (docs/exposure-match.md: it replaced the skyboxes; on baltownr it made no difference),
+  and the map light sun lights the outdoor maps.
 - Texture hashes: Remix hash = XXH3_64 of mip 0 in D3D format (BGRA, alpha 255 without alpha). The texture pack
   changes level texture hashes; the mod's hand-made materials are remapped with `rehash_textures.py`.
 
@@ -164,7 +164,6 @@ when started with `+map`, so it is untested. Tuning knobs: `rtx.volumetrics.fogR
 - Rowdy's normal maps and five sign emissions have visible effects in two saved views
   ([2026-10-17 check](https://github.com/felixarvid2/anoxrtx/blob/main/docs/rowdys-material-check.md)); retain defaults. Close-up checks for bright
   rims on sharp colour edges still remain (`pbr_layer.py --strength`, default 2).
-- Numos sun rotation convention (shadow direction) on the five outdoor maps.
 - Map light brightness in environments other than Rowdy's.
 - Initial lighting is corrected for the tested startup device-replacement path in Rowdy's;
   other maps, stock Remix and in-place device Reset remain separate coverage.
