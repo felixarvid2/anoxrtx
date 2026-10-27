@@ -270,3 +270,21 @@ player model, and map light views are outside the original's PVS. With the globa
 views -0.23 to +0.17 afterwards). With slime 2 and bias -3.5: -2.13 to +1.09, median -0.35; bias set to **-3.8**
 (verified: -1.72 to +1.34, median -0.07). Left: s1_1 (looking along the slime corridor) -1.7, s0_2/s1_3 +1.2/+1.3,
 and the start shaft's sky (TODO).
+
+Start shaft, after QindieGL #38 (`skipenclosingmodels`, 2026-10-27): the player starts at `344 -3850 1200` inside the
+hill `ob_commhill02`, which is now skipped, so the night sky shows. The walls stayed nearly black: start view
+(player's view) +2.35 EV, shaft view `344 -3850 1260` pitch 10 yaw 315 +2.48, upward view `344 -3850 1380` pitch -75
++2.94. The original lights the shaft with `_sun_ambient 15` and baked bounce from the orange `_sun2` (light 300);
+only `_sun2` is a Remix light. `sun_scale = 48` on baltownr (4x): shaft +1.77, upward +2.60. A fill light just under
+the opening (`maps/overrides/baltownr.override`: `add 344 -3850 1420 1 0.75 0.5 I 0`): I = 300 shaft +0.59; 1000
+-1.83; **400**: shaft +0.01, start view **+0.54**. The lower-level views do not change (s0_0 -0.24, s0_2 +1.23,
+s1_1 -1.76). The upward view stays about +3: the sky is 2-3x darker than in the original, and `rtx.skyBrightness = 3`
+did not help (autoexposure takes it back in a frame that is mostly sky); not kept.
+
+## starport city views (2026-10-27)
+
+The seven rooftop views (`ob_s_building-*`, in the air west of the start; the two inside `ob_btrain` show the city
+since QindieGL #38) are +2.4 to +2.8 EV (Remix darker) at bias -2.5; the start (an indoor corridor) is +0.13.
+`rtx.skyBrightness = 3` changed them by about 0.1 EV: autoexposure brings bright outdoor and dim indoor frames to a
+similar mean, while the original is about 4x brighter outdoors (mean 0.28 vs 0.07). A map bias cannot match both;
+no change until there are views from places the player stands outdoors. The `autoExposure` options are untested.

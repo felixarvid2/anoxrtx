@@ -1,0 +1,5 @@
+# baltownr: fill light in the start shaft (x 268..412, y -3912..-3784, sky opening at z 1464), just under the
+# opening. The original lights the shaft with _sun_ambient 15 and baked bounce from the orange _sun2; under Remix
+# the walls stayed nearly black once the enclosing hill is skipped (QindieGL skipenclosingmodels). Start view
+# +2.35 -> +0.54 EV, shaft view +2.48 -> +0.01, lower-level views unchanged (docs/exposure-match.md).
+add 344 -3850 1420 1 0.75 0.5 400 0

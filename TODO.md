@@ -19,11 +19,12 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   ljus och ljusstilar; verifierad under Proton (QindieGL #27). Kvar: cullingdiagnostik.
 - [x] **3. Händelsestyrt animerat ljus:** spelets ljusstilar 1–63 styr ljusen, START_OFF exporteras och
   hålls släckt av spelets stil; verifierat i crevice och levant1 (QindieGL #27). Kvar att se i spelet:
-  ett ljus som tänds under spel, paus och save-återställning.
+  ett ljus som tänds under spel, paus och save-återställning. Lampytans emission följer en tändning och en
+  sparladdning (tours, punkt 5); själva Remix-ljuset mättes inte där.
 - [x] **4. BSP/PVS:** mätt med riggkamera och `--ab-cfg "set r_novis 1"` (docs/culling-check.md): ingen synlig
   skillnad i sex vyer, upp till 60 % längre bildtid i votowne. Spelets PVS behålls; prova `r_novis 1` per bana
   om ljusläckor eller saknade skuggor syns.
-- [ ] **5. Dynamisk emission:** synkronisera ett verifierat material med
+- [x] **5. Dynamisk emission:** synkronisera ett verifierat material med
   ljushändelser, utan kvarhängande tillstånd eller dubbel illumination.
   Första version 2026-10-27 (QindieGL #37 `styledemission`, `tools/emissive_styles.py`, installsteget `estyles`):
   lampytor vars ljuskarta har en ljusstil (dface styles, 118 ytor på 9 banor) ritas med en texturkopia som skiljer
@@ -31,7 +32,10 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   (stil 11): taklamporna pulserar (takytan 45/41/39/43 över tio bilder, utan inställningen 44-45); spiralerna
   (`bricks/light1a`, emission 5) syns knappt ändras men byts (spiralerna sitter på func_wall: ytor på
   brush-entiteter matchar, även när de rör sig, eftersom QindieGL jämför modellkoordinaterna). Banbyte
-  fortress1 → fortress2 fungerar. Kvar: tändning under spel, sparladdning.
+  fortress1 → fortress2 fungerar. Tändning och sparladdning 2026-10-27 på tours (stil 32, ljuset `explosion`,
+  START_OFF; QindieGL #39 loggar varje nivåbyte): lysröret `bricks2/dwlight2` är släckt vid start, tänds när
+  spelaren (`goto`) går in i dess `trigger_multiple` (som växlar det av/på medan spelaren står kvar, spelets
+  logik), är släckt efter en ny `map tours` och tänt efter `loadgame` av en sparning gjord med det tänt.
 - [ ] **6. PBR-klassificering:** vidareutveckla befintliga namnregler med
   dataregler, undantag, BSP-flaggor och osäkerhetsrapport; kan gå parallellt.
 - [ ] **7. Ankarmeshar:** stabila författar-ID:n, per-karta-data, ersättnings-
@@ -74,6 +78,9 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   Kullen täcker 86 % rakt upp i schaktet och hoppas över: natthimlen och månen syns (+8,45 → +2,94 EV, resten är
   exponeringen; väggar och golv är mörkare än originalet). Under kullens öppna botten (s0, z 404) är det 31 %
   enligt capture-meshen; de vågräta s0/s1-vyerna är oförändrade. rowdys oförändrad, ingen Remix-krasch.
+  Kostnad (tillfälligt mätbygge): 0,03 ms/bildruta på baltownr, 0,09 rowdys, 0,14 starport (av ~18). Spelaren
+  startar i schaktet; med kullen borta var startvyn +2,35 EV, nu +0,54 med ett fyllnadsljus
+  (`maps/overrides/baltownr.override`, docs/exposure-match.md).
 - [x] baltownr exponering (2026-10-27): de nedre nivåerna var 1,5 EV för ljusa (median av 8 vyer); bias -3,8 och
   slemgolvet `ballotine/slime01a` intensitet 2 (docs/exposure-match.md), efter: median -0,07 EV (-1,7 till +1,3). Kvar: s1_1 längs slemkorridoren -1,7.
 - [x] fortress2 blå ton (2026-10-27): originalets cyanfärgade dörrparti (färg/luminans 0,82 1,05 1,02) motsvarar exakt
