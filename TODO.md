@@ -63,8 +63,8 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   himmelstexturerna (alla sex balsun-hashar, original och GE, står i `rtx.skyBoxTextures`; HD-dds är hela) och
   riggkameran (den ersätter spelets vieworg, så himmelskuben ritas runt den). Det är kartans enda himmelsöppning.
   Inga kartljus ovanför schaktet; solen (30° höjd) når inte ner. Nästa steg: Remix-capture av vyn.
-- [ ] baltownr spot0/spot1 (284 -3904 404 och 329 -2813 398) är 1,1 och 2,6 EV ljusare än originalet (även med
-  Numos), bias är standardvärdet -2,0.
+- [x] baltownr exponering (2026-10-27): de nedre nivåerna var 1,5 EV för ljusa (median av 8 vyer); bias -3,8 och
+  slemgolvet `ballotine/slime01a` intensitet 2 (docs/exposure-match.md), efter: median -0,07 EV (-1,7 till +1,3). Kvar: s1_1 längs slemkorridoren -1,7.
 - [x] fortress2 blå ton (2026-10-27): originalets cyanfärgade dörrparti (färg/luminans 0,82 1,05 1,02) motsvarar exakt
   de närmaste lamporna (`_color` 0,79 1 1); Remix blandar in mer neutralt ljus (0,96 1,01 0,98). Panelernas emission
   (`naude-blue-5`) 15/60/240 och de två vita lamporna släckta ändrade inget. Över 89 A/B-par är Remix inte

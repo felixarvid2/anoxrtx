@@ -1,3 +1,4 @@
 # Light textures (SURF_LIGHT) whose emissive intensity is set by hand (tools/emissive_layer.py --intensity) instead of
 # clamp(light value / 100, 1, 15): TEXTURE <TAB> INTENSITY <TAB> note.
 bricks/color10	1	mmuseum window panels, flat blue (52,67,111) with light 2500: 15 turned them white
+ballotine/slime01a	2	baltown/baltownr slime floors, mostly light 100-500 (2000 on two baltown faces): 15 lit baltownr's corridors green

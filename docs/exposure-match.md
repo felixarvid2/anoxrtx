@@ -258,3 +258,15 @@ blue (`enableFogColorRemap = False` there) and the skybox was ~3 EV too dark aga
 bias -0.4): start view -0.23, horizon views +1.13, +0.40, +1.29, +0.55 (whole frame; terrain alone within
 about ±0.7). baltown: start -0.62, views -0.12..+0.16. sunstrip's and starport's views do not change with the sun.
 
+
+## baltownr (2026-10-27)
+
+Usable views are only in the lower levels (`284 -3904 404` and `329 -2813 398`, pitch 10, four directions each, plus
+the slime floor view at `354.7 -2687.8 450`): the start is a closed shaft room, spots near it put the camera in the
+player model, and map light views are outside the original's PVS. With the global bias -2.0 they were -0.30 to
+-3.6 EV (median -1.5, Remix brighter). Not the cause on its own: Numos (on/off identical), map light `scale = 0.36`
+(s0 0.5 EV darker, s1 hardly changed), the green slime floor (`ballotine/slime01a`, intensity 15 from one light
+2000 face on baltown; set to 2 in `maps/emissive_intensity.tsv`: the corridor views 0.5-0.7 EV darker, baltown's
+views -0.23 to +0.17 afterwards). With slime 2 and bias -3.5: -2.13 to +1.09, median -0.35; bias set to **-3.8**
+(verified: -1.72 to +1.34, median -0.07). Left: s1_1 (looking along the slime corridor) -1.7, s0_2/s1_3 +1.2/+1.3,
+and the start shaft's sky (TODO).
