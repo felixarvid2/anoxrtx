@@ -62,7 +62,14 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   mörka radiella strimmor. Uteslutet: Numos, volymetrisk dimma (`enableFogRemap = False`), `skyBrightness = 8`,
   himmelstexturerna (alla sex balsun-hashar, original och GE, står i `rtx.skyBoxTextures`; HD-dds är hela) och
   riggkameran (den ersätter spelets vieworg, så himmelskuben ritas runt den). Det är kartans enda himmelsöppning.
-  Inga kartljus ovanför schaktet; solen (30° höjd) når inte ner. Nästa steg: Remix-capture av vyn.
+  Orsak (capture 2026-10-27): schaktet ligger inne i en bergskulle, `ob_commhill02` (origin 314 -3464 387, offset
+  -319 -317 232, skala 1,15 3,4 10,75, vinkel 255; 842 x 3032 x 1810 enheter, z 619-2429). ref_gl ser inte dess
+  baksidor, Remix träffar insidan. Med kullens textur i `rtx.ignoreTextures` (0x6F93AEF4B3688C86) syns natthimlen,
+  månen och de solbelysta väggarna som i originalet. Samma fel som tåget på starport. Fungerade inte:
+  `rtx.enableCulling = True` (per karta och i rtx.conf) och en QindieGL-test som vände cull-riktningen; Remix
+  culling tar inte bort insidan åt något håll. Texturen kan inte döljas (25 kullar på baltownr delar den), och
+  meshhashen saknar positioner (`indices,texcoords,geometrydescriptor`), så alla kullar delar den också. Möjlig
+  väg: QindieGL hoppar över en modell när kameran är inne i dess skrov (behöver entitet och modell per draw).
 - [x] baltownr exponering (2026-10-27): de nedre nivåerna var 1,5 EV för ljusa (median av 8 vyer); bias -3,8 och
   slemgolvet `ballotine/slime01a` intensitet 2 (docs/exposure-match.md), efter: median -0,07 EV (-1,7 till +1,3). Kvar: s1_1 längs slemkorridoren -1,7.
 - [x] fortress2 blå ton (2026-10-27): originalets cyanfärgade dörrparti (färg/luminans 0,82 1,05 1,02) motsvarar exakt
