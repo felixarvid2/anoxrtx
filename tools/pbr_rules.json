@@ -39,7 +39,11 @@
   "tensil/rope-ladder": {"class": "fabric", "why": "rope ladder: \"ladder\" (metal) and \"rope\" (fabric) both match"},
   "bricks/televthing": {"class": "screen", "why": "television, not an elevator"},
   "tensil/thatch": {"class": "organic", "why": "thatch, not a metal hatch (found by DeepSeek review)"},
-  "senderstation/curtainrods": {"class": "metal", "why": "curtain rods (found by DeepSeek review)"}
+  "senderstation/curtainrods": {"class": "metal", "why": "curtain rods (found by DeepSeek review)"},
+  "tensil/door02": {"class": "wood", "why": "wooden door (the door rule and DeepSeek vision said tech)"},
+  "tensil/door03": {"class": "wood", "why": "wooden door (the door rule and DeepSeek vision said tech)"},
+  "baltown/doorwall-101top": {"class": "glass", "why": "louvered glass above a door, not a tech panel"},
+  "sunder/monitor-btm3": {"class": "tech", "why": "monitor bezel, not the screen"}
  },
  "haze_glass": ["sunder/sun_glass3"],
  "glass_words": ["glass", "win", "clear"],
