@@ -72,3 +72,10 @@ scaled by level / 3 (off at 0). Faces of brush entities (func_wall, func_door) m
 the BSP stores their vertices in model coordinates, ref_gl places the model with the modelview matrix, and
 QindieGL compares the untransformed vertices. The log's "draws of a listed texture matched no face" (at map
 change) includes faces with the same texture but no style, e.g. fortress1's 32 unstyled `bricks/light1a` faces.
+
+Style 0 lines (QindieGL #41) list the faces that use an emissive texture without being lights in that map (no
+SURF_LIGHT, or light value 0). `emissive.usda` makes a texture emissive if any face of any map is a light, and a
+Remix material belongs to the texture, so before this e.g. `bricks/empty` (a light on 16 faces, a wall on 21 692)
+glowed on every wall. QindieGL always draws style 0 faces with the level 0 copy (emission off); only level 0 is
+generated for textures without styled faces. 173 882 such faces on 91 maps (2026-10-28). QindieGL buckets the
+entries by hash and 8-unit cell of the centre, so a texture listed thousands of times costs a few lookups per draw.

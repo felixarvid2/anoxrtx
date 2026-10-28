@@ -40,12 +40,14 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   släckt/tänt: Remix +0,01..+0,26 EV, originalet +0,54..+1,44 EV. Ljuset tänds, men rummet är redan 2,0–3,9 EV för
   ljust släckt (se nedan: icke-ljusytor med lysande texturer), så tändningen syns knappt. Triggern sitter i taket
   (1239 228 -91, spelaren får inte plats); den löser bara ut via `goto` från en giltig plats (1280 -32 -100).
-- [ ] **Lysande texturer på vanliga ytor (2026-10-28):** `emissive.usda` gör en textur emissiv om någon yta i någon
+- [x] **Lysande texturer på vanliga ytor (2026-10-28):** `emissive.usda` gör en textur emissiv om någon yta i någon
   bana har SURF_LIGHT, och Remix-material gäller per textur. 295 texturer används både som ljus och som vanlig yta:
   183 000 vanliga ytor (91 banor) mot 50 000 ljusytor, t.ex. `baseanox/clear` 27 450/610, `bricks/empty` 21 692/16,
   `shuttle/sschrome` 11 058/427, `bricks/twall01` 3 210/22. I originalet lyser de bara via ljuskartan. Förslag: samma
   variantteknik som `styledemission`, per textur listas minoritetsytorna (~14 500 totalt) och får den andra
-  varianten (emission av/på). Ändrar alla banors ljusnivå, så exponeringen per bana måste mätas om. Ej beslutat.
+  varianten (emission av/på). Ändrar alla banors ljusnivå, så exponeringen per bana måste mätas om. Klart 2026-10-28 (QindieGL #41): vanliga ytor
+  får stil 0 i `.estyles` (173 882 rader, 91 banor); bias omräknad för slounge, hephtower2, mystech2, scommons, tours
+  (docs/exposure-match.md). Ingen prestandakostnad. slounge: rätt medelnivå men annan ljusfördelning än originalet.
 - [ ] **6. PBR-klassificering:** vidareutveckla befintliga namnregler med
   dataregler, undantag, BSP-flaggor och osäkerhetsrapport; kan gå parallellt.
 - [ ] **7. Ankarmeshar:** stabila författar-ID:n, per-karta-data, ersättnings-
