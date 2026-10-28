@@ -251,7 +251,7 @@ horizon views:
 | sunstrip | -4.3 → -2.4 | -0.09 | +1.20, -1.07, +0.28, -0.16 |
 | comhills | -2.4 → -1.8 | +0.16 | +1.82, +1.15, +1.76, +1.45 (distant terrain too dark) |
 | baltown | -0.5 → -1.8 | -0.02 | -0.10, -0.06, -0.06, -0.11 |
-| starport | -2.5 | +0.11 | (building views as above) |
+| starport | 0, autoexposure off | +0.19 | walkway +0.45 / +0.52, atrium -0.39 (2026-10-28, below) |
 
 With `sun_scale = 12` comhills' terrain is sunlit as in the original. Its blue map fog tinted the sunlit ground
 blue (`enableFogColorRemap = False` there) and the skybox was ~3 EV too dark against it (`skyBrightness = 24`,
@@ -287,4 +287,19 @@ The seven rooftop views (`ob_s_building-*`, in the air west of the start; the tw
 since QindieGL #38) are +2.4 to +2.8 EV (Remix darker) at bias -2.5; the start (an indoor corridor) is +0.13.
 `rtx.skyBrightness = 3` changed them by about 0.1 EV: autoexposure brings bright outdoor and dim indoor frames to a
 similar mean, while the original is about 4x brighter outdoors (mean 0.28 vs 0.07). A map bias cannot match both;
-no change until there are views from places the player stands outdoors. The `autoExposure` options are untested.
+no change until there are views from places the player stands outdoors.
+
+Follow-up (2026-10-28): views at path_corner spots the player and NPCs use, with the player moved next to each
+(`goto`, so the original renderer's PVS covers it): the outdoor walkway east of the service-tunnel exit (beltway2
+3960 -573 -422, beltway3 3475 -567 -419, yaw 0 / -22, pitch -10), the atrium with the skylight (pikachu 917 1378 345,
+yaw -135), the café with the large window (mannberg4 -248 2718 -154, yaw 45) and a fixed view in the start corridor
+(-1503 1767 158, yaw 90). The walkway is +3.22 / +2.64 EV (Remix darker), the atrium +1.50, the start +0.10.
+
+Tried, one session per series, the ini rewritten and the map reloaded (QindieGL re-reads it on map load):
+`rtx.autoExposure.evMaxValue` 3 / 1 / 0 and `evMinValue` -3 / -4 / -6 / -1 / 0 / 0.5 changed no view (images equal up
+to noise); they are applied (QindieGL logs them) but do not take effect when set at runtime. `rtx.skyBrightness`
+30 / 100: walkway +3.16..+2.08, atrium +0.44 / +0.11. `rtx.autoExposure.enabled = False` does take effect: with
+`exposureBias = 0` the start is +0.19, the walkway +0.45 / +0.52, the atrium -0.39 (fresh start, settle < 0.05).
+Kept: autoexposure off and bias 0 on starport (`enabled = True` in `[rtxconf.default]` so other maps get it back).
+The café is -1.80 because Remix draws its window glass milky white instead of transparent (the original shows the
+city through it); that is a glass problem, not exposure.
