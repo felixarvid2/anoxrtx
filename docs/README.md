@@ -18,6 +18,7 @@ retiring a document.
 | [screenshot-regression.md](screenshot-regression.md) | Capture/compare tools and workflow |
 | [test-locations.md](test-locations.md) | Repeatable save-based test views |
 | [startup-lighting-check.md](startup-lighting-check.md) | Evidence for the startup device-replacement light fix |
+| [pbr-conflict-review.md](pbr-conflict-review.md) | PBR rule-vs-Jev conflict review: exceptions added, open cases, effect on `pbr.usda` |
 
 In QindieGL: [README](https://github.com/felixarvid2/QindieGL/blob/master/README.md),
 [ROADMAP](https://github.com/felixarvid2/QindieGL/blob/master/ROADMAP.md) (wrapper responsibilities),

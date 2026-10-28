@@ -6,7 +6,8 @@ usage: pbr_classify.py OUTDIR MAP.bsp... [--rules RULES.json] [--classes JEV.jso
                        [--deepseek-vision GAMEDIR [--pick SETS] [--max-usd 1.0]] [--vision CACHE.json]
 
 Every texture the maps use gets a class from tools/pbr_rules.json (roughness/metallic per class), in this order:
-  exception   exact texture path in "exceptions"
+  exception   exact texture path in "exceptions" (reviewed, so never a conflict); when it names Jev's material, Jev's
+              roughness/metal are kept (the exception only settles the rule-vs-Jev conflict)
   flags       SURF_SKY/SURF_WARP faces: no PBR material (hd_sky/liquids layers own them); "haze_glass" likewise
   jev         --classes (tools/jev_classify.py): Jev's roughness/metal, as pbr_layer.py has used them; when a strong
               name rule and the DeepSeek suggestion both disagree with Jev's material, the name rule wins (vote);
@@ -156,6 +157,11 @@ def flagnames(flags, table):
     return [k for k, v in table.items() if flags & v]
 
 
+def jev_values(j):
+    """(roughness, metallic) from a Jev entry: roughness clamped to 0.05..1, metal only when at least 0.5"""
+    return round(min(1.0, max(0.05, j['roughness'])), 3), (round(j['metal'], 3) if j['metal'] >= 0.5 else 0.0)
+
+
 def classify(name, use, rules, jev=None, ai=None, vision=None):
     """{'class', 'roughness', 'metallic', 'source', 'confidence', 'rule', 'notes': [...], 'conflict': bool, ...}"""
     use = use or {'faces': 0, 'maps': 0, 'flags': 0, 'light': 0, 'trans': 0, 'contents': 0, 'frame_of': ''}
@@ -217,6 +223,12 @@ def classify(name, use, rules, jev=None, ai=None, vision=None):
     if name in rules['exceptions']:
         e = rules['exceptions'][name]
         notes.append('exception: %s' % e.get('why', ''))
+        res['conflict'] = False         # reviewed: the exception settles rule-vs-rule (and rule-vs-Jev) conflicts
+        j = (jev or {}).get(name)
+        if j and JEV_CLASS.get(j.get('material')) == e['class']:
+            # the exception confirms Jev's material: keep Jev's finer per-texture roughness/metal
+            notes.append('confirms Jev')
+            return done(e['class'], 'exception', 'high', '', *jev_values(j))
         return done(e['class'], 'exception', 'high')
     skip = [f for f in rules['flag_rules']['skip_flags'] if use['flags'] & SURF[f]]
     if skip:
@@ -241,9 +253,7 @@ def classify(name, use, rules, jev=None, ai=None, vision=None):
         conf = 'high' if top and near(top[1], jc) else 'medium' if j.get('material_conf', 0) >= 0.8 else 'low'
         if res['conflict']:
             conf = 'low'
-        rough = round(min(1.0, max(0.05, j['roughness'])), 3)
-        metal = round(j['metal'], 3) if j['metal'] >= 0.5 else 0.0
-        return done(jc, 'jev', conf, '', rough, metal)
+        return done(jc, 'jev', conf, '', *jev_values(j))
     if top:
         conf = top[3]
         if res['conflict']:

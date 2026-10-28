@@ -126,7 +126,9 @@ I raise roughness and metalicity of character materials to the max to mask the p
    (about 0.12 USD for ~800 textures; cached in `~/.cache/anoxrtx/deepseek_vision.json`). With `--vision` (and in
    the installer, when that cache and the Jev classes exist) a strong name rule plus a high-confidence image answer
    overrule Jev ("rule+vision", 68 textures, e.g. `bricks2/bricksrock*` stone instead of metal); otherwise the image
-   answers are only listed in the report.
+   answers are only listed in the report. The remaining rule-vs-Jev conflicts were reviewed by hand with DeepSeek
+   as a second opinion and settled as exceptions ([docs/pbr-conflict-review.md](docs/pbr-conflict-review.md)); an
+   exception that names Jev's material keeps Jev's roughness/metallic.
    Better roughness/metallic: `tools/jev_classify.py <Anachronox> ~/.cache/anoxrtx/work/jev_classes.json
    <maps>/*.bsp --gemini` lets Gemini describe the textures (128 px contact sheets; free tier) and TypeSafe Jev
    decide material, roughness, metal and glow (about 0.12 USD for all textures; cached). `pbr_layer.py
