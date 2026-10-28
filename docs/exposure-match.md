@@ -303,3 +303,21 @@ to noise); they are applied (QindieGL logs them) but do not take effect when set
 Kept: autoexposure off and bias 0 on starport (`enabled = True` in `[rtxconf.default]` so other maps get it back).
 The café is -1.80 because Remix draws its window glass milky white instead of transparent (the original shows the
 city through it); that is a glass problem, not exposure.
+
+## Static-off emission for plain faces (2026-10-28)
+
+`emissive_styles.py` now also lists plain faces (no SURF_LIGHT) whose texture is emissive elsewhere, with style 0
+(QindieGL #41), so those faces no longer glow. Several map biases had been calibrated against walls that glowed;
+start-view EV against the 2026-10-18 originals (old files / new files / new files with the new bias):
+
+| map | old | new | new bias | bias |
+|---|---|---|---|---|
+| slounge | -0.07 | +3.68 | +0.41 | -3.7 -> 0.0 |
+| hephtower2 | +0.03 | +1.73 | +0.31 | -4.8 -> -3.1 |
+| mystech2 | -0.26 | +1.29 | +0.18 | -5.2 -> -3.9 |
+| scommons | -0.12 | +0.41 | +0.08 | -2.8 -> -2.4 |
+| tours | +0.03 | +0.40 | +0.04 | -1.3 -> -0.9 |
+
+onegate, hive, senderss and kraptonmaze moved by at most 0.24 EV; ballotine and kraptonmaze give a black start frame
+with both file sets. ms/frame is unchanged (A/B on the same ten maps, within 0.4 ms). slounge matches in mean but
+not in distribution: the original lights the room evenly, Remix lights one wall and leaves the door dark.
