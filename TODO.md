@@ -67,8 +67,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   (`rule+vision`, 68 texturer, konflikter 305 -> 237); installern använder cachen när den finns.
   Installerat 2026-10-28 (69 texturer ändrade inkl. undantag; normalkartor oförändrade): undantag `tensil/door02`/`door03`
   trä, `baltown/doorwall-101top` glas, `sunder/monitor-btm3` tech. A/B gammal/ny i spelet (13 vyer, 13 banor): högst
-  1,6 % pixlar ändrade, inga krascher; skillnaden (roughness/metallic) syns knappt i vyerna. Installern behöver
-  `--work ~/.cache/anoxrtx/work` och kartorna där (just nu ligger de i `event-lighting-2026-10-18/maps`).
+  1,6 % pixlar ändrade, inga krascher; skillnaden (roughness/metallic) syns knappt i vyerna.
+  2026-10-28: installern: arbetskatalogen är nu `~/.cache/anoxrtx/work` (där `jev_classes.json` redan låg),
+  `--maps DIR` för kartor extraherade på annat ställe (här `event-lighting-2026-10-18/maps`), steg som behöver
+  kartor avbryter med fel i stället för att köra verktygen utan kartor, och `pbr`/`emissive` lägger själva till
+  GE-hasharna (förut bara `mod`), så `install.sh pbr` ensamt ger ett komplett `pbr.usda`.
   2026-10-28: alla 237 konflikter granskade ([docs/pbr-conflict-review.md](docs/pbr-conflict-review.md)):
   `deepseek-flash` dömde från kontaktark (128 px) med regelns och Jevs klass och Geminis beskrivning (10 anrop,
   ~0,02 USD, cache `deepseek_conflicts.json`), sedan egen granskning av varje ark. 205 nya undantag (t.ex.
