@@ -34,6 +34,7 @@ fv, rh, adat, layers = _load('find_views'), _load('remixhash'), _load('adat'), _
 
 SURF_LIGHT, SURF_SKY, SURF_WARP, SURF_NODRAW = 0x1, 0x4, 0x8, 0x80
 LEVELS = 3
+TOL = 2.0   # QindieGL ESTYLES_TOL
 
 
 def styled_faces(path, emissive=()):
@@ -46,7 +47,7 @@ def styled_faces(path, emissive=()):
         flags, value = struct.unpack_from('<ii', d, toff + i * 76 + 32)
         tex.append((flags, value, d[toff + i * 76 + 40:toff + i * 76 + 72].split(b'\0', 1)[0].decode('latin-1')
                     .replace('\\', '/').lower()))
-    out = []
+    out = []; lit = {}
     for i in range(fn):
         _, _, first, num, ti = struct.unpack_from('<HHiHH', d, foff + i * 20)
         flags, value, name = tex[ti]
@@ -55,6 +56,7 @@ def styled_faces(path, emissive=()):
             continue
         if flags & SURF_LIGHT and value > 0:
             if not styles:
+                lit.setdefault(name, []).append(i)
                 continue
         elif name in emissive:
             styles = [0]
@@ -66,7 +68,21 @@ def styled_faces(path, emissive=()):
             v0, v1 = struct.unpack_from('<HH', d, eoff + abs(se) * 4)
             pts.append(struct.unpack_from('<fff', d, voff + (v0 if se >= 0 else v1) * 12))
         out.append((name, [sum(p[j] for p in pts) / len(pts) for j in range(3)], styles[0]))
-    return out
+    # QindieGL matches a drawn face to the nearest row within ESTYLES_TOL (2 units per axis); an unstyled light face
+    # has no row, so a style-0 row of the same texture that close (e.g. the top of a hanging lamp, 2 units above its
+    # lit bottom) would switch the light off: drop those rows (the plain face then keeps its emission)
+    near = {}
+    for name, idx in lit.items():
+        for i in idx:
+            _, _, first, num, _ = struct.unpack_from('<HHiHH', d, foff + i * 20)
+            pts = []
+            for k in range(num):
+                se = struct.unpack_from('<i', d, seoff + (first + k) * 4)[0]
+                v0, v1 = struct.unpack_from('<HH', d, eoff + abs(se) * 4)
+                pts.append(struct.unpack_from('<fff', d, voff + (v0 if se >= 0 else v1) * 12))
+            near.setdefault(name, []).append([sum(p[j] for p in pts) / len(pts) for j in range(3)])
+    return [r for r in out if r[2] != 0 or not any(all(abs(r[1][j] - c[j]) <= TOL + 0.5 for j in range(3))
+                                                    for c in near.get(r[0], ()))]
 
 
 def blocks(text):

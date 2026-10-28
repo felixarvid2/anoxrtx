@@ -140,9 +140,12 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   uppskattat direktljus i Remix på alla 98 banor; kandidater (otestade) utanför repot. slounge-hytten: lampytan
   `celight2` släcks av en stil 0-rad i `.estyles` (lampans ovansida 2 enheter bort, QindieGL matchar inom 2), samma
   krock släcker 108 ljusytor på 13 banor; rätta i `emissive_styles.py`. tours-fläcken ligger i stil 32-blocket
-  (släckt läge är inte 0 i originalet). Testa i spelet: slounge, vendomart, votowne, sexmach, fortress2.
-- [ ] slounge ljusfördelning: en punktlampa ger en skarp ljusfläck, originalet är jämnt upplyst. Flytt/radie hjälper
-  inte (docs/exposure-match.md); ljusmodellsskillnad.
+  (släckt läge är inte 0 i originalet). Krocken rättad 2026-10-28 (`emissive_styles.py` hoppar över stil 0-rader nära
+  ostilade ljusytor, 123 rader): slounge/vendomart bias -3,2/-3,6, -0,14/-0,05 EV. Kvar att testa: votowne, sexmach,
+  fortress2 (ljusytor med högt värde som emissionstaket 15 underskattar).
+- [x] slounge ljusfördelning (2026-10-28): lampytan var släckt av en `.estyles`-krock, inte en ljusmodellsskillnad.
+- [x] Dimma bakom glas (2026-10-28): vyer genom genomskinliga ytor mot himlen på 72 dimbanor; dimma av på sunstrip,
+  fortressgrounds, fortress2 (sunstrip start +2,14 -> -0,29 EV). starport-ljusgården kvar på ca -1,1 EV.
 - [x] baltownr exponering (2026-10-27): de nedre nivåerna var 1,5 EV för ljusa (median av 8 vyer); bias -3,8 och
   slemgolvet `ballotine/slime01a` intensitet 2 (docs/exposure-match.md), efter: median -0,07 EV (-1,7 till +1,3). Kvar: s1_1 längs slemkorridoren -1,7.
 - [x] fortress2 blå ton (2026-10-27): originalets cyanfärgade dörrparti (färg/luminans 0,82 1,05 1,02) motsvarar exakt

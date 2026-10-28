@@ -334,7 +334,13 @@ verified +0.07. kraptonmaze -0.48 (no change).
 **slounge light distribution.** The room is lit by one light (index 86, `-984 1504 192`, light 200). Under Remix it
 throws a hard-edged pool on the left wall and leaves the door dark; the original lights the room evenly. Moving it
 down 24/48/96 units changed the start view by 0.2-0.8 EV but not the look; a radius of 16/48/96 only made it brighter
-(-2.2 to -4.2 EV). It is the difference between a ray-traced point light and the baked lightmap; no override kept.
+(-2.2 to -4.2 EV). Cause found by `tools/baked_light_gaps.py` (docs/baked-light-gaps.md): the booth's real light is
+the hanging lamp's lit face (`sendormitory/celight2`, value 3000); its top face (same texture, not a light) had a
+style-0 row in `slounge.estyles` 2 units away, and QindieGL matches within 2 units, so the light face drew with its
+emission off as well. The same collision switched off 108 light faces on 13 maps. `emissive_styles.py` now drops
+style-0 rows within the tolerance of an unstyled light face of the same texture (123 rows). The room is then evenly
+lit as in the original; bias back from 0.0 to -3.2 (slounge -3.24 -> -0.14 EV), vendomart -2.7 -> -3.6
+(-0.90 -> -0.05); krap2 -0.35, scommons +0.08, kraptonmaze -0.50, tours2 +0.26 kept.
 
 **starport café window.** The milky glass was `braintrain/glass-1b`, a translucent texture that is also emissive (a
 SURF_LIGHT face elsewhere); with the static-off rows it is clear. Through it the city props show, but the skybox
@@ -356,3 +362,12 @@ Views a/b (towards the door) -1.6..-0.9 EV in both states. The original "on" sho
 the indoor level. `rtx.autoExposure.enabled = False`, bias -0.5 (was autoexposure with -3.8): EV per view
 (old -> new) shaft_h +0.01 -> -0.24, up_hi +3.05 -> +0.72, s0_0 -0.24 -> -0.80, s0_2 +1.23 -> -0.25,
 s1_1 -1.76 -> -1.62, start +0.54 -> +0.34; median -0.24, spread 4.8 -> 2.3 EV.
+
+**Fog behind glass on other maps (2026-10-28).** Views through translucent faces (SURF_TRANS33/66) that look at the
+sky, on the 72 maps with worldspawn fog (any distance from the spawn; the player is moved there with `goto`): Remix
+with fog, without fog, and the original. Fog drew the sky or the objects behind the glass grey on sunstrip (glass
+views +3.64/+1.05 -> -0.22/-0.75 EV, and its start +2.14 -> -0.29), fortressgrounds (-1.11 -> -0.51, start
+unchanged) and fortress2 (the tank behind the glass shows; start unchanged): `enableFogRemap = False` there.
+crevicelanding and krapton did not change. starport's atrium stays about -1.1 EV without fog (+0.67 with it); a
+bias of -0.3 did not move the views consistently (run-to-run noise about ±0.5 EV), so bias 0 is kept.
+
