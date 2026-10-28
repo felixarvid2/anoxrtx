@@ -64,7 +64,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   Egen granskning av kontaktarken: i konflikterna har bilden oftast rätt (`bricks2/bricksrock*` sten, inte metall;
   mattor/soffor/tält tyg; tavlor skylt), men sämre än Jev på t.ex. dörrar (`tensil/door02` blir tech, inte trä) och
   svarta/genomskinliga miniatyrer (`*/clear`). Därför: stark namnregel + bildsvar med hög säkerhet slår Jev
-  (`rule+vision`, 68 texturer, konflikter 305 -> 237); installern använder cachen när den finns. Ej verifierat i spelet.
+  (`rule+vision`, 68 texturer, konflikter 305 -> 237); installern använder cachen när den finns.
+  Installerat 2026-10-28 (69 texturer ändrade inkl. undantag; normalkartor oförändrade): undantag `tensil/door02`/`door03`
+  trä, `baltown/doorwall-101top` glas, `sunder/monitor-btm3` tech. A/B gammal/ny i spelet (13 vyer, 13 banor): högst
+  1,6 % pixlar ändrade, inga krascher; skillnaden (roughness/metallic) syns knappt i vyerna. Installern behöver
+  `--work ~/.cache/anoxrtx/work` och kartorna där (just nu ligger de i `event-lighting-2026-10-18/maps`).
 - [ ] **7. Ankarmeshar:** stabila författar-ID:n, per-karta-data, ersättnings-
   och resurslivscykel; statiska ankare först.
 - [ ] **8. Dimma/miljötillstånd:** mjuka, verifierade övergångar och återgång
