@@ -75,7 +75,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   `bricks/windowplain` glas, `commbase/compside-*` tech, `whitendon/in_rafter*` trä, `sunder/bardrink-*` skärm);
   konflikter 237 -> 31 (kvar: svarta `*/clear`, limbus-pelare, ballotine-pelare m.fl., listade i dokumentet).
   Undantag som bekräftar Jevs material behåller Jevs värden, så 67 texturer ändrar roughness/metallic mot main.
-  Kvar: installera och titta i spelet (`*/clear` på vätskebrushar, `bricks/windowplain` på fasaderna).
+  Installerat 2026-10-28 (granskat lager, 63 texturer ändrade mot visionlagret). Närbilder med handplacerade vyer
+  (goto + rigcam: tält på commiteon, säten på starport, pelare på fortress1, stol på whitendon) gamla/nya lagret:
+  0-4 % pixlar ändrade, för att vyerna mest visar oförändrade varianter (`tent1-2`, `tent2-1`). Spegeltest (alla
+  `commbase/tent*` metallic 1, roughness 0,02) ändrade 87-89 % av pixlarna: materialvärdena når Remix. Kontroll
+  whitendon, starport, commiteon, senderss: ok, inga fel. Kvar: närbilder av `bricks/windowplain` och `*/clear`.
 - [ ] **7. Ankarmeshar:** stabila författar-ID:n, per-karta-data, ersättnings-
   och resurslivscykel; statiska ankare först.
 - [ ] **8. Dimma/miljötillstånd:** mjuka, verifierade övergångar och återgång
