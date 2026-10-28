@@ -50,6 +50,14 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   (docs/exposure-match.md). Ingen prestandakostnad. slounge: rätt medelnivå men annan ljusfördelning än originalet.
 - [ ] **6. PBR-klassificering:** vidareutveckla befintliga namnregler med
   dataregler, undantag, BSP-flaggor och osäkerhetsrapport; kan gå parallellt.
+  2026-10-28: regler som data (`tools/pbr_rules.json`: klasser, ordnade nyckelord, undantag, haze_glass),
+  `tools/pbr_classify.py` (BSP-användning: ytor/banor, SURF_LIGHT/TRANS-andel, brush-contents, animationsramar;
+  rapport `pbr_report.md` med oklassade, svaga, konflikter och modellkällor), `pbr_layer.py` använder den.
+  Utan Jev: oklassade 2683 -> 1700 av 3676 (nya klasser sign/light/organic; tidigare klassade oförändrade).
+  Med Jev (som installeras): samma material som förut utom undantagen; 305 konflikter regel mot Jev listas.
+  DeepSeek (`--deepseek`, bara text, ~0,09 USD) gav klass åt 159 av 1700 oklassade, sa "default" om resten,
+  och hittade regelfel (thatch/hatch, curtainrods) som blev undantag; förslag används bara med `--ai`.
+  Kvar: granska konflikterna (t.ex. `baseanox/clear`, `bricks/windowplain`), fler undantag, närbilder i spelet.
 - [ ] **7. Ankarmeshar:** stabila författar-ID:n, per-karta-data, ersättnings-
   och resurslivscykel; statiska ankare först.
 - [ ] **8. Dimma/miljötillstånd:** mjuka, verifierade övergångar och återgång

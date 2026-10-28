@@ -1,0 +1,50 @@
+{
+ "_doc": "PBR material classes for the level textures, read by tools/pbr_classify.py (and pbr_layer.py). classes: roughness/metallic per class. rules: keywords matched in the texture's base name, first matching rule wins (order matters). A keyword of at most 3 letters inside a longer word (not at its start or end) is a weak match: ignored except in legacy rules (the original pbr_layer.py keyword list, kept so the installed layer does not change) and listed in the report. exceptions: exact texture paths, override everything else; give a reason. haze_glass: translucent haze sheets that get no material (Remix keeps the blended look). glass_words: SURF_TRANS33/66 textures whose base name contains one of these become thin-walled translucent glass. flag_rules: BSP surface flags/usage, see pbr_classify.py.",
+ "classes": {
+  "glass": {"roughness": 0.25, "metallic": 0.0, "about": "glass, windows, facades with windows"},
+  "screen": {"roughness": 0.2, "metallic": 0.0, "about": "monitors, displays, computer screens"},
+  "metal": {"roughness": 0.45, "metallic": 0.6, "about": "bare metal: steel, pipes, grates, girders, machinery"},
+  "tech": {"roughness": 0.5, "metallic": 0.3, "about": "doors, trims, painted tech panels, mixed metal/plastic"},
+  "polished": {"roughness": 0.3, "metallic": 0.0, "about": "marble, ceramic tiles, polished floors"},
+  "wood": {"roughness": 0.6, "metallic": 0.0, "about": "wood, furniture, crates"},
+  "stone": {"roughness": 0.85, "metallic": 0.0, "about": "rock, stone, brick, concrete, plaster, dirt"},
+  "fabric": {"roughness": 0.95, "metallic": 0.0, "about": "carpet, curtains, cloth, upholstery, cushions"},
+  "organic": {"roughness": 0.9, "metallic": 0.0, "about": "grass, plants, moss, hedges, thatch"},
+  "sign": {"roughness": 0.5, "metallic": 0.0, "about": "painted signs, posters, pictures, paintings, labels"},
+  "light": {"roughness": 0.35, "metallic": 0.0, "about": "lamps and light fixtures, light panels (emission comes from the emissive layers)"},
+  "default": {"roughness": 0.7, "metallic": 0.0, "about": "unclassified: generic painted walls, floors, unknown"}
+ },
+ "rules": [
+  {"legacy": true, "class": "glass", "words": ["glass", "window", "win", "clear", "mirror", "chrome"]},
+  {"legacy": true, "class": "screen", "words": ["monitor", "screen", "scrn", "monitext", "comp", "ssmon"]},
+  {"legacy": true, "class": "metal", "words": ["metl", "mtl", "metal", "steel", "iron", "pipe", "grate", "girder", "vent", "panel", "rail", "tank"]},
+  {"legacy": true, "class": "tech", "words": ["door", "trim", "tech", "electro", "power"]},
+  {"legacy": true, "class": "polished", "words": ["marble", "tile", "polish"]},
+  {"legacy": true, "class": "wood", "words": ["wood", "parquet", "crate", "plank", "cabinet", "bar"]},
+  {"legacy": true, "class": "stone", "words": ["rock", "stone", "brick", "concrete", "cement", "dirt", "sand", "ground", "cave", "plaster"]},
+  {"legacy": true, "class": "fabric", "words": ["carpet", "curtain", "cloth", "fabric", "bed"]},
+  {"class": "glass", "words": ["wndw", "panes", "glas"]},
+  {"class": "screen", "words": ["display", "video", "ztv", "arcade", "viewr", "noxnet"]},
+  {"class": "metal", "words": ["stainless", "valve", "turbin", "furnac", "generator", "duct", "girdr", "beam", "brace", "scaff", "chain", "ladder", "fence", "gate", "grid", "rivet", "rust", "gold", "silver", "wheel", "fan", "conveyor", "airlock", "hatch", "elevator", "lift"]},
+  {"class": "tech", "words": ["cntrl", "ctrl", "control", "console", "consol", "button", "numpad", "machine", "vending", "fridg", "jukebox"]},
+  {"class": "wood", "words": ["desk", "table", "shelf", "bookcase", "rafter", "fruitbox"]},
+  {"class": "sign", "words": ["sign", "poster", "pict", "painting", "certificate", "comic", "billb", "text", "logo", "welcome", "menu"]},
+  {"class": "stone", "words": ["conc", "colum", "pillar", "pilr", "arch", "cobble", "sidewalk", "street", "path", "road", "roof", "asphalt", "mud", "hill", "snow"]},
+  {"class": "fabric", "words": ["couch", "cushion", "seat", "sofa", "chair", "towel", "tent", "rug", "flag", "rope"]},
+  {"class": "organic", "words": ["grass", "gras", "moss", "ivy", "hedge", "leaf", "leaves", "plant", "forest", "thatch", "bush"]},
+  {"class": "light", "words": ["lamp", "light", "lite", "lit", "torch", "bulb", "neon"]}
+ ],
+ "exceptions": {
+  "smallbricks/streetsigns": {"class": "sign", "why": "street signs, not street paving (\"street\" matches the stone rule first)"},
+  "tensil/rope-ladder": {"class": "fabric", "why": "rope ladder: \"ladder\" (metal) and \"rope\" (fabric) both match"},
+  "bricks/televthing": {"class": "screen", "why": "television, not an elevator"},
+  "tensil/thatch": {"class": "organic", "why": "thatch, not a metal hatch (found by DeepSeek review)"},
+  "senderstation/curtainrods": {"class": "metal", "why": "curtain rods (found by DeepSeek review)"}
+ },
+ "haze_glass": ["sunder/sun_glass3"],
+ "glass_words": ["glass", "win", "clear"],
+ "flag_rules": {
+  "skip_flags": ["SKY", "WARP"],
+  "light_share": 0.5
+ }
+}
