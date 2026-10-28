@@ -2,7 +2,7 @@
 """Approximate PBR materials for the level textures: normal maps, roughness/metallic, glass.
 
 usage: pbr_layer.py MODDIR GAMEDIR MAP.bsp... [--max 512] [--strength 2.0] [--only NAME,NAME] [--classes JEV.json]
-                    [--rules RULES.json] [--ai CACHE.json] [--report DIR]
+                    [--rules RULES.json] [--ai CACHE.json] [--vision CACHE.json] [--report DIR]
 
 For every texture the maps use (BSP texinfo) that exists in the loose texture pack in GAMEDIR/anoxdata/textures
 (e.g. Chuncki's 4x pack; hashes via remixhash.py, so the pack must be what the game loads):
@@ -13,7 +13,8 @@ For every texture the maps use (BSP texinfo) that exists in the loose texture pa
   rules in tools/pbr_rules.json: exceptions, BSP flags, name keywords); with --classes CLASSES.json from
   tools/jev_classify.py (Gemini looks, Jev decides): roughness = Jev's score (clamped 0.05..1), metallic = Jev's metal
   probability when it is at least 0.5, otherwise 0, unless an exception says otherwise; --ai CACHE.json adds the
-  DeepSeek suggestions cached by pbr_classify.py --deepseek (see there); --report DIR writes the uncertainty report;
+  DeepSeek suggestions cached by pbr_classify.py --deepseek, --vision CACHE.json what DeepSeek saw in the thumbnails
+  (pbr_classify.py --deepseek-vision: settles rule-vs-Jev conflicts, see there); --report DIR writes the uncertainty report;
 - glass: SURF_TRANS33/66 textures named glass/win/clear (glass_words) become thin-walled AperturePBR_Translucent with
   the texture as transmittance (not haze_glass: haze sheets keep Remix' blended look).
 Sky (SURF_SKY) and liquid (SURF_WARP) surfaces are skipped (liquids.usda handles those), and so is haze_glass.
@@ -62,6 +63,7 @@ def main():
     maxside = int(opt('--max', '512')); strength = float(opt('--strength', '2.0'))
     only = set(opt('--only', '').split(',')) - {''}
     classes_file = opt('--classes', ''); ai_file = opt('--ai', ''); report_dir = opt('--report', '')
+    vision_file = opt('--vision', '')
     rules = pc.load_rules(opt('--rules', pc.RULES))
     jev = {}
     if classes_file:
@@ -71,7 +73,7 @@ def main():
         print(__doc__); sys.exit(1)
     moddir, gamedir, maps = args[0], args[1], args[2:]
 
-    results, _ = pc.classify_all(maps, rules, jev, pc.load_ai(ai_file))
+    results, _ = pc.classify_all(maps, rules, jev, pc.load_ai(ai_file), pc.load_ai(vision_file))
     if report_dir:
         import json
         os.makedirs(report_dir, exist_ok=True)

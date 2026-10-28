@@ -58,6 +58,13 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   DeepSeek (`--deepseek`, bara text, ~0,09 USD) gav klass åt 159 av 1700 oklassade, sa "default" om resten,
   och hittade regelfel (thatch/hatch, curtainrods) som blev undantag; förslag används bara med `--ai`.
   Kvar: granska konflikterna (t.ex. `baseanox/clear`, `bricks/windowplain`), fler undantag, närbilder i spelet.
+  2026-10-28: DeepSeek ser texturerna (`--deepseek-vision`, 5x5-kontaktark med 128 px-miniatyrer, `deepseek-flash`,
+  ~0,12 USD för 780 texturer). Kalibrering 50/50 rätt (tydliga namn där regel och Jev är eniga). Överens med Jev
+  78 % (slumpprov 143), 75 % (300 största oklassade), 46 % (305 konflikter regel mot Jev); med textläget 65 %.
+  Egen granskning av kontaktarken: i konflikterna har bilden oftast rätt (`bricks2/bricksrock*` sten, inte metall;
+  mattor/soffor/tält tyg; tavlor skylt), men sämre än Jev på t.ex. dörrar (`tensil/door02` blir tech, inte trä) och
+  svarta/genomskinliga miniatyrer (`*/clear`). Därför: stark namnregel + bildsvar med hög säkerhet slår Jev
+  (`rule+vision`, 68 texturer, konflikter 305 -> 237); installern använder cachen när den finns. Ej verifierat i spelet.
 - [ ] **7. Ankarmeshar:** stabila författar-ID:n, per-karta-data, ersättnings-
   och resurslivscykel; statiska ankare först.
 - [ ] **8. Dimma/miljötillstånd:** mjuka, verifierade övergångar och återgång

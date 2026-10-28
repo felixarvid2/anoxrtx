@@ -104,6 +104,80 @@ class PriorityTest(unittest.TestCase):
                          {'a/x': {'class': 'metal', 'confidence': 'high', 'why': 'w'}})
 
 
+class VisionTest(unittest.TestCase):
+    def test_numbered_answers_map_to_names(self):
+        got = {'1': {'class': 'stone', 'confidence': 'high', 'why': 'rock'}, '2': {'class': 'plastic'},
+               '3': {'class': 'Glass', 'confidence': 'sure'}, '9': {'class': 'wood'}}
+        self.assertEqual(pc.vision_validate(got, ['a/x', 'a/y', 'a/z'], RULES['classes']),
+                         {'a/x': {'class': 'stone', 'confidence': 'high', 'why': 'rock'},
+                          'a/z': {'class': 'glass', 'confidence': 'low', 'why': ''}})
+
+    def test_prompt_lists_numbers_and_classes(self):
+        p = pc.dsv_prompt(RULES, ['a/x | 5 | 1 | 0 | 0 | -', 'a/y | 2 | 1 | 0 | 0 | -'])
+        self.assertIn('\n1: a/x | 5', p)
+        self.assertIn('\n2: a/y | 2', p)
+        self.assertIn('- polished: ', p)
+
+    def test_image_is_a_data_url_and_key_only_a_header(self):
+        import io, json
+        sent = {}
+        def fake(req, timeout=0):
+            sent['body'] = json.loads(req.data); sent['headers'] = dict(req.header_items()); sent['url'] = req.full_url
+            return io.BytesIO(json.dumps({'usage': {'prompt_tokens': 3}, 'choices': [
+                {'message': {'content': '{"1": {"class": "metal"}}'}}]}).encode())
+        orig = pc.urllib.request.urlopen
+        pc.urllib.request.urlopen = fake
+        try:
+            got, u = pc.ds_ask('SECRET', 'prompt', lambda u: None, b'\x89PNG')
+        finally:
+            pc.urllib.request.urlopen = orig
+        self.assertEqual(got, {'1': {'class': 'metal'}})
+        msg = sent['body']['messages'][0]['content']
+        self.assertEqual(sent['body']['model'], 'deepseek-flash')
+        self.assertEqual(msg[0]['image_url']['url'], 'data:image/png;base64,iVBORw==')
+        self.assertEqual(msg[1], {'type': 'text', 'text': 'prompt'})
+        self.assertNotIn('SECRET', json.dumps(sent['body']) + sent['url'])
+        self.assertEqual(sent['headers']['Authorization'], 'Bearer SECRET')
+
+    def test_pick_sets(self):
+        jev = lambda m: {'material': m, 'roughness': 0.5, 'metal': 0.0, 'material_conf': 1.0}
+        u = {'a/rockwall': use(5), 'a/pipewall': use(50), 'a/xyz': use(7), 'a/abc': use(70), 'a/sky': use(9, pc.SURF['SKY']),
+             'a/noimage': use(99)}
+        j = {'a/rockwall': jev('stone'), 'a/pipewall': jev('wood'), 'a/xyz': jev('metal')}
+        res = {n: pc.classify(n, v, RULES, j) for n, v in u.items()}
+        files = {n: n for n in u if n != 'a/noimage'}
+        pick = lambda p: pc.vision_pick(res, u, RULES, files, p)
+        self.assertEqual(pick('calib'), ['a/rockwall'])
+        self.assertEqual(pick('conflicts'), ['a/pipewall'])
+        self.assertEqual(pick('unclassified'), ['a/abc', 'a/xyz'])
+        self.assertEqual(pick('unclassified:1,top:2'), ['a/abc', 'a/pipewall', 'a/xyz'])   # N new ones per set
+        self.assertEqual(sorted(pick('jev')), ['a/pipewall', 'a/rockwall', 'a/xyz'])
+
+    def test_rule_and_image_outvote_jev(self):
+        jev = {'a/rockwall': {'material': 'metal', 'roughness': 0.5, 'metal': 0.7, 'material_conf': 1.0}}
+        vis = lambda c, conf: {'a/rockwall': {'class': c, 'confidence': conf}}
+        r = pc.classify('a/rockwall', use(), RULES, jev, vision=vis('stone', 'high'))
+        self.assertEqual((r['class'], r['source'], r['metallic'], r['conflict']), ('stone', 'rule+vision', 0.0, False))
+        for v in (vis('stone', 'medium'), vis('metal', 'high'), vis('light', 'high'), vis('default', 'high')):
+            r = pc.classify('a/rockwall', use(), RULES, jev, vision=v)
+            self.assertEqual((r['class'], r['source'], r['conflict']), ('metal', 'jev', True), v)
+        # a weak (non-high) rule never outvotes Jev
+        jev = {'a/tpipewall': {'material': 'wood', 'roughness': 0.5, 'metal': 0.0, 'material_conf': 1.0}}
+        r = pc.classify('a/tpipewall', use(), RULES, jev, vision={'a/tpipewall': {'class': 'metal', 'confidence': 'high'}})
+        self.assertEqual(r['source'], 'jev')
+
+    def test_image_before_text_model_for_unnamed(self):
+        r = pc.classify('a/xyz', use(), RULES, ai={'a/xyz': {'class': 'wood', 'confidence': 'high'}},
+                        vision={'a/xyz': {'class': 'stone', 'confidence': 'high'}})
+        self.assertEqual((r['class'], r['source'], r['confidence']), ('stone', 'vision', 'medium'))
+        self.assertTrue(pc.uncertain(r))
+
+    def test_vision_answer_recorded(self):
+        r = pc.classify('a/xyz', use(), RULES, vision={'a/xyz': {'class': 'metal', 'confidence': 'high', 'why': 'w'}})
+        self.assertEqual(r['vision'], {'class': 'metal', 'confidence': 'high', 'why': 'w'})
+        self.assertNotIn('vision', pc.classify('a/xyz', use(), RULES, vision={'a/xyz': {'class': 'plastic'}}))
+
+
 class UsageTest(unittest.TestCase):
     def test_faces_flags_frames_and_contents(self):
         data = bsp([('a/+0blink', 0x1, 1), ('a/+1blink', 0x1, 0), ('a/wall', 0, -1), ('a/pool', 0, -1)],
