@@ -113,8 +113,15 @@ I raise roughness and metalicity of character materials to the max to mask the p
 
 7. Approximate PBR materials for the level textures (after 6, since the hashes come from the loose pack):
    `tools/pbr_layer.py rtx-remix/mods/anoxrt <Anachronox> <maps>/*.bsp` writes normal maps (from the texture's
-   luminance), roughness/metallic by keywords in the texture name, and thin-walled glass for the
+   luminance), roughness/metallic per material class, and thin-walled glass for the
    `SURF_TRANS33/66` glass/window textures, as `pbr.usda`; add `@./pbr.usda@` to mod.usda's subLayers.
+   The classes come from `tools/pbr_classify.py` with the reviewable rules in `tools/pbr_rules.json`
+   (exceptions, BSP flags such as sky/liquid/light faces, name keywords). `tools/pbr_classify.py OUTDIR
+   <maps>/*.bsp [--classes jev_classes.json]` (or `pbr_layer.py --report DIR`) writes `pbr_report.md`: class
+   counts and the unclassified, weak, conflicting (rule vs Jev) and model-sourced textures, largest face count
+   first. `--deepseek` asks DeepSeek (text only: texture paths and usage numbers; cached in
+   `~/.cache/anoxrtx/deepseek_pbr.json`) for the textures the rules leave open; `pbr_layer.py --ai` applies
+   those suggestions, marked as such in the report.
    Better roughness/metallic: `tools/jev_classify.py <Anachronox> ~/.cache/anoxrtx/work/jev_classes.json
    <maps>/*.bsp --gemini` lets Gemini describe the textures (128 px contact sheets; free tier) and TypeSafe Jev
    decide material, roughness, metal and glow (about 0.12 USD for all textures; cached). `pbr_layer.py
@@ -243,6 +250,7 @@ Regression checks, without Steam or a running X server:
 
 ```sh
 python -m unittest discover -s tools -p 'test_anoxrig.py'
+python -m unittest discover -s tools -p 'test_pbr_classify.py'
 ```
 
 

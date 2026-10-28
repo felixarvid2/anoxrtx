@@ -91,6 +91,12 @@ Do not upload game assets or private data as context. Exception approved by Feli
 `tools/jev_classify.py --gemini` may send 128 px texture thumbnails (contact sheets) to Gemini for
 material classification; no other game assets.
 
+DeepSeek (`tools/pbr_classify.py --deepseek`, model `deepseek-flash`) suggests PBR classes for texture names the
+rules leave open. It receives text only (texture paths, flag/usage counts, the class list), never images or game
+files. Key in `~/.config/anoxrtx/deepseek.key` (same rules as the Gemini key); answers are cached in
+`~/.cache/anoxrtx/deepseek_pbr.json` with token counts in `deepseek_pbr.log`; stop on API errors, no retries.
+Keep spend bounded with `--max-usd`.
+
 TypeSafe Jev (decision model: yes/no, choice, score) classifies textures in `tools/jev_classify.py`
 from Gemini's descriptions; Gemini looks, Jev decides, results are cached. Its key is in
 `~/Documents/jev-api.md` (same rules as the Gemini key). Felix's budget for Jev is 5 USD in total; a full

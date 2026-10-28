@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
 """Approximate PBR materials for the level textures: normal maps, roughness/metallic, glass.
 
-usage: pbr_layer.py MODDIR GAMEDIR MAP.bsp... [--max 512] [--strength 2.0] [--only NAME,NAME]
+usage: pbr_layer.py MODDIR GAMEDIR MAP.bsp... [--max 512] [--strength 2.0] [--only NAME,NAME] [--classes JEV.json]
+                    [--rules RULES.json] [--ai CACHE.json] [--report DIR]
 
 For every texture the maps use (BSP texinfo) that exists in the loose texture pack in GAMEDIR/anoxdata/textures
 (e.g. Chuncki's 4x pack; hashes via remixhash.py, so the pack must be what the game loads):
 - normal map: the texture's luminance as a height field (blurred, Sobel, wraps around since textures tile),
   encoded the way Remix reads `normalmap_texture` (unorm hemi-octahedral in R/G: t = n.xy / (|x|+|y|+|z|),
   p = (t.x + t.y, t.x - t.y)), DirectX tangent space, written as DXT1 with mips, longest side <= --max;
-- reflection_roughness_constant / metallic_constant from keywords in the texture name (see CLASSES), or with
-  --classes CLASSES.json from tools/jev_classify.py (Gemini looks, Jev decides): roughness = Jev's score
-  (clamped 0.05..1), metallic = Jev's metal probability when it is at least 0.5, otherwise 0; textures missing
-  from the file fall back to the keywords;
-- glass: SURF_TRANS33/66 textures named glass/win/clear become thin-walled AperturePBR_Translucent with
-  the texture as transmittance (not HAZE_GLASS: haze sheets keep Remix' blended look).
-Sky (SURF_SKY) and liquid (SURF_WARP) surfaces are skipped (liquids.usda handles those), and so are HAZE_GLASS.
+- reflection_roughness_constant / metallic_constant per material class (tools/pbr_classify.py with the reviewable
+  rules in tools/pbr_rules.json: exceptions, BSP flags, name keywords); with --classes CLASSES.json from
+  tools/jev_classify.py (Gemini looks, Jev decides): roughness = Jev's score (clamped 0.05..1), metallic = Jev's metal
+  probability when it is at least 0.5, otherwise 0, unless an exception says otherwise; --ai CACHE.json adds the
+  DeepSeek suggestions cached by pbr_classify.py --deepseek (see there); --report DIR writes the uncertainty report;
+- glass: SURF_TRANS33/66 textures named glass/win/clear (glass_words) become thin-walled AperturePBR_Translucent with
+  the texture as transmittance (not haze_glass: haze sheets keep Remix' blended look).
+Sky (SURF_SKY) and liquid (SURF_WARP) surfaces are skipped (liquids.usda handles those), and so is haze_glass.
 Writes MODDIR/pbr.usda and MODDIR/hd/pbr/. Add @./pbr.usda@ to mod.usda's subLayers; overrides in mod.usda,
 emissive.usda and liquids.usda keep their own values where they set the same inputs.
 Needs: pillow, numpy, xxhash.
@@ -27,34 +29,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 def _load(name):
     spec = importlib.util.spec_from_file_location(name, os.path.join(here, name + '.py'))
     m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); return m
-bspinfo, rh, layers = _load('bspinfo'), _load('remixhash'), _load('make_layers')
-
-SURF_SKY, SURF_WARP, SURF_TRANS33, SURF_TRANS66 = 0x4, 0x8, 0x10, 0x20
-
-# (keywords in the texture path, roughness, metallic); first match wins, DEFAULT otherwise
-CLASSES = [
-    (('glass', 'window', 'win', 'clear', 'mirror', 'chrome'), 0.25, 0.0),   # mostly opaque facades with windows
-    (('monitor', 'screen', 'scrn', 'monitext', 'comp', 'ssmon'), 0.2, 0.0),
-    (('metl', 'mtl', 'metal', 'steel', 'iron', 'pipe', 'grate', 'girder', 'vent', 'panel', 'rail', 'tank'), 0.45, 0.6),
-    (('door', 'trim', 'tech', 'electro', 'power'), 0.5, 0.3),
-    (('marble', 'tile', 'polish'), 0.3, 0.0),
-    (('wood', 'parquet', 'crate', 'plank', 'cabinet', 'bar'), 0.6, 0.0),
-    (('rock', 'stone', 'brick', 'concrete', 'cement', 'dirt', 'sand', 'ground', 'cave', 'plaster'), 0.85, 0.0),
-    (('carpet', 'curtain', 'cloth', 'fabric', 'bed'), 0.95, 0.0),
-]
-DEFAULT = (0.7, 0.0)
-GLASS_WORDS = ('glass', 'win', 'clear')
-# translucent haze sheets, not clear glass: the original blends their light texture at 33 % over the view (the haze
-# over the city in labbuilding); as clear AperturePBR_Translucent glass the haze is gone and the room reflects in it
-HAZE_GLASS = ('sunder/sun_glass3',)
-
-
-def classify(name):
-    base = name.split('/')[-1]
-    for words, rough, metal in CLASSES:
-        if any(w in base for w in words):
-            return rough, metal
-    return DEFAULT
+rh, layers, pc = _load('remixhash'), _load('make_layers'), _load('pbr_classify')
 
 
 def normal_map(path, maxside, strength):
@@ -86,7 +61,8 @@ def main():
         return default
     maxside = int(opt('--max', '512')); strength = float(opt('--strength', '2.0'))
     only = set(opt('--only', '').split(',')) - {''}
-    classes_file = opt('--classes', '')
+    classes_file = opt('--classes', ''); ai_file = opt('--ai', ''); report_dir = opt('--report', '')
+    rules = pc.load_rules(opt('--rules', pc.RULES))
     jev = {}
     if classes_file:
         import json
@@ -95,12 +71,12 @@ def main():
         print(__doc__); sys.exit(1)
     moddir, gamedir, maps = args[0], args[1], args[2:]
 
-    flags = {}
-    for m in maps:
-        _, _, tex = bspinfo.load(m)
-        for name, f, v in tex:
-            k = name.replace('\\', '/').lower()
-            flags[k] = flags.get(k, 0) | f
+    results, _ = pc.classify_all(maps, rules, jev, pc.load_ai(ai_file))
+    if report_dir:
+        import json
+        os.makedirs(report_dir, exist_ok=True)
+        json.dump(results, open(os.path.join(report_dir, 'pbr_classes.json'), 'w'), indent=1, sort_keys=True)
+        open(os.path.join(report_dir, 'pbr_report.md'), 'w').write(pc.report(results))
     root = os.path.join(gamedir, 'anoxdata', 'textures')
     files = {}
     for p in glob.glob(os.path.join(root, '**', '*.*'), recursive=True):
@@ -109,9 +85,9 @@ def main():
     outdir = os.path.join(moddir, 'hd', 'pbr'); os.makedirs(outdir, exist_ok=True)
     tmp = os.path.join(outdir, '_tmp.png')
     out = layers.header(); done = set(); n = nglass = nskip = njev = 0
-    for k in sorted(flags):
-        f = flags[k]
-        if (only and k not in only) or f & (SURF_SKY | SURF_WARP) or k not in files or k in HAZE_GLASS:
+    for k in sorted(results):
+        r = results[k]
+        if (only and k not in only) or r['class'] == 'skip' or k not in files:
             nskip += 1; continue
         try:
             h, _ = rh.remix_hash(files[k])
@@ -121,14 +97,10 @@ def main():
             continue
         done.add(h)
         hx = '%016X' % h
-        if k in jev:
-            rough = round(min(1.0, max(0.05, jev[k]['roughness'])), 3)
-            metal = round(jev[k]['metal'], 3) if jev[k]['metal'] >= 0.5 else 0.0
-            njev += 1
-        else:
-            rough, metal = classify(k)
+        rough, metal = r['roughness'], r['metallic']
+        njev += r['source'] == 'jev'
         lines = ['        # %s' % k, '        over "mat_%s"' % hx, '        {', '            over "Shader"', '            {']
-        if f & (SURF_TRANS33 | SURF_TRANS66) and any(w in k.split('/')[-1] for w in GLASS_WORDS):
+        if r['translucent']:
             Image.open(files[k]).convert('RGB').save(tmp)
             layers.dds(tmp, os.path.join(outdir, hx + '.t.dds'))
             lines += ['                uniform asset info:mdl:sourceAsset = @AperturePBR_Translucent.mdl@',
@@ -154,7 +126,7 @@ def main():
     if os.path.exists(tmp):
         os.remove(tmp)
     open(os.path.join(moddir, 'pbr.usda'), 'w').write('\n'.join(out + layers.footer()))
-    print('%d materials (%d glass, %d from Jev classes), %d skipped (sky/liquid/not in pack) -> %s' % (n, nglass, njev, nskip,
+    print('%d materials (%d glass, %d from Jev classes), %d skipped (sky/liquid/haze/not in pack) -> %s' % (n, nglass, njev, nskip,
           os.path.join(moddir, 'pbr.usda')))
 
 
