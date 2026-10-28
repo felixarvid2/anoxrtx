@@ -43,6 +43,12 @@ downloaded), emissive and PBR materials, the lava material and mod.usda, and set
 it the level textures stay original and the PBR/lava layers are skipped. `--ge GraphicalEnhancements0.3.zip` also
 installs that mod's model and sky textures (step 11 below). Steps can be run on their own, e.g.
 `tools/install.sh lights mod`; `--help` lists them. Replaced files go to `<game>/anoxrtx-backup/`.
+Work directory (`--work`, default `~/.cache/anoxrtx/work`; older installs used `~/.cache/anoxrtx` and keep it while
+`work/` does not exist): downloads, the extracted maps (`<work>/maps`, from the `extract` step; `--maps DIR` uses
+maps extracted elsewhere) and `jev_classes.json` (`--classes FILE`). The DeepSeek caches stay in `~/.cache/anoxrtx`
+(`deepseek_vision.json`, `--vision FILE`). The `lights`, `emissive`, `pbr` and `estyles` steps stop with an error
+when there are no maps. `pbr` and `emissive` also add the Graphical Enhancements hashes, so they can be rebuilt
+alone (`tools/install.sh pbr`) without rerunning `mod`.
 `tools/toggle.sh off|on` switches between RTX Remix and the plain game. Needs: python3 (venv), git, cmake, a
 Vulkan-capable NVIDIA GPU; the first full run takes a while (texture upscaling).
 
@@ -258,6 +264,7 @@ Regression checks, without Steam or a running X server:
 ```sh
 python -m unittest discover -s tools -p 'test_anoxrig.py'
 python -m unittest discover -s tools -p 'test_pbr_classify.py'
+python -m unittest discover -s tools -p 'test_install.py'
 ```
 
 

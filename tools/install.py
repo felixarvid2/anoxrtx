@@ -11,12 +11,14 @@ Steps (default: all, in this order; each can be rerun on its own):
   textures  Chuncki's 4x level texture pack (--chuncki ZIP; skipped when not given and not installed)
   ge        Graphical Enhancements 0.3 (--ge ZIP): upscaled model and sky textures, loose in anoxdata/models and
             anoxdata/graphics; its 12 level textures only fix the alpha, which goes into Chuncki's pack (merge_alpha.py)
-  extract   maps, sky, liquid and model images from the game archives (into the work directory)
+  extract   maps, sky, liquid and model images from the game archives (into the work directory; maps not
+            extracted when --maps is given)
   lights    map light files (rtx-remix/maplights/*.lights) + maps/overrides/*.override where none exists yet
   sky       HD skyboxes (Real-ESRGAN x4) -> hd_sky.usda
   liquids   HD liquids with water/lava/slime materials -> liquids.usda
   emissive  light-emitting surfaces -> emissive.usda
-  pbr       normal maps, roughness, glass for the level textures -> pbr.usda (needs the texture pack)
+  pbr       normal maps, roughness, glass for the level textures -> pbr.usda (needs the texture pack; GE's
+            hashes are added as in the mod step, so it can be rerun alone)
   proctex   lava material for QindieGL's frozen procedural textures -> proctex.usda (needs the texture pack)
   models    HD model textures (Real-ESRGAN x4; posters redrawn with FLUX if --flux) -> models_hd.usda
   estyles   light faces that follow light styles: rtx-remix/maplights/*.estyles + emissive_styles.usda (after the
@@ -26,7 +28,13 @@ Steps (default: all, in this order; each can be rerun on its own):
 
 Options:
   --game DIR          Anachronox folder (default: found in the Steam libraries)
-  --work DIR          downloads and intermediate files (default ~/.cache/anoxrtx)
+  --work DIR          downloads and intermediate files (default ~/.cache/anoxrtx/work; ~/.cache/anoxrtx when an
+                      older install left its files there and work/ does not exist)
+  --maps DIR          the extracted *.bsp files (default <work>/maps, filled by the extract step). The lights,
+                      emissive, pbr and estyles steps stop with an error when there are none
+  --classes FILE      Jev classes from tools/jev_classify.py (default <work>/jev_classes.json, used when present)
+  --vision FILE       DeepSeek thumbnail answers from tools/pbr_classify.py --deepseek-vision (default
+                      ~/.cache/anoxrtx/deepseek_vision.json, used together with the Jev classes when present)
   --qindiegl PATH     a prebuilt opengl32.dll, or a QindieGL checkout to build (default: clone
                       felixarvid2/QindieGL into the work directory and build with llvm-mingw)
   --llvm-mingw DIR    llvm-mingw toolchain (default ~/.local/llvm-mingw or $LLVM_MINGW)
@@ -46,6 +54,7 @@ import datetime, glob, importlib.util, io, os, re, shutil, subprocess, sys, time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
+CACHE = os.path.expanduser('~/.cache/anoxrtx')
 STEPS = ['qindiegl', 'remix', 'config', 'textures', 'ge', 'extract', 'lights', 'sky', 'liquids', 'emissive', 'pbr',
          'proctex', 'models', 'estyles', 'mod', 'steam']
 APPID = '242940'
@@ -80,6 +89,7 @@ class Installer:
         self.mod = os.path.join(self.game, 'rtx-remix', 'mods', 'anoxrt')
         self.backup_dir = os.path.join(self.game, 'anoxrtx-backup', datetime.datetime.now().strftime('%Y%m%d-%H%M%S'))
         self.backed_up = set()
+        self.ran = []
         os.makedirs(self.work, exist_ok=True)
 
     # ---- helpers
@@ -170,6 +180,42 @@ class Installer:
 
     def py(self, tool, *args):
         self.run([sys.executable, '-W', 'ignore', os.path.join(HERE, tool)] + list(args))
+
+    def maps_dir(self):
+        return self.a['maps'] or os.path.join(self.work, 'maps')
+
+    def maps(self):
+        return sorted(glob.glob(os.path.join(self.maps_dir(), '**', '*.bsp'), recursive=True))
+
+    def need_maps(self, step):
+        """the extracted maps; stops the install when there are none (the tools would write empty or no output)"""
+        m = self.maps()
+        if not m:
+            if self.a['dry_run'] and 'extract' in self.ran:
+                self.log('%s: would use the maps extracted above' % step)
+            else:
+                sys.exit('%s: no maps (*.bsp) in %s; run the extract step or pass --maps DIR' % (step, self.maps_dir()))
+        return m
+
+    def optional_file(self, key, default):
+        """--classes / --vision: a given file must exist, the default one is used when present"""
+        if self.a[key]:
+            if not os.path.exists(self.a[key]):
+                sys.exit('--%s %s: file not found' % (key, self.a[key]))
+            return self.a[key]
+        return default if os.path.exists(default) else None
+
+    def classes(self):
+        return self.optional_file('classes', os.path.join(self.work, 'jev_classes.json'))
+
+    def ge_add(self, files):
+        """GE's loose model/sky textures replace the archive ones the layers are made from, and its level textures
+        give the pack's images a new alpha: add those hashes (old ones kept, so it is safe to repeat)"""
+        if not os.path.exists(self.ge_manifest()) or not files:
+            return
+        self.py('rehash_textures.py', 'add', os.path.join(REPO, 'maps', 'ge_texmap.tsv'), *files)
+        if os.path.exists(self.ge_texmap()):
+            self.py('rehash_textures.py', 'add', self.ge_texmap(), *files)
 
     def esrgan(self, src, dst):
         exe = os.path.join(self.work, 'esrgan', 'realesrgan-ncnn-vulkan')
@@ -351,7 +397,10 @@ class Installer:
         ad = os.path.join(self.game, 'anoxdata')
         for arch, out, pats in (('MAPS.dat', 'maps', ['*.bsp']), ('GRAPHICS.dat', 'sky', ['sky*']),
                                 ('MODELS.dat', 'models', ['*.tga', '*.png', '*.bmp'])):
-            d = os.path.join(self.work, out)
+            d = self.maps_dir() if out == 'maps' else os.path.join(self.work, out)
+            if out == 'maps' and self.a['maps']:
+                self.log('maps: %d in %s (--maps), not extracted' % (len(self.maps()), d))
+                continue
             if os.path.isdir(d) and os.listdir(d):
                 continue
             for p in pats:
@@ -361,7 +410,7 @@ class Installer:
         if not (os.path.isdir(d) and os.listdir(d)) and not self.a['dry_run']:
             bsp = _load('bspinfo'); a = _load('adat')
             want = set()
-            for m in glob.glob(os.path.join(self.work, 'maps', '**', '*.bsp'), recursive=True):
+            for m in self.maps():
                 want |= {t.lower() for t in bsp.info(m)['water_textures']}
             dat = self.textures_dat()
             with open(dat, 'rb') as f:
@@ -373,14 +422,11 @@ class Installer:
                         open(dst, 'wb').write(a.read(f, o, n, c))
             self.log('liquids: %d textures' % len(glob.glob(os.path.join(d, '*', '*.tga'))))
 
-    def maps(self):
-        return sorted(glob.glob(os.path.join(self.work, 'maps', '**', '*.bsp'), recursive=True))
-
     def step_lights(self):
         out = os.path.join(self.game, 'rtx-remix', 'maplights')
         self.backup(out)
         # --events: styles 1..63 and START_OFF lights for QindieGL's game-driven light styles (QindieGL #27+)
-        self.py('bsp2lights.py', '--events', out, *self.maps())
+        self.py('bsp2lights.py', '--events', out, *self.need_maps('lights'))
         # light fixes per map (maps/overrides/<map>.override); an existing file is the user's and is kept
         for src in sorted(glob.glob(os.path.join(REPO, 'maps', 'overrides', '*.override'))):
             dst = os.path.join(out, os.path.basename(src))
@@ -416,28 +462,35 @@ class Installer:
                 '--liq-hd', os.path.join(self.work, 'liquids_x4'))
 
     def step_emissive(self):
-        if not self.maps():
-            self.log('emissive: no extracted maps in the work directory (run the extract step), skipped'); return
+        maps = self.need_maps('emissive')
         self.backup(os.path.join(self.mod, 'emissive.usda'))
-        classes = os.path.join(self.work, 'jev_classes.json')
-        extra = ['--classes', classes] if self.has_pack() and os.path.exists(classes) else []
+        classes = self.classes()
+        extra = ['--classes', classes] if self.has_pack() and classes else []
         models = ['--models', os.path.join(REPO, 'maps', 'model_emission.tsv'),
                   '--intensity', os.path.join(REPO, 'maps', 'emissive_intensity.tsv')]
-        self.py('emissive_layer.py', self.mod, self.game, *self.maps(), *(['--pack'] if self.has_pack() else []), *extra,
+        self.py('emissive_layer.py', self.mod, self.game, *maps, *(['--pack'] if self.has_pack() else []), *extra,
                 *models)
+        self.ge_add([os.path.join(self.mod, l + '.usda') for l in ('emissive', 'emissive_jev')
+                     if os.path.exists(os.path.join(self.mod, l + '.usda')) or (self.a['dry_run'] and l == 'emissive')])
 
     def step_pbr(self):
         if not self.has_pack():
             self.log('pbr: needs the texture pack, skipped'); return
-        self.backup(os.path.join(self.mod, 'pbr.usda'))
+        maps = self.need_maps('pbr')
+        pbr = os.path.join(self.mod, 'pbr.usda')
+        self.backup(pbr)
         # tools/jev_classify.py results (Gemini + Jev) replace the name keywords when present
-        classes = os.path.join(self.work, 'jev_classes.json')
-        extra = ['--classes', classes] if os.path.exists(classes) else []
+        classes = self.classes()
+        extra = ['--classes', classes] if classes else []
         # tools/pbr_classify.py --deepseek-vision answers settle conflicts between a strong name rule and Jev
-        vision = os.path.expanduser('~/.cache/anoxrtx/deepseek_vision.json')
-        if extra and os.path.exists(vision):
+        vision = self.optional_file('vision', os.path.join(CACHE, 'deepseek_vision.json')) if classes else None
+        if vision:
             extra += ['--vision', vision]
-        self.py('pbr_layer.py', self.mod, self.game, *self.maps(), *extra)
+        self.log('pbr: %d maps in %s; Jev classes: %s; DeepSeek vision: %s'
+                 % (len(maps), self.maps_dir(), classes or 'none (name rules only)', vision or 'none'))
+        self.py('pbr_layer.py', self.mod, self.game, *maps, *extra)
+        # the GE hashes the mod step adds, so that rebuilding pbr alone keeps them
+        self.ge_add([pbr])
 
     def step_proctex(self):
         if not self.has_pack():
@@ -491,11 +544,12 @@ class Installer:
         self.py('hd_layer.py', self.mod, 'models_hd', x4, alpha)
 
     def step_estyles(self):
-        if not self.maps() or not os.path.exists(os.path.join(self.mod, 'emissive.usda')):
-            self.log('estyles: needs the extracted maps and emissive.usda (extract and emissive steps), skipped'); return
+        maps = self.need_maps('estyles')
+        if not os.path.exists(os.path.join(self.mod, 'emissive.usda')) and \
+                not (self.a['dry_run'] and 'emissive' in self.ran):
+            sys.exit('estyles: no emissive.usda in %s; run the emissive step first' % self.mod)
         self.backup(os.path.join(self.mod, 'emissive_styles.usda'))
-        self.py('emissive_styles.py', self.mod, self.game, os.path.join(self.game, 'rtx-remix', 'maplights'),
-                *self.maps())
+        self.py('emissive_styles.py', self.mod, self.game, os.path.join(self.game, 'rtx-remix', 'maplights'), *maps)
 
     def step_mod(self):
         dst = os.path.join(self.mod, 'mod.usda')
@@ -521,19 +575,15 @@ class Installer:
             if os.path.exists(os.path.join(self.mod, 'liquids.usda')):
                 files.append(os.path.join(self.mod, 'liquids.usda'))
             self.py('rehash_textures.py', 'apply', os.path.join(REPO, 'maps', 'chuncki_texmap.tsv'), *files)
-        if os.path.exists(self.ge_manifest()):
-            # GE's loose model/sky textures replace the archive ones the layers are made from. Add their hashes
-            # (old ones kept, so it is safe to repeat) to the lists and material overrides, but not to the HD
-            # layers: there GE's own upscale wins. The FLUX posters keep ours.
-            ge = os.path.join(REPO, 'maps', 'ge_texmap.tsv')
-            files = [os.path.join(self.game, 'rtx.conf')] + [
-                os.path.join(self.mod, f + '.usda') for f in ('mod', 'liquids', 'emissive', 'emissive_jev', 'pbr')]
-            self.py('rehash_textures.py', 'add', ge, *[f for f in files if os.path.exists(f)])
-            if os.path.exists(self.ge_texmap()):
-                self.py('rehash_textures.py', 'add', self.ge_texmap(), *[f for f in files if os.path.exists(f)])
-            hd = os.path.join(self.mod, 'models_hd.usda')
-            if os.path.exists(hd):
-                self.py('rehash_textures.py', 'add', ge, hd, '--only', os.path.join(REPO, 'maps', 'posters_flux.tsv'))
+        # GE hashes go to the lists and material overrides, but not to the HD layers: there GE's own upscale wins.
+        # The FLUX posters keep ours.
+        files = [os.path.join(self.game, 'rtx.conf')] + [
+            os.path.join(self.mod, f + '.usda') for f in ('mod', 'liquids', 'emissive', 'emissive_jev', 'pbr')]
+        self.ge_add([f for f in files if os.path.exists(f)])
+        hd = os.path.join(self.mod, 'models_hd.usda')
+        if os.path.exists(self.ge_manifest()) and os.path.exists(hd):
+            self.py('rehash_textures.py', 'add', os.path.join(REPO, 'maps', 'ge_texmap.tsv'), hd,
+                    '--only', os.path.join(REPO, 'maps', 'posters_flux.tsv'))
 
     def step_steam(self):
         if not self.a['steam']:
@@ -583,9 +633,17 @@ def find_game():
     return None
 
 
+def default_work():
+    """~/.cache/anoxrtx/work; installs before 2026-10-28 kept the work files in ~/.cache/anoxrtx itself"""
+    new = os.path.join(CACHE, 'work')
+    if not os.path.isdir(new) and any(os.path.isdir(os.path.join(CACHE, d)) for d in ('maps', 'downloads', 'QindieGL')):
+        return CACHE
+    return new
+
+
 def main():
     args = sys.argv[1:]
-    a = {'game': None, 'work': os.path.expanduser('~/.cache/anoxrtx'), 'qindiegl': None,
+    a = {'game': None, 'work': default_work(), 'maps': None, 'classes': None, 'vision': None, 'qindiegl': None,
          'llvm_mingw': os.environ.get('LLVM_MINGW', os.path.expanduser('~/.local/llvm-mingw')), 'remix': 'stock',
          'data_collection': 'no', 'chuncki': None, 'ge': None, 'flux': False, 'steam': False, 'dry_run': False}
     steps = []
@@ -615,11 +673,14 @@ def main():
     inst.log('game:', a['game']); inst.log('work:', a['work'])
     if os.path.exists(os.path.join(a['game'], 'opengl32.dll')) and subprocess.run(
             ['pgrep', '-f', r'[S]:.steamapps.common.Anachronox'], capture_output=True).stdout:
-        sys.exit('the game is running; close it first')
+        if not a['dry_run']:
+            sys.exit('the game is running; close it first')
+        inst.log('the game is running (a real run would stop here)')
     for s in [x for x in STEPS if x in steps] if steps else STEPS:
         inst.log('==== %s' % s)
         getattr(inst, 'step_' + s)()
-    if inst.backed_up:
+        inst.ran.append(s)
+    if inst.backed_up and not a['dry_run']:
         inst.log('replaced files backed up in', inst.backup_dir)
     inst.log('done')
 
