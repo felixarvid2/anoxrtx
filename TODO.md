@@ -36,6 +36,16 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   START_OFF; QindieGL #39 loggar varje nivåbyte): lysröret `bricks2/dwlight2` är släckt vid start, tänds när
   spelaren (`goto`) går in i dess `trigger_multiple` (som växlar det av/på medan spelaren står kvar, spelets
   logik), är släckt efter en ny `map tours` och tänt efter `loadgame` av en sparning gjord med det tänt.
+  Kartljuset (Remix-ljuset, inte emissionen) mätt 2026-10-28 i rummet runt ljuset (1280 -32 -80, 330), fyra vyer
+  släckt/tänt: Remix +0,01..+0,26 EV, originalet +0,54..+1,44 EV. Ljuset tänds, men rummet är redan 2,0–3,9 EV för
+  ljust släckt (se nedan: icke-ljusytor med lysande texturer), så tändningen syns knappt. Triggern sitter i taket
+  (1239 228 -91, spelaren får inte plats); den löser bara ut via `goto` från en giltig plats (1280 -32 -100).
+- [ ] **Lysande texturer på vanliga ytor (2026-10-28):** `emissive.usda` gör en textur emissiv om någon yta i någon
+  bana har SURF_LIGHT, och Remix-material gäller per textur. 295 texturer används både som ljus och som vanlig yta:
+  183 000 vanliga ytor (91 banor) mot 50 000 ljusytor, t.ex. `baseanox/clear` 27 450/610, `bricks/empty` 21 692/16,
+  `shuttle/sschrome` 11 058/427, `bricks/twall01` 3 210/22. I originalet lyser de bara via ljuskartan. Förslag: samma
+  variantteknik som `styledemission`, per textur listas minoritetsytorna (~14 500 totalt) och får den andra
+  varianten (emission av/på). Ändrar alla banors ljusnivå, så exponeringen per bana måste mätas om. Ej beslutat.
 - [ ] **6. PBR-klassificering:** vidareutveckla befintliga namnregler med
   dataregler, undantag, BSP-flaggor och osäkerhetsrapport; kan gå parallellt.
 - [ ] **7. Ankarmeshar:** stabila författar-ID:n, per-karta-data, ersättnings-
@@ -81,6 +91,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   Kostnad (tillfälligt mätbygge): 0,03 ms/bildruta på baltownr, 0,09 rowdys, 0,14 starport (av ~18). Spelaren
   startar i schaktet; med kullen borta var startvyn +2,35 EV, nu +0,54 med ett fyllnadsljus
   (`maps/overrides/baltownr.override`, docs/exposure-match.md).
+- [x] starport exponering (2026-10-28): utomhusgången var +3,2/+2,6 EV för mörk på spelarplatser (autoexponeringen
+  jämnar ut ute/inne, originalet är ~4x ljusare ute). `evMin`/`evMaxValue` verkar inte när de sätts vid körning,
+  `skyBrightness` 30/100 knappt; autoexponering av + bias 0: start +0,19, gången +0,45/+0,52, ljusgården -0,39.
+- [ ] starport kaféfönstret (mannberg4, -248 2718 -154): glaset blir mjölkvitt/ogenomskinligt i Remix, originalet
+  visar staden genom det (vyn -1,8 EV).
 - [x] baltownr exponering (2026-10-27): de nedre nivåerna var 1,5 EV för ljusa (median av 8 vyer); bias -3,8 och
   slemgolvet `ballotine/slime01a` intensitet 2 (docs/exposure-match.md), efter: median -0,07 EV (-1,7 till +1,3). Kvar: s1_1 längs slemkorridoren -1,7.
 - [x] fortress2 blå ton (2026-10-27): originalets cyanfärgade dörrparti (färg/luminans 0,82 1,05 1,02) motsvarar exakt
