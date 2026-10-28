@@ -44,9 +44,12 @@ RIGCAM="$GAME/rtx-remix/rigcam.txt"; rm -f "$RIGCAM"
 size_before=$(stat -c %s "$QLOG" 2>/dev/null || echo 0)
 $RIG start > "$out/$tag-$map.start.txt" 2>&1
 end=$((SECONDS + wait))
+# QindieGL.log keeps earlier sessions: look only at this run's part, or an old line ends the wait at once
+newlog() { if [ "$(stat -c %s "$QLOG" 2>/dev/null || echo 0)" -lt "$size_before" ]; then cat "$QLOG"
+           else tail -c +$((size_before + 1)) "$QLOG"; fi 2>/dev/null; }
 while [ $SECONDS -lt $end ]; do
-  grep -aq "MapLights: $map CreateLight" "$QLOG" 2>/dev/null && break
-  [ -f "$GAME/d3d9.dll" ] || { grep -aq "MapLights: map '$map'" "$QLOG" 2>/dev/null && break; }
+  newlog | grep -aq "MapLights: $map CreateLight" && break
+  [ -f "$GAME/d3d9.dll" ] || { newlog | grep -aq "MapLights: map '$map'" && break; }
   sleep 2
 done
 sleep "$settle"
@@ -58,7 +61,11 @@ if [ -s "$views" ]; then
   done < "$views"
   rm -f "$RIGCAM"; sleep 2
 else
-  $RIG shot "anoxcheck_$tag-${map}_a" > /dev/null 2>&1
+  # some maps (ballotine) show "One moment..." for a while after their lights are created: wait out a black frame
+  for try in 1 2 3 4 5 6; do
+    $RIG shot "anoxcheck_$tag-${map}_a" 2>&1 | grep -qE 'avg \[[0-3], [0-3], [0-3]\]' || break
+    sleep 10
+  done
   sleep 2
   $RIG shot "anoxcheck_$tag-${map}_b" > /dev/null 2>&1
 fi
