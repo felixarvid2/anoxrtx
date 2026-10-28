@@ -433,6 +433,10 @@ class Installer:
         # tools/jev_classify.py results (Gemini + Jev) replace the name keywords when present
         classes = os.path.join(self.work, 'jev_classes.json')
         extra = ['--classes', classes] if os.path.exists(classes) else []
+        # tools/pbr_classify.py --deepseek-vision answers settle conflicts between a strong name rule and Jev
+        vision = os.path.expanduser('~/.cache/anoxrtx/deepseek_vision.json')
+        if extra and os.path.exists(vision):
+            extra += ['--vision', vision]
         self.py('pbr_layer.py', self.mod, self.game, *self.maps(), *extra)
 
     def step_proctex(self):

@@ -45,7 +45,7 @@ All generators read the user's own game files; nothing generated is committed.
 | `rtx-remix/maplights/*.lights` | `tools/bsp2lights.py` | `MAPS.dat` BSP entities (light, style, _cone, worldspawn sun) |
 | `hd_sky.usda`, `liquids.usda` | `tools/make_layers.py` | `GRAPHICS.dat` sky faces, `TEXTURES.dat` warp textures, Real-ESRGAN x4 |
 | `emissive.usda` | `tools/emissive_layer.py` | BSP `SURF_LIGHT` textures |
-| `pbr.usda` | `tools/pbr_layer.py` | texture pack images (normal from luminance), roughness/metal per class from `tools/pbr_classify.py` + `tools/pbr_rules.json` |
+| `pbr.usda` | `tools/pbr_layer.py` | texture pack images (normal from luminance), roughness/metal per class from `tools/pbr_classify.py` + `tools/pbr_rules.json` (+ Jev classes, + cached DeepSeek thumbnail answers that settle rule-vs-Jev conflicts) |
 | `proctex.usda` | `tools/proctex_layer.py` | names of frozen procedural textures (hash computed from the name) |
 | `models_hd.usda` | `tools/hd_layer.py` (+ `flux_refine.py`) | `MODELS.dat` images, Real-ESRGAN x4, optional FLUX posters |
 | `mod.usda` (hand-made materials) | repo file + `tools/rehash_textures.py` | `maps/chuncki_texmap.tsv` (original → pack hashes) |

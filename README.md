@@ -121,7 +121,12 @@ I raise roughness and metalicity of character materials to the max to mask the p
    counts and the unclassified, weak, conflicting (rule vs Jev) and model-sourced textures, largest face count
    first. `--deepseek` asks DeepSeek (text only: texture paths and usage numbers; cached in
    `~/.cache/anoxrtx/deepseek_pbr.json`) for the textures the rules leave open; `pbr_layer.py --ai` applies
-   those suggestions, marked as such in the report.
+   those suggestions, marked as such in the report. `--deepseek-vision <Anachronox>` lets DeepSeek (`deepseek-flash`)
+   look at the textures: 5x5 contact sheets of 128 px thumbnails plus path and usage numbers, one class per texture
+   (about 0.12 USD for ~800 textures; cached in `~/.cache/anoxrtx/deepseek_vision.json`). With `--vision` (and in
+   the installer, when that cache and the Jev classes exist) a strong name rule plus a high-confidence image answer
+   overrule Jev ("rule+vision", 68 textures, e.g. `bricks2/bricksrock*` stone instead of metal); otherwise the image
+   answers are only listed in the report.
    Better roughness/metallic: `tools/jev_classify.py <Anachronox> ~/.cache/anoxrtx/work/jev_classes.json
    <maps>/*.bsp --gemini` lets Gemini describe the textures (128 px contact sheets; free tier) and TypeSafe Jev
    decide material, roughness, metal and glow (about 0.12 USD for all textures; cached). `pbr_layer.py

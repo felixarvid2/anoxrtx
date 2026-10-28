@@ -103,14 +103,26 @@ GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1
 SHEET = 16
 
 
-def contact_sheet(paths):
-    """4x4 grid of 128 px thumbnails, each numbered in its top-left corner"""
+def texture_files(gamedir):
+    """{texture name: image path} in the loose texture pack GAMEDIR/anoxdata/textures"""
+    root = os.path.join(gamedir, 'anoxdata', 'textures')
+    files = {}
+    for p in sorted(glob.glob(os.path.join(root, '**', '*.*'), recursive=True)):
+        if os.path.splitext(p)[1].lower() not in ('.png', '.tga', '.jpg', '.jpeg', '.pcx', '.bmp'):
+            continue   # .atd animation/procedural definitions are not images
+        files.setdefault(os.path.splitext(os.path.relpath(p, root).replace('\\', '/').lower())[0], p)
+    return files
+
+
+def contact_sheet(paths, cols=4):
+    """grid of 128 px thumbnails (cols x cols), each numbered in its top-left corner"""
     from PIL import ImageDraw
-    sheet = Image.new('RGB', (4 * 136, 4 * 136), (255, 255, 255))
+    rows = max(1, (len(paths) + cols - 1) // cols)
+    sheet = Image.new('RGB', (cols * 136, rows * 136), (255, 255, 255))
     dr = ImageDraw.Draw(sheet)
     for i, p in enumerate(paths):
         im = Image.open(p).convert('RGB').resize((128, 128), Image.LANCZOS)
-        x, y = (i % 4) * 136 + 4, (i // 4) * 136 + 4
+        x, y = (i % cols) * 136 + 4, (i // cols) * 136 + 4
         sheet.paste(im, (x, y))
         dr.rectangle((x, y, x + 22, y + 16), fill=(255, 255, 0))
         dr.text((x + 3, y + 2), str(i + 1), fill=(0, 0, 0))
@@ -183,12 +195,7 @@ def main():
         for name, f, v in tex:
             if not f & 0xC:   # skip sky and liquids
                 names.add(name.replace('\\', '/').lower())
-    root = os.path.join(gamedir, 'anoxdata', 'textures')
-    files = {}
-    for p in glob.glob(os.path.join(root, '**', '*.*'), recursive=True):
-        if os.path.splitext(p)[1].lower() not in ('.png', '.tga', '.jpg', '.jpeg', '.pcx', '.bmp'):
-            continue   # .atd animation/procedural definitions are not images
-        files.setdefault(os.path.splitext(os.path.relpath(p, root).replace('\\', '/').lower())[0], p)
+    files = texture_files(gamedir)
     cache = json.load(open(out)) if os.path.exists(out) else {}
     todo = sorted(n for n in names if n in files and n not in cache and (not only or n in only))
     if limit:
