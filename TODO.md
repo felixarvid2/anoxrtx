@@ -69,6 +69,13 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   trä, `baltown/doorwall-101top` glas, `sunder/monitor-btm3` tech. A/B gammal/ny i spelet (13 vyer, 13 banor): högst
   1,6 % pixlar ändrade, inga krascher; skillnaden (roughness/metallic) syns knappt i vyerna. Installern behöver
   `--work ~/.cache/anoxrtx/work` och kartorna där (just nu ligger de i `event-lighting-2026-10-18/maps`).
+  2026-10-28: alla 237 konflikter granskade ([docs/pbr-conflict-review.md](docs/pbr-conflict-review.md)):
+  `deepseek-flash` dömde från kontaktark (128 px) med regelns och Jevs klass och Geminis beskrivning (10 anrop,
+  ~0,02 USD, cache `deepseek_conflicts.json`), sedan egen granskning av varje ark. 205 nya undantag (t.ex.
+  `bricks/windowplain` glas, `commbase/compside-*` tech, `whitendon/in_rafter*` trä, `sunder/bardrink-*` skärm);
+  konflikter 237 -> 31 (kvar: svarta `*/clear`, limbus-pelare, ballotine-pelare m.fl., listade i dokumentet).
+  Undantag som bekräftar Jevs material behåller Jevs värden, så 67 texturer ändrar roughness/metallic mot main.
+  Kvar: installera och titta i spelet (`*/clear` på vätskebrushar, `bricks/windowplain` på fasaderna).
 - [ ] **7. Ankarmeshar:** stabila författar-ID:n, per-karta-data, ersättnings-
   och resurslivscykel; statiska ankare först.
 - [ ] **8. Dimma/miljötillstånd:** mjuka, verifierade övergångar och återgång

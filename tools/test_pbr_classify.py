@@ -60,6 +60,17 @@ class PriorityTest(unittest.TestCase):
                                                                                 'metal': 0.9, 'material_conf': 1}})
         self.assertEqual((r['class'], r['source']), ('glass', 'exception'))
 
+    def test_exception_settles_conflicts_and_keeps_jev_values(self):
+        rules = dict(RULES, exceptions={'a/pipe_glass': {'class': 'metal', 'why': 'test'},
+                                        'a/rockwall': {'class': 'wood', 'why': 'test'}})
+        jev = {n: {'material': 'metal', 'roughness': 0.02, 'metal': 0.8, 'material_conf': 1} for n in
+               ('a/pipe_glass', 'a/rockwall')}
+        self.assertTrue(pc.classify('a/pipe_glass', use(), RULES)['conflict'])          # metal vs glass rule
+        r = pc.classify('a/pipe_glass', use(), rules, jev)                              # confirms Jev: Jev's values
+        self.assertEqual((r['class'], r['roughness'], r['metallic'], r['conflict']), ('metal', 0.05, 0.8, False))
+        r = pc.classify('a/rockwall', use(), rules, jev)                               # overrides Jev: class values
+        self.assertEqual((r['class'], r['roughness'], r['metallic'], r['conflict']), ('wood', 0.6, 0.0, False))
+
     def test_sky_and_liquid_skipped(self):
         self.assertEqual(pc.classify('a/metal', use(flags=pc.SURF['SKY']), RULES)['class'], 'skip')
         self.assertEqual(pc.classify('a/water', use(flags=pc.SURF['WARP']), RULES)['class'], 'skip')
