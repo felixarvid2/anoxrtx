@@ -136,6 +136,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [x] baltownr uppåtvyn (2026-10-28): autoexponering av, bias -0,5: uppåt +3,05 -> +0,72 EV, median -0,24.
 - [x] ballotine/kraptonmaze "svart bild" (2026-10-28): anoxcheck läste gamla rader i QindieGL.log och väntade inte;
   rättat, plus omtag av svart första bild. ballotine bias -1,5 (+0,07 EV).
+- [ ] Bakat ljus utan Remix-ljus (2026-10-28, `tools/baked_light_gaps.py`, docs/baked-light-gaps.md): ljuskartan mot
+  uppskattat direktljus i Remix på alla 98 banor; kandidater (otestade) utanför repot. slounge-hytten: lampytan
+  `celight2` släcks av en stil 0-rad i `.estyles` (lampans ovansida 2 enheter bort, QindieGL matchar inom 2), samma
+  krock släcker 108 ljusytor på 13 banor; rätta i `emissive_styles.py`. tours-fläcken ligger i stil 32-blocket
+  (släckt läge är inte 0 i originalet). Testa i spelet: slounge, vendomart, votowne, sexmach, fortress2.
 - [ ] slounge ljusfördelning: en punktlampa ger en skarp ljusfläck, originalet är jämnt upplyst. Flytt/radie hjälper
   inte (docs/exposure-match.md); ljusmodellsskillnad.
 - [x] baltownr exponering (2026-10-27): de nedre nivåerna var 1,5 EV för ljusa (median av 8 vyer); bias -3,8 och

@@ -19,6 +19,7 @@ retiring a document.
 | [test-locations.md](test-locations.md) | Repeatable save-based test views |
 | [startup-lighting-check.md](startup-lighting-check.md) | Evidence for the startup device-replacement light fix |
 | [pbr-conflict-review.md](pbr-conflict-review.md) | PBR rule-vs-Jev conflict review: exceptions added, open cases, effect on `pbr.usda` |
+| [baked-light-gaps.md](baked-light-gaps.md) | Where the baked lightmaps are brighter than the Remix lights can give (`tools/baked_light_gaps.py`), candidates to test |
 
 In QindieGL: [README](https://github.com/felixarvid2/QindieGL/blob/master/README.md),
 [ROADMAP](https://github.com/felixarvid2/QindieGL/blob/master/ROADMAP.md) (wrapper responsibilities),
