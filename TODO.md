@@ -104,8 +104,14 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [x] starport exponering (2026-10-28): utomhusgången var +3,2/+2,6 EV för mörk på spelarplatser (autoexponeringen
   jämnar ut ute/inne, originalet är ~4x ljusare ute). `evMin`/`evMaxValue` verkar inte när de sätts vid körning,
   `skyBrightness` 30/100 knappt; autoexponering av + bias 0: start +0,19, gången +0,45/+0,52, ljusgården -0,39.
-- [ ] starport kaféfönstret (mannberg4, -248 2718 -154): glaset blir mjölkvitt/ogenomskinligt i Remix, originalet
-  visar staden genom det (vyn -1,8 EV).
+- [ ] starport kaféfönstret (mannberg4, -248 2718 -154): glaset (`braintrain/glass-1b`, emissivt på andra banor) är
+  genomskinligt sedan static-off (2026-10-28). Kvar: himlen bakom är platt mörkgrå i stället för blå med spiror;
+  skyBrightness, skyProbeSide, skyReprojectToMainCameraSpace och skyForceHDR ändrar inget.
+- [x] baltownr uppåtvyn (2026-10-28): autoexponering av, bias -0,5: uppåt +3,05 -> +0,72 EV, median -0,24.
+- [x] ballotine/kraptonmaze "svart bild" (2026-10-28): anoxcheck läste gamla rader i QindieGL.log och väntade inte;
+  rättat, plus omtag av svart första bild. ballotine bias -1,5 (+0,07 EV).
+- [ ] slounge ljusfördelning: en punktlampa ger en skarp ljusfläck, originalet är jämnt upplyst. Flytt/radie hjälper
+  inte (docs/exposure-match.md); ljusmodellsskillnad.
 - [x] baltownr exponering (2026-10-27): de nedre nivåerna var 1,5 EV för ljusa (median av 8 vyer); bias -3,8 och
   slemgolvet `ballotine/slime01a` intensitet 2 (docs/exposure-match.md), efter: median -0,07 EV (-1,7 till +1,3). Kvar: s1_1 längs slemkorridoren -1,7.
 - [x] fortress2 blå ton (2026-10-27): originalets cyanfärgade dörrparti (färg/luminans 0,82 1,05 1,02) motsvarar exakt

@@ -321,3 +321,28 @@ start-view EV against the 2026-10-18 originals (old files / new files / new file
 onegate, hive, senderss and kraptonmaze moved by at most 0.24 EV; ballotine and kraptonmaze give a black start frame
 with both file sets. ms/frame is unchanged (A/B on the same ten maps, within 0.4 ms). slounge matches in mean but
 not in distribution: the original lights the room evenly, Remix lights one wall and leaves the door dark.
+
+## Follow-ups (2026-10-28)
+
+**ballotine, kraptonmaze "black frame".** Not a rendering fault. `anoxcheck.py` waited for the map's
+`MapLights: <map> CreateLight` line in QindieGL.log, but the log keeps earlier sessions, so an old line ended the wait
+at once and the shots came `--settle` seconds after the window appeared. ballotine also shows "One moment..." for a
+while after its lights are created. anoxcheck now reads only this run's part of the log and retakes a black first
+shot (up to six times, 10 s apart). ballotine was +0.51 EV at the default bias: `[rtxconf.ballotine]` bias -1.5,
+verified +0.07. kraptonmaze -0.48 (no change).
+
+**slounge light distribution.** The room is lit by one light (index 86, `-984 1504 192`, light 200). Under Remix it
+throws a hard-edged pool on the left wall and leaves the door dark; the original lights the room evenly. Moving it
+down 24/48/96 units changed the start view by 0.2-0.8 EV but not the look; a radius of 16/48/96 only made it brighter
+(-2.2 to -4.2 EV). It is the difference between a ray-traced point light and the baked lightmap; no override kept.
+
+**starport café window.** The milky glass was `braintrain/glass-1b`, a translucent texture that is also emissive (a
+SURF_LIGHT face elsewhere); with the static-off rows it is clear. Through it the city props show, but the skybox
+behind them is a flat dark grey instead of the original's blue sky with spires. `rtx.skyBrightness` 10,
+`rtx.skyProbeSide` 2048, `rtx.skyReprojectToMainCameraSpace` and `rtx.skyForceHDR` (all confirmed applied) did not
+change it. Open.
+
+**baltownr upward view.** Like starport, autoexposure brought the sky-filled upward view of the start shaft down to
+the indoor level. `rtx.autoExposure.enabled = False`, bias -0.5 (was autoexposure with -3.8): EV per view
+(old -> new) shaft_h +0.01 -> -0.24, up_hi +3.05 -> +0.72, s0_0 -0.24 -> -0.80, s0_2 +1.23 -> -0.25,
+s1_1 -1.76 -> -1.62, start +0.54 -> +0.34; median -0.24, spread 4.8 -> 2.3 EV.
