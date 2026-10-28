@@ -339,8 +339,18 @@ down 24/48/96 units changed the start view by 0.2-0.8 EV but not the look; a rad
 **starport café window.** The milky glass was `braintrain/glass-1b`, a translucent texture that is also emissive (a
 SURF_LIGHT face elsewhere); with the static-off rows it is clear. Through it the city props show, but the skybox
 behind them is a flat dark grey instead of the original's blue sky with spires. `rtx.skyBrightness` 10,
-`rtx.skyProbeSide` 2048, `rtx.skyReprojectToMainCameraSpace` and `rtx.skyForceHDR` (all confirmed applied) did not
-change it. Open.
+`rtx.skyProbeSide` 2048, `rtx.skyReprojectToMainCameraSpace`, `rtx.skyForceHDR`, `rtx.skyMode = 1` and hiding the
+three glass textures (`rtx.hideInstanceTextures`) did not change it, and the skybox is complete in all eight
+directions from the walkway. The cause was the volumetric fog (worldspawn `"fog" ".00014 .5 .5 .5"`), as on
+labbuilding: `rtx.volumetrics.enableFogRemap = False` on starport shows the sky and spires as in the original.
+Café +2.59 -> -0.55 EV, walkway (beltway2) +0.47 -> +0.36, atrium (pikachu) +0.67 -> -1.16, start +0.19 -> -0.15;
+bias kept at 0. (The two diagnostic tests were suggested by DeepSeek; neither was the cause.)
+
+**tours room, light on/off.** Re-measured after the new tours bias (-0.9), views c/d (the room's back), Remix vs
+original: light on -0.74 / -0.31 EV, light off +1.49 / +3.09. Remix switches the room 3.5-4.7 EV, the original
+1.2-1.3: with the light off the original still shows a bright patch on the far wall that Remix does not have (no
+point light near it; light 209 at 948 -24 -112 is behind the camera), probably baked from a light-textured face.
+Views a/b (towards the door) -1.6..-0.9 EV in both states. The original "on" shots have the console over them.
 
 **baltownr upward view.** Like starport, autoexposure brought the sky-filled upward view of the start shaft down to
 the indoor level. `rtx.autoExposure.enabled = False`, bias -0.5 (was autoexposure with -3.8): EV per view
