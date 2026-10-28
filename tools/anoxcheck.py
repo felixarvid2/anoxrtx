@@ -133,6 +133,10 @@ def analyse_logs(out, tag, mp):
         if m: r['lights_created'] = int(m[-1])
         m = re.findall(r'MapLights: %s static draw frame \d+ attempted \d+ success \d+ failed (\d+)' % re.escape(mp), q)
         if m: r['draw_failed'] = max(int(x) for x in m)
+        # animated lights whose style starts at level 0 (e.g. style 9, "aaaaaaaazzzzzzzz") are created when they
+        # first light up, so count the live handles a few seconds in as created too
+        m = re.findall(r'MapLights: %s static draw frame \d+ .*live_handles (\d+)' % re.escape(mp), q)
+        if m and r['lights_created'] is not None: r['lights_created'] = max(r['lights_created'], max(int(x) for x in m))
         if 'EventLights: game light styles valid' in q: r['event_styles'] = 'valid'
         elif 'EventLights: game light styles unavailable' in q: r['event_styles'] = 'unavailable'
         r['proctex'] = re.findall(r'ProcTex: .*frozen.*', q)[:4]
