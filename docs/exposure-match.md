@@ -387,6 +387,13 @@ spew1 lost its view). Per-map `[rtxconf.MAP]` keys only apply with a default in 
 `hideInstanceTextures` hides `_default`, `expon_64` and `flare_01` (particle textures). The other additive draws
 in the trace are a second pass over character skins (alpha 25, SRC_ALPHA/ONE). Next option: make `burst_04` and
 `magical_08` emissive materials in the mod layer, checked on the other maps that use them.
+Tried 2026-10-29 by hand in the installed `emissive.usda` (`over "mat_<hash>"` with `enable_emission` and
+the particle texture's RGB x alpha as `emissive_mask_texture`): the material override makes the steam visible,
+but as a dark grey haze that darkens the view, not the original's white one, and intensity 2 and 8 look nearly
+the same (EV spew0/spew1: none +1.88/+1.91, intensity 2 +2.64/+3.49, intensity 8 +2.33/+3.50). The emission
+does not seem to apply to these alpha-blended particle draws; replacing the material only changes how they are
+shaded. Not kept. Rig note: in two runs with two sessions back to back, one session's shots were all black
+(1624-byte PNGs) while the other was fine; rerun a session whose shots are that size.
 
 **baltownr upward view.** Like starport, autoexposure brought the sky-filled upward view of the start shaft down to
 the indoor level. `rtx.autoExposure.enabled = False`, bias -0.5 (was autoexposure with -3.8): EV per view
