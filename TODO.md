@@ -141,8 +141,8 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   `celight2` släcks av en stil 0-rad i `.estyles` (lampans ovansida 2 enheter bort, QindieGL matchar inom 2), samma
   krock släcker 108 ljusytor på 13 banor; rätta i `emissive_styles.py`. tours-fläcken ligger i stil 32-blocket
   (släckt läge är inte 0 i originalet). Krocken rättad 2026-10-28 (`emissive_styles.py` hoppar över stil 0-rader nära
-  ostilade ljusytor, 123 rader): slounge/vendomart bias -3,2/-3,6, -0,14/-0,05 EV. Kvar att testa: votowne, sexmach,
-  fortress2 (ljusytor med högt värde som emissionstaket 15 underskattar).
+  ostilade ljusytor, 123 rader): slounge/vendomart bias -3,2/-3,6, -0,14/-0,05 EV. votowne, sexmach och fortress2 testade
+  2026-10-29 med goto: kandidatljusen ändrar inget märkbart (autoexponering, saknad studs), inga behålls.
 - [x] slounge ljusfördelning (2026-10-28): lampytan var släckt av en `.estyles`-krock, inte en ljusmodellsskillnad.
 - [x] Dimma bakom glas (2026-10-28): vyer genom genomskinliga ytor mot himlen på 72 dimbanor; dimma av på sunstrip,
   fortressgrounds, fortress2 (sunstrip start +2,14 -> -0,29 EV). starport-ljusgården kvar på ca -1,1 EV.

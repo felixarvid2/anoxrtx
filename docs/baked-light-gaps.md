@@ -106,6 +106,20 @@ levant1, levant2.
 4. sexmach `lite3` (value 20000): `add -656 400 104 0.93 0.94 1.00 800 0`; view `sexmach gap0 -424 408 130 38.7 180`.
 5. fortress2 `naude-blue-5`: `add -1312 272 -480 0.65 0.87 1.00 1047 0`; view `fortress2 gap0 -1369 -175 -506 -38.7 0`.
 
+Tested 2026-10-29 (items 3–5; 1–2 were the `.estyles` collision, fixed). Player moved next to each view with
+`goto` so the PVS covers it, the original shot through Wine D3D9 (gamma 1.4), EV = original / Remix (+ = Remix darker):
+
+| View | Remix | Remix + candidate | Note |
+| --- | --- | --- | --- |
+| votowne gap0 | +2.21 | +2.21 | close-up of a wall below the lamps; the light at z 559 lights only the top edge |
+| sexmach gap0 | +0.82 | +1.13 | corridor with the coloured strips; no visible change |
+| fortress2 gap0 | +0.38 | +0.47 | Remix already close; no visible change |
+
+None of the three candidates is kept. Autoexposure (on for these maps) evens out a local fill light within the view,
+and the estimate's 10–20x baked/Remix ratio is mostly Remix' missing bounce, not a missing source. The votowne wall
+stays 2.2 EV dark although the spawn view is matched (-0.03, `exposure-match.md`); a deepseek_compare.py check agrees
+("crushed shadows, lack of ambient"). A per-map bias cannot fix one view without overbrightening the spawn.
+
 ## Limits
 
 Direct light only, no Remix bounce, sky or Numos; luminance only; brush entities (doors, func_wall) neither block
