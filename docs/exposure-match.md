@@ -395,6 +395,17 @@ does not seem to apply to these alpha-blended particle draws; replacing the mate
 shaded. Not kept. Rig note: in two runs with two sessions back to back, one session's shots were all black
 (1624-byte PNGs) while the other was fine; rerun a session whose shots are that size.
 
+**sunstrip steam: drawn additively (2026-10-29, QindieGL #44).** QindieGL's `additive_textures` (per map in
+`[maplights.<map>]`) draws the listed alpha-blended particle textures with SRC_ALPHA/ONE, so the emissive blend
+override reaches them. On sunstrip (`burst_04`, `magical_08`, override intensity 2.5) the steam glows white, but
+with autoexposure the bright haze pulled the whole view down (steam views +2.58/+3.57; intensity 8 +2.17/+3.62).
+With autoexposure off: bias -2 +0.71/+0.57, 0 -0.78/-0.60; bias -1 is kept. Against the original: steam views
++1.79/+2.01 -> -0.14/-0.04, view y0 +0.88 -> +0.02, start view +0.04 (`anoxcheck --ab-original`, flagged "not
+settled" as before because of the animated water). Fixed exposure moves the views without steam by -0.9..+1.3 EV
+against Remix with autoexposure (y90 +0.91, y180 +0.32, y270 +1.08, glass views +1.29/+0.31 darker); the
+original shots of those views had the console over them, so they were not compared again. In one run the steam
+was not yet emitting when the shots were taken (spew0 +1.69, no haze); three other runs showed it.
+
 **baltownr upward view.** Like starport, autoexposure brought the sky-filled upward view of the start shaft down to
 the indoor level. `rtx.autoExposure.enabled = False`, bias -0.5 (was autoexposure with -3.8): EV per view
 (old -> new) shaft_h +0.01 -> -0.24, up_hi +3.05 -> +0.72, s0_0 -0.24 -> -0.80, s0_2 +1.23 -> -0.25,
