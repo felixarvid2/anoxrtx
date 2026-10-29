@@ -83,6 +83,9 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   0-4 % pixlar ändrade, för att vyerna mest visar oförändrade varianter (`tent1-2`, `tent2-1`). Spegeltest (alla
   `commbase/tent*` metallic 1, roughness 0,02) ändrade 87-89 % av pixlarna: materialvärdena når Remix. Kontroll
   whitendon, starport, commiteon, senderss: ok, inga fel. Kvar: närbilder av `bricks/windowplain` och `*/clear`.
+  Försök 2026-10-29 (`find_views.py` utan --pvs, goto 60 enheter bakom kameran, Remix + original): 8 vyer på
+  bricksd, tenements, routubes1, mystech1, baltown, sunstrip, limbus gav mest svart, utanför världen eller fel plats;
+  bara sunstrip `baseanox/clear` (vattenyta) syns lika i båda. Behöver handvalda vyer från spelarplatser/sparningar.
 - [ ] **7. Ankarmeshar:** stabila författar-ID:n, per-karta-data, ersättnings-
   och resurslivscykel; statiska ankare först.
 - [ ] **8. Dimma/miljötillstånd:** mjuka, verifierade övergångar och återgång
@@ -131,8 +134,9 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   `skyBrightness` 30/100 knappt; autoexponering av + bias 0: start +0,19, gången +0,45/+0,52, ljusgården -0,39.
 - [x] starport kaféfönstret (2026-10-28): glaset (`braintrain/glass-1b`, emissivt på andra banor) genomskinligt sedan
   static-off; himlen bakom var grå av volymetrisk dimma: `enableFogRemap = False` på starport, kaféet +2,59 -> -0,55 EV.
-- [ ] tours-rummet (2026-10-28): tänt -0,74/-0,31 EV mot originalet (vy c/d), släckt +1,49/+3,09: originalet har kvar
-  en ljus fläck på bortre väggen när lampan är släckt (troligen bakad från en ljustexturerad yta).
+- [x] tours-rummet (2026-10-29): stil 32 är 0,000 släckt och 1,000 tänt i både originalet och Remix (QindieGL #42
+  loggar faktorn). Fläcken i originalet syns lika i tänt och släckt läge: ånga från `spew`-entiteterna under lampan,
+  som originalet ritar självlysande. En partikelskillnad (IDEAS punkt 1), inte ljus; inget ändrat.
 - [x] baltownr uppåtvyn (2026-10-28): autoexponering av, bias -0,5: uppåt +3,05 -> +0,72 EV, median -0,24.
 - [x] ballotine/kraptonmaze "svart bild" (2026-10-28): anoxcheck läste gamla rader i QindieGL.log och väntade inte;
   rättat, plus omtag av svart första bild. ballotine bias -1,5 (+0,07 EV).
@@ -145,7 +149,10 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   2026-10-29 med goto: kandidatljusen ändrar inget märkbart (autoexponering, saknad studs), inga behålls.
 - [x] slounge ljusfördelning (2026-10-28): lampytan var släckt av en `.estyles`-krock, inte en ljusmodellsskillnad.
 - [x] Dimma bakom glas (2026-10-28): vyer genom genomskinliga ytor mot himlen på 72 dimbanor; dimma av på sunstrip,
-  fortressgrounds, fortress2 (sunstrip start +2,14 -> -0,29 EV). starport-ljusgården kvar på ca -1,1 EV.
+  fortressgrounds, fortress2 (sunstrip start +2,14 -> -0,29 EV). starport-ljusgården: -1,1 EV var ett mätfel
+  (konsolen låg över originalbilden). Ny mätning 2026-10-29 utan konsol: start -0,15, ljusgård -0,26, gången
+  +0,23/-0,25; bara kaféet -1,7 (solbelysta husmodeller bakom glaset). Himmel 0,5 / sol 8 flyttar kaféet 0,4 EV men
+  gången lika mycket åt andra hållet: inställningarna behålls.
 - [x] baltownr exponering (2026-10-27): de nedre nivåerna var 1,5 EV för ljusa (median av 8 vyer); bias -3,8 och
   slemgolvet `ballotine/slime01a` intensitet 2 (docs/exposure-match.md), efter: median -0,07 EV (-1,7 till +1,3). Kvar: s1_1 längs slemkorridoren -1,7.
 - [x] fortress2 blå ton (2026-10-27): originalets cyanfärgade dörrparti (färg/luminans 0,82 1,05 1,02) motsvarar exakt

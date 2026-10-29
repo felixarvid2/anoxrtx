@@ -357,6 +357,11 @@ original: light on -0.74 / -0.31 EV, light off +1.49 / +3.09. Remix switches the
 1.2-1.3: with the light off the original still shows a bright patch on the far wall that Remix does not have (no
 point light near it; light 209 at 948 -24 -112 is behind the camera), probably baked from a light-textured face.
 Views a/b (towards the door) -1.6..-0.9 EV in both states. The original "on" shots have the console over them.
+Follow-up 2026-10-29 (QindieGL #42 logs the exact style factor): style 32 is 0.000 off and 1.000 on in both the
+original and Remix, so the off value is not the cause. The patch is the same in the original's on and off shots and
+looks like lit steam: several `spew` particle emitters (particleflags 33, pointing up) sit under the lamp at
+1236..1328, -96..41, -198..-133, and the original draws their particles fullbright. A particle difference (IDEAS.md,
+particles), not missing light; nothing changed.
 
 **baltownr upward view.** Like starport, autoexposure brought the sky-filled upward view of the start shaft down to
 the indoor level. `rtx.autoExposure.enabled = False`, bias -0.5 (was autoexposure with -3.8): EV per view
@@ -370,4 +375,14 @@ views +3.64/+1.05 -> -0.22/-0.75 EV, and its start +2.14 -> -0.29), fortressgrou
 unchanged) and fortress2 (the tank behind the glass shows; start unchanged): `enableFogRemap = False` there.
 crevicelanding and krapton did not change. starport's atrium stays about -1.1 EV without fog (+0.67 with it); a
 bias of -0.3 did not move the views consistently (run-to-run noise about ±0.5 EV), so bias 0 is kept.
+
+**starport re-measured (2026-10-29).** The ±0.5 EV "noise" and the atrium's -1.1 came from the console: after
+`goto`, an unconditional console-toggle key left it open over the left third of some shots (original and Remix).
+With the console closed only when it is detected on screen, repeated runs agree within 0.01 EV. Settings as
+installed: start -0.15, atrium (pikachu) -0.26, walkway (beltway2/3) +0.23 / -0.25, café -1.72 (right half; the
+original café shot still had the console). The café's difference is the sunlit white building models behind the
+glass. Tried: `[maplights.starport] sun_scale` 6 / 4 (café -1.37 / -1.14, atrium darker), `rtx.skyBrightness`
+0.5 / 0.35, and 0.5 or 0.7 with sun 8: the café improves by at most 0.4 EV while the walkway moves +0.4..+0.9.
+Nothing changed. Rig scripts: close the console only when it is visible (gold text in the top-left), never toggle
+blindly.
 
