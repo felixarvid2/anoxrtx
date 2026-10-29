@@ -361,7 +361,9 @@ Follow-up 2026-10-29 (QindieGL #42 logs the exact style factor): style 32 is 0.0
 original and Remix, so the off value is not the cause. The patch is the same in the original's on and off shots and
 looks like lit steam: several `spew` particle emitters (particleflags 33, pointing up) sit under the lamp at
 1236..1328, -96..41, -198..-133, and the original draws their particles fullbright. A particle difference (IDEAS.md,
-particles), not missing light; nothing changed.
+particles), not missing light. The steam is additive: `[rtxconf.tours] rtx.enableEmissiveBlendEmissiveOverride = True`
+with intensity 2.5 (as bricksd) draws it like the original: views c/d with the light off +1.52/+3.23 -> -0.12/+0.09
+EV (intensity 10: -0.88/-0.84), start view -0.07.
 
 **baltownr upward view.** Like starport, autoexposure brought the sky-filled upward view of the start shaft down to
 the indoor level. `rtx.autoExposure.enabled = False`, bias -0.5 (was autoexposure with -3.8): EV per view

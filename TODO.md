@@ -136,7 +136,8 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   static-off; himlen bakom var grå av volymetrisk dimma: `enableFogRemap = False` på starport, kaféet +2,59 -> -0,55 EV.
 - [x] tours-rummet (2026-10-29): stil 32 är 0,000 släckt och 1,000 tänt i både originalet och Remix (QindieGL #42
   loggar faktorn). Fläcken i originalet syns lika i tänt och släckt läge: ånga från `spew`-entiteterna under lampan,
-  som originalet ritar självlysande. En partikelskillnad (IDEAS punkt 1), inte ljus; inget ändrat.
+  som originalet ritar självlysande. Löst 2026-10-29: `[rtxconf.tours] enableEmissiveBlendEmissiveOverride`,
+  intensitet 2,5: rummets vyer släckt +1,52/+3,23 -> -0,12/+0,09 EV, startvyn -0,07 (10 blev för ljust, -0,88).
 - [x] baltownr uppåtvyn (2026-10-28): autoexponering av, bias -0,5: uppåt +3,05 -> +0,72 EV, median -0,24.
 - [x] ballotine/kraptonmaze "svart bild" (2026-10-28): anoxcheck läste gamla rader i QindieGL.log och väntade inte;
   rättat, plus omtag av svart första bild. ballotine bias -1,5 (+0,07 EV).
