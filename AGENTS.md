@@ -93,6 +93,9 @@ material classification; no other game assets.
 Exception approved by Felix on 2026-10-28: `tools/pbr_classify.py --deepseek-vision` may send 128 px texture
 thumbnails (contact sheets of the level textures) to DeepSeek (`deepseek-flash`) for PBR classification; no
 other game assets (no BSPs, full-resolution textures or other files).
+Also approved by Felix on 2026-10-28: `tools/deepseek_compare.py ORIG REMIX` may send two screenshots of one
+view (original renderer and Remix, each shrunk to at most 512 px JPEG) to `deepseek-flash` for a lighting
+comparison. It is a second opinion next to `tools/ab_ev.py`, which stays the measurement.
 
 DeepSeek (`tools/pbr_classify.py --deepseek`) suggests PBR classes for texture names the rules leave open from
 text only (texture paths, flag/usage counts, the class list); `--deepseek-vision` adds the thumbnails above.
