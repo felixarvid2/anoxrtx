@@ -145,7 +145,9 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   (QindieGL #43 `TraceBlendDraws`): partiklarna (`burst_04`, `magical_08`) når Remix som vanlig alfablandning
   (SRC_ALPHA/ONE_MINUS_SRC_ALPHA, ingen djupskrivning), inte additivt, och belyses av den mörka hallen. Ingen
   effekt av: dolda `_default` synlig, `particleSoftnessFactor = 0`, `magical_08` i `particleTextures`; fog remap gav
-  mörk dimma. Nästa: göra `burst_04`/`magical_08` självlysande i mod-lagret och kolla andra banor (docs/exposure-match.md).
+  mörk dimma. Självlysande `burst_04`/`magical_08` i mod-lagret (intensitet 2 och 8) gjorde ångan synlig men
+  mörkgrå och bilden mörkare (+2,6..+3,5 EV), emissionen verkar inte nå alfablandade partiklar; inte behållet.
+  Kvar att pröva: rita dessa partiklar additivt i QindieGL så att emissive blend-overriden når dem.
 - [x] baltownr uppåtvyn (2026-10-28): autoexponering av, bias -0,5: uppåt +3,05 -> +0,72 EV, median -0,24.
 - [x] ballotine/kraptonmaze "svart bild" (2026-10-28): anoxcheck läste gamla rader i QindieGL.log och väntade inte;
   rättat, plus omtag av svart första bild. ballotine bias -1,5 (+0,07 EV).
