@@ -365,6 +365,16 @@ particles), not missing light. The steam is additive: `[rtxconf.tours] rtx.enabl
 with intensity 2.5 (as bricksd) draws it like the original: views c/d with the light off +1.52/+3.23 -> -0.12/+0.09
 EV (intensity 10: -0.88/-0.84), start view -0.07.
 
+**Spew steam on other maps (2026-10-29).** Maps without the override with the most `spew` emitters (basement 15,
+sphere3 14, sunstrip 12, limbus 12, hephtower1 12, hephpoor 8, onegatestn 7; whitendon had no usable view): two
+views per map, camera 200 units from an emitter, Remix as committed vs `enableEmissiveBlendEmissiveOverride` with
+intensity 2.5, vs the original. The override changed no view by more than 0.13 EV (sunstrip +1.88/+1.91 ->
++1.96/+1.78, the rest within 0.02 apart from a console-covered limbus shot), so no map got it. The original shows
+visible steam in only two views: a white haze over the sunstrip pool (Remix +1.9 EV darker, no steam at all, the
+override does not bring it back, so it is not an additive emissive-blend draw) and foam under the limbus
+waterfall. Unusable: hephtower1 (camera in a wall, black), hephpoor (original drew the player in view),
+basement spew1 and onegatestn spew1 (console over one side). Shots `tools/shots/sp_{orig,rtx}_*`.
+
 **baltownr upward view.** Like starport, autoexposure brought the sky-filled upward view of the start shaft down to
 the indoor level. `rtx.autoExposure.enabled = False`, bias -0.5 (was autoexposure with -3.8): EV per view
 (old -> new) shaft_h +0.01 -> -0.24, up_hi +3.05 -> +0.72, s0_0 -0.24 -> -0.80, s0_2 +1.23 -> -0.25,
