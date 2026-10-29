@@ -138,6 +138,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   loggar faktorn). Fläcken i originalet syns lika i tänt och släckt läge: ånga från `spew`-entiteterna under lampan,
   som originalet ritar självlysande. Löst 2026-10-29: `[rtxconf.tours] enableEmissiveBlendEmissiveOverride`,
   intensitet 2,5: rummets vyer släckt +1,52/+3,23 -> -0,12/+0,09 EV, startvyn -0,07 (10 blev för ljust, -0,88).
+- [x] `spew`-ånga på andra banor (2026-10-29): basement, sphere3, sunstrip, limbus, hephtower1, hephpoor, onegatestn
+  med och utan emissive blend-override (2,5) mot originalet: ingen vy ändrades mer än 0,13 EV, ingen bana fick den
+  (docs/exposure-match.md).
+- [ ] sunstrip: originalets vita ångdis över bassängen saknas helt i Remix (+1,9 EV); overriden hjälper inte, så
+  partiklarna ritas inte som additiv blend. Undersök hur QindieGL/Remix tar emot spew-partiklarna (IDEAS.md, partiklar).
 - [x] baltownr uppåtvyn (2026-10-28): autoexponering av, bias -0,5: uppåt +3,05 -> +0,72 EV, median -0,24.
 - [x] ballotine/kraptonmaze "svart bild" (2026-10-28): anoxcheck läste gamla rader i QindieGL.log och väntade inte;
   rättat, plus omtag av svart första bild. ballotine bias -1,5 (+0,07 EV).
