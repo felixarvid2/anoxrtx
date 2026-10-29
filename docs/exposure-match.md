@@ -375,6 +375,19 @@ override does not bring it back, so it is not an additive emissive-blend draw) a
 waterfall. Unusable: hephtower1 (camera in a wall, black), hephpoor (original drew the player in view),
 basement spew1 and onegatestn spew1 (console over one side). Shots `tools/shots/sp_{orig,rtx}_*`.
 
+**sunstrip steam haze (2026-10-29).** The haze moves between two original shots, so it is drawn by particles,
+not fog. QindieGL's `TraceBlendDraws` (QindieGL #43) shows how they reach Remix: the spew particles use
+`burst_04` (0xA8B10A8D9D0E8F13, in `rtx.particleTextures`) and `magical_08` (0x511F4421461D6C0B, not listed) as
+SRC_ALPHA/ONE_MINUS_SRC_ALPHA quads with depth write off. They are not additive, so the emissive blend override
+cannot reach them; the original draws them unlit (white), while in Remix they are lit by the dim pool hall. No
+setting brought the haze back (EV spew0/spew1, repo +1.88/+1.91): showing the hidden `_default` particle
+(+1.88/+1.96; sunstrip never draws it), `rtx.particleSoftnessFactor = 0` (+1.89/+1.99), that plus `magical_08`
+in `particleTextures` (+1.84/+1.75), `enableFogRemap = True` (spew0 +1.22, but dark fog instead of a white haze;
+spew1 lost its view). Per-map `[rtxconf.MAP]` keys only apply with a default in `[rtxconf.default]`; the global
+`hideInstanceTextures` hides `_default`, `expon_64` and `flare_01` (particle textures). The other additive draws
+in the trace are a second pass over character skins (alpha 25, SRC_ALPHA/ONE). Next option: make `burst_04` and
+`magical_08` emissive materials in the mod layer, checked on the other maps that use them.
+
 **baltownr upward view.** Like starport, autoexposure brought the sky-filled upward view of the start shaft down to
 the indoor level. `rtx.autoExposure.enabled = False`, bias -0.5 (was autoexposure with -3.8): EV per view
 (old -> new) shaft_h +0.01 -> -0.24, up_hi +3.05 -> +0.72, s0_0 -0.24 -> -0.80, s0_2 +1.23 -> -0.25,

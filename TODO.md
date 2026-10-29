@@ -141,8 +141,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [x] `spew`-ånga på andra banor (2026-10-29): basement, sphere3, sunstrip, limbus, hephtower1, hephpoor, onegatestn
   med och utan emissive blend-override (2,5) mot originalet: ingen vy ändrades mer än 0,13 EV, ingen bana fick den
   (docs/exposure-match.md).
-- [ ] sunstrip: originalets vita ångdis över bassängen saknas helt i Remix (+1,9 EV); overriden hjälper inte, så
-  partiklarna ritas inte som additiv blend. Undersök hur QindieGL/Remix tar emot spew-partiklarna (IDEAS.md, partiklar).
+- [ ] sunstrip: originalets vita ångdis över bassängen saknas i Remix (+1,9 EV). Undersökt 2026-10-29
+  (QindieGL #43 `TraceBlendDraws`): partiklarna (`burst_04`, `magical_08`) når Remix som vanlig alfablandning
+  (SRC_ALPHA/ONE_MINUS_SRC_ALPHA, ingen djupskrivning), inte additivt, och belyses av den mörka hallen. Ingen
+  effekt av: dolda `_default` synlig, `particleSoftnessFactor = 0`, `magical_08` i `particleTextures`; fog remap gav
+  mörk dimma. Nästa: göra `burst_04`/`magical_08` självlysande i mod-lagret och kolla andra banor (docs/exposure-match.md).
 - [x] baltownr uppåtvyn (2026-10-28): autoexponering av, bias -0,5: uppåt +3,05 -> +0,72 EV, median -0,24.
 - [x] ballotine/kraptonmaze "svart bild" (2026-10-28): anoxcheck läste gamla rader i QindieGL.log och väntade inte;
   rättat, plus omtag av svart första bild. ballotine bias -1,5 (+0,07 EV).
