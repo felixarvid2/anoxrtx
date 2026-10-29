@@ -58,7 +58,8 @@ of 2 (the floor under the light too); the bright patch is in the style-32 block 
 `--styled` as cluster 0 (*styled light*, 95 % of the baked light in styled blocks, at `1296 26 -76`). So the original
 does not take that style to 0 when the light is "off", while Remix (light and emission) does; the 1.2 EV vs 3.5–4.7 EV
 switch in `exposure-match.md` fits a residual style value, not a missing source. Worth checking the style's off
-value in the game (QindieGL #39 logs the levels) before adding any light.
+value in the game (QindieGL #39 logs the levels) before adding any light. Checked 2026-10-29: the off value is
+0.000 in both renderers; the original's patch is lit steam from `spew` particles, not light (exposure-match.md).
 
 ## Maps by gap
 
