@@ -411,21 +411,29 @@ def is_console(im):
     return gold_fraction((0, 0, 640, 200)) > 0.01 and gold_fraction((400, 308, 640, 324)) > 0.015
 
 
+def console_shown(d, secs=3.0):
+    """Poll for the console after the toggle key. One look after 0.5 s sometimes missed a console that was
+    still sliding in; toggling developer mode then left it open with developer mode off, where no key closes it."""
+    for _ in range(int(secs / 0.1)):
+        time.sleep(0.1)
+        if is_console(grab(d)):
+            return True
+    return False
+
+
 def ensure_console(d, before_enable=None):
     """Return whether we enabled developer mode, so the caller can turn it back off."""
     if is_console(grab(d)):
         return False
     toggle = os.environ.get('ANOX_CONSOLE_KEY', 'kc49')
     cmd_key(toggle)
-    time.sleep(0.5)
-    if is_console(grab(d)):
+    if console_shown(d):
         return False
     if before_enable is not None:
         before_enable()  # register rollback before the first key can change developer mode
     cmd_chord('Alt_L', 'Shift_L', 'F10')  # game's built-in developer-mode toggle
     cmd_key(toggle)
-    time.sleep(0.5)
-    if is_console(grab(d)):
+    if console_shown(d):
         return True
     cmd_chord('Alt_L', 'Shift_L', 'F10')
     raise RuntimeError('developer console not recognized; no load command sent (check ANOX_CONSOLE_KEY)')

@@ -25,6 +25,12 @@ The game's [editing documentation](https://anachrodox.talonbrave.info/appendix/c
 describes the `loadgame`, `viewpos`, and `condump` commands used by the rig.
 The game console must retain its default layout/gold build footer; customized
 fonts or a different console key may need adjustment (`ANOX_CONSOLE_KEY`).
+The rig polls up to 3 s for the console after the toggle key before it toggles developer mode (Alt+Shift+F10):
+one look after 0.5 s sometimes missed a console still sliding in, and toggling developer mode then left the
+console open with developer mode off, where neither the key, `toggleconsole` nor Escape closes it (seen mostly
+with the original renderer, 2026-10-30). A/B comparisons: the first map load of a session can differ from later
+loads of the same map (hephpipes floor +0.17 EV after the first load), so load the reference config second or
+repeat it.
 Console typing uses 120 ms key holds and gaps, matching the isolated probe
 used for the 2026-10-17 saved-view check. Prompt clearing holds Backspace
 instead of sending 1,024 taps. It requires enabled X autorepeat and `xset`;
