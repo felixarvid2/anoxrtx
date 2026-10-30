@@ -144,6 +144,8 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [x] sunstrip: originalets vita ångdis över bassängen saknades i Remix (+1,9 EV). Löst 2026-10-29: QindieGL #44
   `additive_textures` ritar `burst_04`/`magical_08` additivt, emissive blend-override 2,5, autoexponering av och
   bias -1: ångvyerna -0,14/-0,04 EV, startvyn +0,04. Vyer utan ånga flyttas -0,9..+1,3 EV mot autoexponering.
+  Ommätt mot originalet 2026-10-30: vyer utan ånga -1,24..+0,79 EV, snitt -0,13, så bias -1 står kvar. Ångan
+  sprutar periodvis; spew1 är vitare än originalets tunna dis (-1,3..-1,7 EV mot en ny originalbild).
   Tidigare försök (2026-10-29,
   (QindieGL #43 `TraceBlendDraws`): partiklarna (`burst_04`, `magical_08`) når Remix som vanlig alfablandning
   (SRC_ALPHA/ONE_MINUS_SRC_ALPHA, ingen djupskrivning), inte additivt, och belyses av den mörka hallen. Ingen
@@ -344,6 +346,8 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 
 - [ ] Rätt bildformat och högre renderupplösning utan felaktig UI-/musmappning.
 - [ ] Komplettera UI-/intro-, partikel- och stråltexturlistor.
+  Partiklar (2026-10-30): `tools/apd_textures.py` listar partikeltexturerna i *.apd med blandläge och tagg; att
+  tagga alla 62 olistade ändrade inget på tre kartor och gav ljusare golv på hephpipes, inte behållet (IDEAS.md 3.1).
 - [ ] Fasta CPU-/GPU-bildtider och VRAM-baslinjer innan prestandainställningar ändras.
 - [ ] Remix overlay-/capture-hotkeys från riggen; konsolinput är separat och rättad.
 - [ ] MSVC-bygge och Windows-verifiering; Linux-bygge bevisar inte dessa.

@@ -346,7 +346,7 @@ lit as in the original; bias back from 0.0 to -3.2 (slounge -3.24 -> -0.14 EV), 
 SURF_LIGHT face elsewhere); with the static-off rows it is clear. Through it the city props show, but the skybox
 behind them is a flat dark grey instead of the original's blue sky with spires. `rtx.skyBrightness` 10,
 `rtx.skyProbeSide` 2048, `rtx.skyReprojectToMainCameraSpace`, `rtx.skyForceHDR`, `rtx.skyMode = 1` and hiding the
-three glass textures (`rtx.hideInstanceTextures`) did not change it, and the skybox is complete in all eight
+the three textures in `rtx.hideInstanceTextures` (particle textures, not glass) did not change it, and the skybox is complete in all eight
 directions from the walkway. The cause was the volumetric fog (worldspawn `"fog" ".00014 .5 .5 .5"`), as on
 labbuilding: `rtx.volumetrics.enableFogRemap = False` on starport shows the sky and spires as in the original.
 Café +2.59 -> -0.55 EV, walkway (beltway2) +0.47 -> +0.36, atrium (pikachu) +0.67 -> -1.16, start +0.19 -> -0.15;
@@ -405,6 +405,14 @@ settled" as before because of the animated water). Fixed exposure moves the view
 against Remix with autoexposure (y90 +0.91, y180 +0.32, y270 +1.08, glass views +1.29/+0.31 darker); the
 original shots of those views had the console over them, so they were not compared again. In one run the steam
 was not yet emitting when the shots were taken (spew0 +1.69, no haze); three other runs showed it.
+Re-measured 2026-10-30 against original shots with the same rig camera (`goto`, then `rigcam.txt`). The
+original renderer's console stays open over the left third of its shots (also with `toggleconsole` in the goto
+line), so EV is taken over the right 64 % of the frame: y0 -1.19, y90 -0.41, y180 -1.24, y270 +0.60, glass
++0.68/+0.79; mean -0.13, so bias -1 is balanced and the spread is the scenes, not the exposure. The steam is
+periodic: in two of four Remix runs spew0 had no haze yet, in both original runs it had. spew1 against the new
+original shot is -1.3..-1.7 EV (Remix brighter): the Remix steam column is an opaque white where the original's
+is a thin haze with the water showing through; the earlier -0.04 was against an original shot with more steam.
+Not changed, because the steam's phase differs between runs. Shots `tools/shots/sp_{v14,o16}_repo_sunstrip_*`.
 
 **baltownr upward view.** Like starport, autoexposure brought the sky-filled upward view of the start shaft down to
 the indoor level. `rtx.autoExposure.enabled = False`, bias -0.5 (was autoexposure with -3.8): EV per view
