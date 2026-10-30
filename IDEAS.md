@@ -125,6 +125,15 @@ QindieGL's game profiles in `msvc/QindieGL.ini`. The ModDB pages could not be re
    `rtx.particleTextures` and `rtx.beamTextures`. Next step: check which particle draws come through as
    camera-facing quads and whether Remix's particle handling (`rtx.particleSoftnessFactor` is already set)
    gives stable results, or if some particles should be emissive lights instead.
+   Inventory (2026-10-30, `tools/apd_textures.py`): the *.apd definitions use about 100 particle textures, 15 of
+   them tagged (14 particle, 3 of these also hidden; 1 ignored). Generators draw additively by default; `genblend :
+   0x0302 : 0x0303` makes them alpha-blended (e.g. `burst_04`, `smoke_01`, `water_fall`, `shell_casing_01`),
+   the candidates for QindieGL's `additive_textures`. A blend trace at the spawns of 14 maps saw only four
+   untagged ones (`magical_08` sunstrip, `smoke_03` hephpipes, `sewage` sewagic1a, `flare_01a` rowdys, which is
+   in `ignoreTextures`). Tagging all 62 hashed untagged ones as particles changed nothing at the spawns of
+   sewagic1a, rowdys and sunstrip, and on hephpipes removed a dark layer over the floor (+0.17 EV brighter, away
+   from the original); not kept. Next: check `smoke_03` alone on hephpipes in a view without the console, and
+   the hidden `_default`/`expon_64`/`flare_01` (drawn on hephpipes and rowdys) against the original.
 
 2. **Water.** The Quake 2 Remix mod notes that water-heavy maps cost a lot of frame rate. Water in Quake 2
    engines is drawn with warped UV per vertex every frame, so its hash changes. Options: Heretic 2-style
