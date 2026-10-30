@@ -131,9 +131,13 @@ QindieGL's game profiles in `msvc/QindieGL.ini`. The ModDB pages could not be re
    the candidates for QindieGL's `additive_textures`. A blend trace at the spawns of 14 maps saw only four
    untagged ones (`magical_08` sunstrip, `smoke_03` hephpipes, `sewage` sewagic1a, `flare_01a` rowdys, which is
    in `ignoreTextures`). Tagging all 62 hashed untagged ones as particles changed nothing at the spawns of
-   sewagic1a, rowdys and sunstrip, and on hephpipes removed a dark layer over the floor (+0.17 EV brighter, away
-   from the original); not kept. Next: check `smoke_03` alone on hephpipes in a view without the console, and
-   the hidden `_default`/`expon_64`/`flare_01` (drawn on hephpipes and rowdys) against the original.
+   sewagic1a, rowdys and sunstrip. On hephpipes the floor was lighter (+0.17 EV), but that was the session's
+   first map load, not the tags: loaded after another variant, the untagged repo config gives the same image
+   (2026-10-30). `smoke_03` alone and showing the hidden `_default`/`expon_64`/`flare_01` (hideInstanceTextures
+   set to a dummy hash) were within run noise of the repo config at the hephpipes and rowdys spawns, with the
+   console closed; the original is 0.13 (hephpipes) and 0.54 EV (rowdys) darker. Nothing changed in rtx.conf:
+   the tags have no visible effect at these views, so the untagged textures and the hidden three stay as they
+   are until a view shows a reason.
 
 2. **Water.** The Quake 2 Remix mod notes that water-heavy maps cost a lot of frame rate. Water in Quake 2
    engines is drawn with warped UV per vertex every frame, so its hash changes. Options: Heretic 2-style

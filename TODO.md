@@ -347,7 +347,8 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [ ] Rätt bildformat och högre renderupplösning utan felaktig UI-/musmappning.
 - [ ] Komplettera UI-/intro-, partikel- och stråltexturlistor.
   Partiklar (2026-10-30): `tools/apd_textures.py` listar partikeltexturerna i *.apd med blandläge och tagg; att
-  tagga alla 62 olistade ändrade inget på tre kartor och gav ljusare golv på hephpipes, inte behållet (IDEAS.md 3.1).
+  tagga alla 62 olistade, `smoke_03` ensam eller visa de tre dolda ändrade inget synligt (hephpipes ljusare golv var
+  sessionens första kartladdning), inget ändrat (IDEAS.md 3.1).
 - [ ] Fasta CPU-/GPU-bildtider och VRAM-baslinjer innan prestandainställningar ändras.
 - [ ] Remix overlay-/capture-hotkeys från riggen; konsolinput är separat och rättad.
 - [ ] MSVC-bygge och Windows-verifiering; Linux-bygge bevisar inte dessa.

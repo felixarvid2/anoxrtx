@@ -430,6 +430,14 @@ class SaveTests(unittest.TestCase):
                     with self.assertRaises(KeyboardInterrupt):
                         rig.ensure_console(Mock(), before_enable=rollback)
 
+    def test_slow_console_does_not_toggle_developer_mode(self):
+        with patch.object(rig, 'grab'), patch.object(rig, 'is_console', side_effect=[False] * 8 + [True]):
+            with patch.object(rig, 'cmd_key') as key, patch.object(rig, 'cmd_chord') as chord, \
+                    patch.object(rig.time, 'sleep'):
+                self.assertFalse(rig.ensure_console(Mock()))
+        key.assert_called_once()
+        chord.assert_not_called()
+
     def test_cleanup_waits_for_game_to_close_console(self):
         clock = [0]
         with patch.object(rig, 'grab'), patch.object(rig, 'is_console', side_effect=[True, True, False]) as console:
