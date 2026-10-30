@@ -461,3 +461,28 @@ stand. EV, negative = Remix brighter:
   of 64 changed nothing visible; not kept.
 
 Shots `tools/shots/sp_{r23,r26}_repo_*` and `sp_o23_orig_*`.
+
+**Water: clear and animated (2026-10-30).** The old water material used the HD texture as transmittance and
+`emissive.usda` gave the same texture as emission (intensity 1), so `tensil/poo` showed as an opaque white and
+black marble. Now (`tools/make_layers.py` WATER, rtx.conf `rtx.animatedWaterTextures` and
+`rtx.translucentMaterial.animatedWaterEnable`): AperturePBR_Translucent with a pale tint from the texture's mean
+colour, a normal map from the texture (pbr_layer's normal_map, strength 2), which Remix animates, and an
+emission that overrides emissive.usda. Variants, EV against the original (right 64 %), old -> no emission ->
+emission 0.4 on a flat mask -> as kept:
+
+| view | old | no emission | poo 0.4 flat | kept |
+|---|---|---|---|---|
+| sunstrip poo | +0.41 | +3.66 | +1.32 | +2.42 |
+| starport poo | -0.59 | +1.20 | -0.29 | +0.48 |
+| limbus water3b / 3b1 | -0.02 / +0.76 | +0.27 / +1.11 | +0.18 / +0.94 | +0.17 / +0.95 |
+| senderss water1 | +0.28 | +0.36 | +0.34 | +0.34 |
+| hovel brownwater | +0.36 | +0.66 | -0.02 | -0.02 |
+
+Kept: limbus and senderss emission 0.6 with their emissive.usda mask (the colour of the original's fullbright
+water stays), `poo`/`h2002_sm` 0.15 on a flat mask (80 % mean colour, 20 % blurred texture), brownwater 0.5 with
+a brown tint and 24 units distance. Without emission the water was clear but its colour went; with the texture
+pattern as emission poo looked like marble again; 0.4 on the flat mask was milky. At 0.15 the poo is clear with
+moving ripples and reflections, but the sunstrip pool is 2.4 EV darker than the original, whose floor is a bright
+lightmap seen through 33 % water; in Remix the floor is dimly lit. Remix's coloured translucent shadows are off
+by default, so the water does not shade the floor. `baseanox/sewagesolid` keeps the old textured material.
+Shots `tools/shots/sp_r{26,27,28,29,30,31}_repo_*`.

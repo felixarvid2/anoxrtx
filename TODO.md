@@ -350,8 +350,9 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
   tagga alla 62 olistade eller visa de tre dolda ändrade inget synligt (hephpipes ljusare golv efter sessionens
   första kartladdning), inget ändrat (IDEAS.md 3.1). Ångan är 1-1,5 EV ljusare än originalet på sunstrip, basement
   och onegatestn.
-- [ ] Vatten: `tensil/poo` på sunstrip är ogenomskinligt vitsvart i Remix, originalet visar poolbotten
-  (docs/exposure-match.md 2026-10-30). Mätavstånd 256 hjälpte inte; prova konstant transmittansfärg.
+- [x] Vatten: klart, animerat (normalkarta + `rtx.animatedWaterTextures`), svag självlysning (2026-10-30).
+- [ ] sunstrip-poolen är 2,4 EV mörkare än originalet: golvet under vattnet är svagt upplyst i Remix
+  (originalet har ljus lightmap). Prova ett ljus i poolhallen hellre än mer självlysning (blir mjölkigt).
 - [ ] Fasta CPU-/GPU-bildtider och VRAM-baslinjer innan prestandainställningar ändras.
 - [ ] Remix overlay-/capture-hotkeys från riggen; konsolinput är separat och rättad.
 - [ ] MSVC-bygge och Windows-verifiering; Linux-bygge bevisar inte dessa.

@@ -9,7 +9,8 @@ usage: make_layers.py MODDIR --sky-src DIR --sky-hd DIR --liq-src DIR --liq-hd D
   --liq-hd   upscaled liquids, as <dir>__<name>.png
 
 Writes MODDIR/hd/{sky,liquids}/*.dds, MODDIR/hd_sky.usda and MODDIR/liquids.usda, and prints the sky
-hashes (for rtx.skyBoxTextures). Add the layers to mod.usda: subLayers = [@./hd_sky.usda@, @./liquids.usda@]
+hashes (for rtx.skyBoxTextures) and the water hashes (for rtx.animatedWaterTextures).
+Add the layers to mod.usda: subLayers = [@./hd_sky.usda@, @./liquids.usda@]
 Material hashes are computed with remixhash.py (Remix = XXH3 of the BGRA mip 0 as QindieGL uploads it).
 Game textures are copyrighted: keep the generated DDS files local, do not commit them.
 """
@@ -21,8 +22,17 @@ spec = importlib.util.spec_from_file_location('remixhash', os.path.join(here, 'r
 rh = importlib.util.module_from_spec(spec); spec.loader.exec_module(rh)
 
 # liquid classes (by looking at the textures); anything else is left alone
-WATER = {'limbus/water3b', 'limbus/water3b1', 'limbus/water3c', 'senderloung/water1', 'bricks2/brownwater',
-         'tensil/h2002_sm', 'tensil/poo', 'baseanox/sewagesolid'}
+# clear water: translucent with a tint from the texture's mean colour, a normal map from the texture (animated by
+# Remix through rtx.animatedWaterTextures) and some emission, since the game draws warp surfaces fullbright.
+# value: emissive intensity; SOFT_WATER use a nearly flat mask (the high-contrast pattern as emission looked
+# like marble and hid the floor). Tuned against the original on sunstrip, starport, limbus, senderss, hovel.
+WATER = {'limbus/water3b': 0.6, 'limbus/water3b1': 0.6, 'limbus/water3c': 0.6, 'senderloung/water1': 0.6,
+         'tensil/h2002_sm': 0.15, 'tensil/poo': 0.15, 'bricks2/brownwater': 0.5}
+SOFT_WATER = {'tensil/h2002_sm', 'tensil/poo'}
+# murky water: fixed tint and short distance instead of the texture's mean colour
+MURKY_WATER = {'bricks2/brownwater': (0.55, 0.42, 0.25)}
+# translucent with the texture as transmittance (the glowing sewage keeps its look)
+WATER_TEXTURED = {'baseanox/sewagesolid'}
 # water the maps draw opaque (warp without SURF_TRANS33/66): as translucent water the deep greattree lake turned
 # black; an opaque glossy surface looks like the original
 WATER_OPAQUE = {'waukees/h2002'}
@@ -66,6 +76,43 @@ def is_dark(path, limit=24):
     return sum(ImageStat.Stat(Image.open(path).convert('RGB')).mean) / 3 < limit
 
 
+def water_body(moddir, tex, hd, key):
+    """AperturePBR_Translucent shader inputs for WATER; writes the normal map (and soft emission mask) next to tex"""
+    import numpy as np
+    from PIL import ImageFilter
+    spec = importlib.util.spec_from_file_location('pbr_layer', os.path.join(here, 'pbr_layer.py'))
+    pl = importlib.util.module_from_spec(spec); spec.loader.exec_module(pl)
+    im = Image.open(hd).convert('RGB')
+    a = np.asarray(im, dtype=float) / 255
+    lin = np.where(a <= 0.04045, a / 12.92, ((a + 0.055) / 1.055) ** 2.4).mean((0, 1))
+    if key in MURKY_WATER:
+        tint, dist = MURKY_WATER[key], 24
+    else:   # pale version of the mean colour; the softly glowing water keeps less of it so the floor shows
+        k = 0.4 if key in SOFT_WATER else 0.6
+        tint, dist = 0.95 * (1 - k * (1 - lin / lin.max())), 256 if key in SOFT_WATER else 128
+    base = os.path.join(moddir, tex[:-4])
+    tmp = base + '.tmp.png'
+    pl.normal_map(hd, 512, 2.0).save(tmp); dds(tmp, base + '.n.dds')
+    mask = tex
+    if key in SOFT_WATER:
+        flat = 0.8 * np.asarray(im, dtype=float).mean((0, 1)) + 0.2 * np.asarray(im.filter(ImageFilter.GaussianBlur(im.width / 32)), dtype=float)
+        Image.fromarray(np.clip(flat, 0, 255).astype(np.uint8)).save(tmp); dds(tmp, base + '.e.dds'); mask = tex[:-4] + '.e.dds'
+    elif os.path.exists(os.path.join(moddir, 'hd/emissive', os.path.basename(tex))):
+        mask = 'hd/emissive/' + os.path.basename(tex)   # same mask as emissive.usda
+    os.remove(tmp)
+    return ['                uniform asset info:mdl:sourceAsset = @AperturePBR_Translucent.mdl@',
+            '                uniform token info:mdl:sourceAsset:subIdentifier = "AperturePBR_Translucent"',
+            '                uniform token info:implementationSource = "sourceAsset"',
+            '                float inputs:ior_constant = 1.33',
+            '                color3f inputs:transmittance_color = (%.3f, %.3f, %.3f)' % tuple(tint),
+            '                float inputs:transmittance_measurement_distance = %g' % dist,
+            '                asset inputs:normalmap_texture = @./%s.n.dds@ (' % tex[:-4], '                    colorSpace = "raw"', '                )',
+            '                bool inputs:thin_walled = 0',
+            '                bool inputs:enable_emission = 1',
+            '                asset inputs:emissive_mask_texture = @./%s@ (' % mask, '                    colorSpace = "auto"', '                )',
+            '                float inputs:emissive_intensity = %g' % WATER[key]]
+
+
 def header():
     return ['#usda 1.0', '(', '    upAxis = "Y"', ')', '', 'over "RootNode"', '{', '    over "Looks"', '    {']
 
@@ -98,7 +145,7 @@ def main():
                 '            }', '        }', '']
     open(os.path.join(a.moddir, 'hd_sky.usda'), 'w').write('\n'.join(out + footer()))
 
-    out = header(); n = 0; seen = set()
+    out = header(); n = 0; seen = set(); water_hashes = []
     for f in sorted(glob.glob(os.path.join(a.liq_src, '*', '*.tga'))):
         d, base = f.split(os.sep)[-2:]
         key = '%s/%s' % (d.lower(), os.path.splitext(base)[0].lower())
@@ -113,6 +160,9 @@ def main():
         dds(hd, os.path.join(a.moddir, tex))
         body = []
         if key in WATER:
+            body = water_body(a.moddir, tex, hd, key)
+            water_hashes.append(h)
+        elif key in WATER_TEXTURED:
             body = ['                uniform asset info:mdl:sourceAsset = @AperturePBR_Translucent.mdl@',
                     '                uniform token info:mdl:sourceAsset:subIdentifier = "AperturePBR_Translucent"',
                     '                uniform token info:implementationSource = "sourceAsset"',
@@ -140,6 +190,7 @@ def main():
     open(os.path.join(a.moddir, 'liquids.usda'), 'w').write('\n'.join(out + footer()))
     print('sky faces: %d, liquid materials: %d' % (len(sky_hashes), n))
     print('SKYHASHES ' + ', '.join('0x%016X' % h for h in sky_hashes))
+    print('WATERHASHES ' + ', '.join('0x%016X' % h for h in water_hashes))
 
 
 if __name__ == '__main__':
