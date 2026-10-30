@@ -145,6 +145,10 @@ QindieGL's game profiles in `msvc/QindieGL.ini`. The ModDB pages could not be re
    engines is drawn with warped UV per vertex every frame, so its hash changes. Options: Heretic 2-style
    water patch (fixed UVs, let Remix animate), or tag the water textures and replace them with a Remix water
    material in `mod.usda`.
+   Done for the clear water (2026-10-30, `tools/make_layers.py` WATER): translucent with a pale tint from the
+   texture's mean colour, a normal map from the texture, `rtx.animatedWaterTextures` with
+   `rtx.translucentMaterial.animatedWaterEnable`, and a little emission. The hash is stable (the game warps the
+   texture coordinates, not the image). Details and the brightness trade-off: docs/exposure-match.md.
 
 3. **Texture replacement pipeline.** Like the Quake 3 remaster (27 levels with PBR textures) and the RTCW
    files repo: keep captures and replacement textures in this repo (or a release zip), one folder per map,
