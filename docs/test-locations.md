@@ -29,8 +29,10 @@ The rig polls up to 3 s for the console after the toggle key before it toggles d
 one look after 0.5 s sometimes missed a console still sliding in, and toggling developer mode then left the
 console open with developer mode off, where neither the key, `toggleconsole` nor Escape closes it (seen mostly
 with the original renderer, 2026-10-30). A/B comparisons: the first map load of a session can differ from later
-loads of the same map (hephpipes floor +0.17 EV after the first load), so load the reference config second or
-repeat it.
+loads of the same map (hephpipes floor +0.16/+0.17 EV after the first load, seen in two runs), so load the reference
+config second or repeat it. A variant that sets a per-map `[rtxconf.MAP]` key must also write that key's default
+in `[rtxconf.default]`, or the next map load keeps the variant's value. With the original renderer the rig camera
+often takes effect only after a few shots, so drop shots that do not match the Remix framing.
 Console typing uses 120 ms key holds and gaps, matching the isolated probe
 used for the 2026-10-17 saved-view check. Prompt clearing holds Backspace
 instead of sending 1,024 taps. It requires enabled X autorepeat and `xset`;

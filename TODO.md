@@ -347,8 +347,11 @@ implementerat men inte sett i relevant spelmiljö anges uttryckligen.
 - [ ] Rätt bildformat och högre renderupplösning utan felaktig UI-/musmappning.
 - [ ] Komplettera UI-/intro-, partikel- och stråltexturlistor.
   Partiklar (2026-10-30): `tools/apd_textures.py` listar partikeltexturerna i *.apd med blandläge och tagg; att
-  tagga alla 62 olistade, `smoke_03` ensam eller visa de tre dolda ändrade inget synligt (hephpipes ljusare golv var
-  sessionens första kartladdning), inget ändrat (IDEAS.md 3.1).
+  tagga alla 62 olistade eller visa de tre dolda ändrade inget synligt (hephpipes ljusare golv efter sessionens
+  första kartladdning), inget ändrat (IDEAS.md 3.1). Ångan är 1-1,5 EV ljusare än originalet på sunstrip, basement
+  och onegatestn.
+- [ ] Vatten: `tensil/poo` på sunstrip är ogenomskinligt vitsvart i Remix, originalet visar poolbotten
+  (docs/exposure-match.md 2026-10-30). Mätavstånd 256 hjälpte inte; prova konstant transmittansfärg.
 - [ ] Fasta CPU-/GPU-bildtider och VRAM-baslinjer innan prestandainställningar ändras.
 - [ ] Remix overlay-/capture-hotkeys från riggen; konsolinput är separat och rättad.
 - [ ] MSVC-bygge och Windows-verifiering; Linux-bygge bevisar inte dessa.

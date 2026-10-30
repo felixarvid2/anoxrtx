@@ -437,3 +437,27 @@ glass. Tried: `[maplights.starport] sun_scale` 6 / 4 (café -1.37 / -1.14, atriu
 Nothing changed. Rig scripts: close the console only when it is visible (gold text in the top-left), never toggle
 blindly.
 
+
+**Re-measured with the console fix (2026-10-30, anoxrig #125).** 30 views (sunstrip, basement, onegatestn, rowdys,
+starport, water on limbus, senderss, tensil, hovel), 5 shots each (12 for steam), installed settings. An original
+shot counts only without console text and with the same framing as the Remix shot (gradient correlation > 0.35 at
+160x100). The original renderer still spoils many shots: the rig camera often takes effect only after one to three
+shots (the first show the player from behind), and the developer messages printed after `set debug 1` cover the
+left third. No clean original for sunstrip y0/y180/y270/glass1/spew0/spew1/wpoo; the right-64 % figures above
+stand. EV, negative = Remix brighter:
+
+- Steam: basement spew1 -0.98 (11 of 12 shots clean), onegatestn spew1 -1.54 (12 of 12), sunstrip spew1 -1.25
+  (console). Remix's steam is 1-1.5 EV brighter on all three maps, not only on sunstrip.
+- rowdys: npc_rowdy_0 -0.57 (console), ob_mystech140 -0.98, view1 -0.13, view2 -0.87, spot0 -0.01, spot1 -1.13,
+  spot2 -0.14, spot3 -0.28; median -0.43. The bright parts are the fluorescent tubes (white in Remix, blue-tinted in
+  the original) and their reflections in the wet floor.
+- starport: beltway2 +0.23, beltway3 -0.25 (as before), café -0.61 (right 64 %: -0.54; the earlier -1.72 was
+  against an original shot with the console). Views loaded after the beltway views failed: the rig did not
+  recognise the console over the bright sky and sent no `goto`, so put the walkway views last.
+- Water (right 64 %): limbus water3b -0.02, water3b1 +0.76, senderss water1 +0.28, hovel brownwater +0.25 (full
+  frame), starport poo -0.59. tensil h2002_sm: the original shot was black. The levels are close; the look is
+  not: on sunstrip `tensil/poo` (TRANS33, 48 units over the pool floor) the original shows the tiled floor with
+  hardly any surface, Remix an opaque white and black surface. `transmittance_measurement_distance` 256 instead
+  of 64 changed nothing visible; not kept.
+
+Shots `tools/shots/sp_{r23,r26}_repo_*` and `sp_o23_orig_*`.
