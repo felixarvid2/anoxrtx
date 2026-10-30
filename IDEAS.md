@@ -130,12 +130,14 @@ QindieGL's game profiles in `msvc/QindieGL.ini`. The ModDB pages could not be re
    0x0302 : 0x0303` makes them alpha-blended (e.g. `burst_04`, `smoke_01`, `water_fall`, `shell_casing_01`),
    the candidates for QindieGL's `additive_textures`. A blend trace at the spawns of 14 maps saw only four
    untagged ones (`magical_08` sunstrip, `smoke_03` hephpipes, `sewage` sewagic1a, `flare_01a` rowdys, which is
-   in `ignoreTextures`). Tagging all 62 hashed untagged ones as particles changed nothing at the spawns of
-   sewagic1a, rowdys and sunstrip. On hephpipes the floor was lighter (+0.17 EV), but that was the session's
-   first map load, not the tags: loaded after another variant, the untagged repo config gives the same image
-   (2026-10-30). `smoke_03` alone and showing the hidden `_default`/`expon_64`/`flare_01` (hideInstanceTextures
-   set to a dummy hash) were within run noise of the repo config at the hephpipes and rowdys spawns, with the
-   console closed; the original is 0.13 (hephpipes) and 0.54 EV (rowdys) darker. Nothing changed in rtx.conf:
+   in `ignoreTextures`). Tagging all 62 hashed untagged ones as particles changed nothing (within 0.01 EV) at the
+   spawns of hephpipes, sewagic1a, rowdys and sunstrip, measured as repo, all 62, repo with `[rtxconf.default]`
+   written so each load resets the tags (2026-10-30; an earlier run without the defaults was invalid). The
+   hephpipes floor is +0.16 EV lighter on every load after the session's first, with or without the tags.
+   Showing the hidden `_default`/`expon_64`/`flare_01` (hideInstanceTextures set to a dummy hash) was within run
+   noise at the hephpipes and rowdys spawns; the original is 0.13 (hephpipes) and 0.54 EV (rowdys) darker. The
+   steam is what differs: Remix draws it 1-1.5 EV brighter than the original on sunstrip, basement and
+   onegatestn (docs/exposure-match.md, 2026-10-30). Nothing changed in rtx.conf:
    the tags have no visible effect at these views, so the untagged textures and the hidden three stay as they
    are until a view shows a reason.
 
